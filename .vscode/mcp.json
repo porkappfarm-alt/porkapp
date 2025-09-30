@@ -1,0 +1,29 @@
+{
+	"servers": {
+		"mcpSupabase": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@supabase/mcp-server-supabase@latest",
+				"--project-ref=xyqftjfnnqbudjhzfpvy"
+			],
+			"env": {
+				"SUPABASE_ACCESS_TOKEN": "sbp_b5d4925f1243f99db99b8f43f44dc4088387f37d"
+			}
+		},
+
+		"mcpContext7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+	
+	 "mcpAceternityui": {
+      "command": "npx",
+      "args": ["aceternityui-mcp"]
+    }
+		
+	},
+	"inputs": []
+}

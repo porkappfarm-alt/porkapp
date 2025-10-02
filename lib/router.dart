@@ -30,6 +30,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       _printRouteInfo('Full URI: ${state.uri}');
 
       final goingToLogin = state.uri.path == '/login';
+      final currentLocation = state.uri.path;
 
       // Handle authentication states
       switch (authState) {
@@ -37,13 +38,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Siempre redirigir a login en el estado inicial
           return '/login';
         case AuthState.unauthenticated:
-          // Si no está en login, redirigir a login
+          // Siempre redirigir a login si no está autenticado
           return goingToLogin ? null : '/login';
         case AuthState.authenticated:
-          // Si está autenticado y va a login, redirigir a dashboard
-          if (goingToLogin) return '/dashboard';
           // Si está en la ruta raíz, redirigir a dashboard
-          if (state.uri.path == '/') return '/dashboard';
+          if (currentLocation == '/') {
+            return '/dashboard';
+          }
+          // Permitir acceso a otras rutas si está autenticado
           return null;
       }
     },

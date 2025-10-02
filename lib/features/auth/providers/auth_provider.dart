@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/supabase/supabase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 
 /// Authentication states for the app
 enum AuthState { initial, unauthenticated, authenticated }
@@ -25,23 +26,30 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   Future<void> _initialize() async {
     print('Initializing AuthStateNotifier');
 
-    // Set initial state based on current session
-    final session = supabase.auth.currentSession;
-    state = session != null
-        ? AuthState.authenticated
-        : AuthState.unauthenticated;
+    // Siempre iniciar como no autenticado
+    state = AuthState.unauthenticated;
 
     // Listen to auth state changes
     _authSubscription = supabase.auth.onAuthStateChange.listen((event) {
       print('Auth state changed: ${event.event}');
       print('Session: ${event.session?.user.email}');
 
-      if (event.session == null) {
-        print('Session is null - user is unauthenticated');
-        state = AuthState.unauthenticated;
-      } else {
-        print('Session is valid - user is authenticated');
-        state = AuthState.authenticated;
+      // Solo actualizar el estado si el evento es signOut o signInWithPassword
+      switch (event.event) {
+        case AuthChangeEvent.signedOut:
+          print('User signed out');
+          state = AuthState.unauthenticated;
+          break;
+        case AuthChangeEvent.signedIn:
+          // Solo autenticar si fue por signInWithPassword
+          if (event.session != null) {
+            print('User signed in with password');
+            state = AuthState.authenticated;
+          }
+          break;
+        default:
+          // Ignorar otros eventos
+          break;
       }
     });
   }

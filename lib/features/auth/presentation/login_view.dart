@@ -55,7 +55,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
       print('LoginView: Usuario autenticado, redirigiendo al dashboard...');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
-          context.go('/');
+          context.go('/dashboard');
         }
       });
     }

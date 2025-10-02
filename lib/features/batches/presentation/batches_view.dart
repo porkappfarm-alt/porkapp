@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:porkapp/features/batches/presentation/batches_controller.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 import 'package:porkapp/features/batches/presentation/batch_details_view.dart';
-import 'package:porkapp/shared/widgets/main_bottom_navigation_bar.dart';
 
 class BatchesView extends ConsumerWidget {
   const BatchesView({super.key});
@@ -17,11 +16,6 @@ class BatchesView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
-      appBar: AppBar(
-        title: const Text('Lotes'),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
-      ),
       body: batchesState.when(
         data: (batches) => ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -260,7 +254,6 @@ class BatchesView extends ConsumerWidget {
         label: const Text('Nuevo Lote'),
         backgroundColor: theme.colorScheme.primary,
       ),
-      bottomNavigationBar: const MainBottomNavigationBar(currentIndex: 1),
     );
   }
 }

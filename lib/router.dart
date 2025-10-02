@@ -8,14 +8,19 @@ import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
 import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/animals/presentation/animals_view.dart';
 import 'package:porkapp/features/biometrics/presentation/biometrics_view.dart';
+import 'package:porkapp/shared/design/bottom_nav_bar.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
   print('Router: $message');
 }
 
+// Navigator keys for different navigation levels
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
+final _dashboardNavigatorKey = GlobalKey<NavigatorState>();
+final _corralsNavigatorKey = GlobalKey<NavigatorState>();
+final _batchesNavigatorKey = GlobalKey<NavigatorState>();
+final _biometricsNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -35,70 +40,97 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Handle authentication states
       switch (authState) {
         case AuthState.initial:
-          // Siempre redirigir a login en el estado inicial
+          // Always redirect to login in initial state
           return '/login';
         case AuthState.unauthenticated:
-          // Siempre redirigir a login si no está autenticado
+          // Always redirect to login if unauthenticated
           return goingToLogin ? null : '/login';
         case AuthState.authenticated:
-          // Si está en la ruta raíz, redirigir a dashboard
+          // If at root path, redirect to dashboard
           if (currentLocation == '/') {
             return '/dashboard';
           }
-          // Permitir acceso a otras rutas si está autenticado
+          // Allow access to other routes if authenticated
+          // But redirect from login to dashboard
+          if (goingToLogin) {
+            return '/dashboard';
+          }
           return null;
       }
     },
     routes: [
-      // Auth screen
-      GoRoute(path: '/login', builder: (context, state) => const LoginView()),
-      // Main shell route for authenticated screens
-      ShellRoute(
-        navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) => child,
-        routes: [
-          // Dashboard screen
-          // Dashboard route
-          GoRoute(
-            path: '/dashboard',
-            parentNavigatorKey: _shellNavigatorKey,
-            builder: (context, state) => const DashboardScreen(),
-          ),
-          // Root route - redirects to dashboard
-          GoRoute(
-            path: '/',
-            parentNavigatorKey: _shellNavigatorKey,
-            redirect: (_, __) => '/dashboard',
-          ),
-          // Corrals screen
-          GoRoute(
-            path: '/corrals',
-            parentNavigatorKey: _shellNavigatorKey,
-            builder: (context, state) => const CorralsView(),
-          ),
-          // Lotes routes
-          GoRoute(
-            path: '/batches',
-            parentNavigatorKey: _shellNavigatorKey,
-            builder: (context, state) => const BatchesView(),
+      // Auth screen - shown outside of shell
+      GoRoute(
+        path: '/login',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const LoginView(),
+      ),
+
+      // Main shell route with bottom navigation for authenticated screens
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return BottomNavBar(navigationShell: navigationShell);
+        },
+        branches: [
+          // 1. Dashboard Branch
+          StatefulShellBranch(
+            navigatorKey: _dashboardNavigatorKey,
             routes: [
-              // Animales en lote route
               GoRoute(
-                path: ':batchId',
-                parentNavigatorKey: _shellNavigatorKey,
-                builder: (context, state) {
-                  final batchId = state.pathParameters['batchId'] ?? '';
-                  final batchName = 'Lote $batchId';
-                  return AnimalsView(batchId: batchId, batchName: batchName);
-                },
+                path: '/dashboard',
+                builder: (context, state) => const DashboardScreen(),
+              ),
+              // Root path redirects to dashboard
+              GoRoute(path: '/', redirect: (_, __) => '/dashboard'),
+            ],
+          ),
+
+          // 2. Corrals Branch
+          StatefulShellBranch(
+            navigatorKey: _corralsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/corrals',
+                builder: (context, state) => const CorralsView(),
               ),
             ],
           ),
-          // Biometrics screen
-          GoRoute(
-            path: '/biometrics',
-            parentNavigatorKey: _shellNavigatorKey,
-            builder: (context, state) => const BiometricsView(),
+
+          // 3. Batches Branch (includes nested animals)
+          StatefulShellBranch(
+            navigatorKey: _batchesNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/batches',
+                builder: (context, state) => const BatchesView(),
+                routes: [
+                  GoRoute(
+                    // This will be displayed in full screen, above the shell
+                    path: ':batchId',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final batchId = state.pathParameters['batchId'] ?? '';
+                      final batchName = 'Lote $batchId';
+                      return AnimalsView(
+                        batchId: batchId,
+                        batchName: batchName,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // 4. Biometrics Branch
+          StatefulShellBranch(
+            navigatorKey: _biometricsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/biometrics',
+                builder: (context, state) => const BiometricsView(),
+              ),
+            ],
           ),
         ],
       ),

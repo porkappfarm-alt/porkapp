@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:porkapp/supabase/supabase.dart';
-import 'package:porkapp/shared/widgets/main_bottom_navigation_bar.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -110,46 +108,10 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // Accesos rápidos
-              const Text(
-                'Accesos Rápidos',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Card(
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.fence, color: Colors.blue),
-                      title: const Text('Gestionar Corrales'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => context.go('/corrals'),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.group, color: Colors.green),
-                      title: const Text('Gestionar Lotes'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => context.go('/batches'),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.pets, color: Colors.orange),
-                      title: const Text('Gestionar Animales'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => context.go('/animals'),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: const MainBottomNavigationBar(currentIndex: 0),
     );
   }
 }

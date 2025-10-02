@@ -13,8 +13,10 @@ _$AnimalImpl _$$AnimalImplFromJson(Map<String, dynamic> json) => _$AnimalImpl(
   birthDate: DateTime.parse(json['birth_date'] as String),
   weight: (json['weight'] as num).toDouble(),
   breed: json['breed'] as String,
+  entryDate: DateTime.parse(json['entry_date'] as String),
   createdAt: DateTime.parse(json['created_at'] as String),
   status: json['status'] as String? ?? 'active',
+  notes: json['notes'] as String?,
 );
 
 Map<String, dynamic> _$$AnimalImplToJson(_$AnimalImpl instance) =>
@@ -25,6 +27,8 @@ Map<String, dynamic> _$$AnimalImplToJson(_$AnimalImpl instance) =>
       'birth_date': instance.birthDate.toIso8601String(),
       'weight': instance.weight,
       'breed': instance.breed,
+      'entry_date': instance.entryDate.toIso8601String(),
       'created_at': instance.createdAt.toIso8601String(),
       'status': instance.status,
+      'notes': instance.notes,
     };

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_controller.dart';
 import 'package:porkapp/features/corrals/presentation/create_corral_view.dart';
-import 'package:porkapp/shared/widgets/main_bottom_navigation_bar.dart';
 
 class CorralsView extends ConsumerWidget {
   const CorralsView({super.key});
@@ -15,11 +14,6 @@ class CorralsView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
-      appBar: AppBar(
-        title: const Text('Gestión de Corrales'),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
-      ),
       body: corralsState.when(
         data: (corrals) => ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -216,7 +210,6 @@ class CorralsView extends ConsumerWidget {
         label: const Text('Nuevo Corral'),
         backgroundColor: theme.colorScheme.primary,
       ),
-      bottomNavigationBar: const MainBottomNavigationBar(currentIndex: 0),
     );
   }
 }

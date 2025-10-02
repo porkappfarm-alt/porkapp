@@ -8,12 +8,15 @@ class Animal with _$Animal {
   factory Animal({
     required String id,
     @JsonKey(name: 'batch_id') required String batchId,
-    required String identifier,
+    required String identifier, // ID interno o número de arete
     @JsonKey(name: 'birth_date') required DateTime birthDate,
-    required double weight,
+    required double weight, // Peso inicial
     required String breed,
+    @JsonKey(name: 'entry_date')
+    required DateTime entryDate, // Fecha de ingreso al lote
     @JsonKey(name: 'created_at') required DateTime createdAt,
-    @Default('active') String status,
+    @Default('active') String status, // active, sold, deceased, removed
+    String? notes,
   }) = _Animal;
 
   factory Animal.fromJson(Map<String, dynamic> json) => _$AnimalFromJson(json);

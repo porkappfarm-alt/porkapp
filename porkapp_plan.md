@@ -157,3 +157,48 @@ Corrals (1) ─── (N) Batches (1) ─── (N) Animals (1) ─── (N) Bi
 - **Corral** → contiene lotes.  
 - **Lote** → agrupa animales.  
 - **Animal** → tiene varios registros de biometría (peso + notas).  
+
+
+📍 Definición del enrutamiento (GoRouter)
+Rutas principales
+
+Siempre arranca en /login.
+
+El login exitoso redirige a /dashboard.
+
+Barra inferior conecta Corrales → Dashboard → Lotes (con Animales) → Biometrías.
+
+
+mas detallado: 
+
+/login → Pantalla de autenticación.
+
+/dashboard → Vista principal (resumen).
+
+/corrals → Gestión de corrales.
+
+/batches → Gestión de lotes.
+
+/batches/:batchId → Detalle de lote específico.
+
+Dentro de cada lote → gestión de Animales.
+
+/biometrics → Módulo de biometrías (peso, medidas, etc.).
+
+Flujo esperado
+
+Usuario abre app → se muestra Login (/login).
+
+Tras login exitoso → context.go('/dashboard').
+
+Desde Dashboard se navega con la barra inferior (BottomNav):
+
+Corrales → /corrals
+
+Dashboard → /dashboard
+
+Lotes → /batches
+
+Al seleccionar un lote → /batches/:batchId (incluye sus animales).
+
+Biometrías → /biometrics

@@ -61,9 +61,6 @@ class SupabaseAnimalDataSource implements AnimalDataSource {
 
   @override
   Future<void> deleteAnimal(String id) async {
-    await _client
-        .from('animals')
-        .delete()
-        .eq('id', id);
+    await _client.from('animals').delete().eq('id', id);
   }
 }

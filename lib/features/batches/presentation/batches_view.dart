@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:porkapp/features/batches/presentation/batches_controller.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
-import 'package:porkapp/features/batches/presentation/batch_details_view.dart';
 
 class BatchesView extends ConsumerWidget {
   const BatchesView({super.key});
@@ -20,6 +21,8 @@ class BatchesView extends ConsumerWidget {
         data: (batches) => ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: batches.length,
+          addAutomaticKeepAlives: false,
+          addRepaintBoundaries: true,
           itemBuilder: (context, index) {
             final batch = batches[index];
             return Slidable(
@@ -135,11 +138,7 @@ class BatchesView extends ConsumerWidget {
               child: Card(
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => BatchDetailsView(batch: batch),
-                      ),
-                    );
+                    context.go('/batches/${batch.id}');
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -212,24 +211,34 @@ class BatchesView extends ConsumerWidget {
                         const SizedBox(width: 16),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
+                          child: CachedNetworkImage(
                             // TODO: Replace with actual image URL
-                            'https://lh3.googleusercontent.com/aida-public/AB6AXuB9AXXNRP9wpS4bnmZeIS0cSq9O7yh3L2QZSzzvkgYGXyjhELBN70WzXSb_p9p6BMHUTppfhn9OctPki_QYPVdYvFf1Oqmo7p_N782Z5SvUJoVRpRDsvHLBO5gNAyABkVy2cqCzKb0zVdD0sbHw9JQzOtU2Mr8LVsp0ht9SFdlL_ckiUMOOnnJHr5FOCIte-juHq3m90-8Vo7n39dtyYBqAGkrhMOryx7UhlkOTAjZCmoA0XtSbqEXJGA7tL-QnNBD5dKV6fmibZ7pM',
+                            imageUrl:
+                                'https://lh3.googleusercontent.com/aida-public/AB6AXuB9AXXNRP9wpS4bnmZeIS0cSq9O7yh3L2QZSzzvkgYGXyjhELBN70WzXSb_p9p6BMHUTppfhn9OctPki_QYPVdYvFf1Oqmo7p_N782Z5SvUJoVRpRDsvHLBO5gNAyABkVy2cqCzKb0zVdD0sbHw9JQzOtU2Mr8LVsp0ht9SFdlL_ckiUMOOnnJHr5FOCIte-juHq3m90-8Vo7n39dtyYBqAGkrhMOryx7UhlkOTAjZCmoA0XtSbqEXJGA7tL-QnNBD5dKV6fmibZ7pM',
                             width: 96,
                             height: 96,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 96,
-                                height: 96,
-                                color: theme.colorScheme.surface,
-                                child: Icon(
-                                  Icons.broken_image_outlined,
-                                  color: theme.colorScheme.onSurface
-                                      .withOpacity(0.5),
+                            placeholder: (context, url) => Container(
+                              width: 96,
+                              height: 96,
+                              color: theme.colorScheme.surface,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                 ),
-                              );
-                            },
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              width: 96,
+                              height: 96,
+                              color: theme.colorScheme.surface,
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.5,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],

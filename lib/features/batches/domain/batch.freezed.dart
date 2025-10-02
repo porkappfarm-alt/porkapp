@@ -33,6 +33,8 @@ mixin _$Batch {
   double? get initialAvgWeight => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
+  @JsonKey(name: 'image_url')
+  String? get imageUrl => throw _privateConstructorUsedError;
 
   /// Serializes this Batch to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,6 +59,7 @@ abstract class $BatchCopyWith<$Res> {
     @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
     String status,
     String? notes,
+    @JsonKey(name: 'image_url') String? imageUrl,
   });
 }
 
@@ -83,6 +86,7 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
     Object? initialAvgWeight = freezed,
     Object? status = null,
     Object? notes = freezed,
+    Object? imageUrl = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -118,6 +122,10 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
                 ? _value.notes
                 : notes // ignore: cast_nullable_to_non_nullable
                       as String?,
+            imageUrl: freezed == imageUrl
+                ? _value.imageUrl
+                : imageUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -141,6 +149,7 @@ abstract class _$$BatchImplCopyWith<$Res> implements $BatchCopyWith<$Res> {
     @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
     String status,
     String? notes,
+    @JsonKey(name: 'image_url') String? imageUrl,
   });
 }
 
@@ -166,6 +175,7 @@ class __$$BatchImplCopyWithImpl<$Res>
     Object? initialAvgWeight = freezed,
     Object? status = null,
     Object? notes = freezed,
+    Object? imageUrl = freezed,
   }) {
     return _then(
       _$BatchImpl(
@@ -201,6 +211,10 @@ class __$$BatchImplCopyWithImpl<$Res>
             ? _value.notes
             : notes // ignore: cast_nullable_to_non_nullable
                   as String?,
+        imageUrl: freezed == imageUrl
+            ? _value.imageUrl
+            : imageUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -218,6 +232,7 @@ class _$BatchImpl implements _Batch {
     @JsonKey(name: 'initial_avg_weight') this.initialAvgWeight,
     this.status = 'active',
     this.notes,
+    @JsonKey(name: 'image_url') this.imageUrl,
   });
 
   factory _$BatchImpl.fromJson(Map<String, dynamic> json) =>
@@ -244,10 +259,13 @@ class _$BatchImpl implements _Batch {
   final String status;
   @override
   final String? notes;
+  @override
+  @JsonKey(name: 'image_url')
+  final String? imageUrl;
 
   @override
   String toString() {
-    return 'Batch(id: $id, name: $name, createdAt: $createdAt, headcountStart: $headcountStart, corralId: $corralId, initialAvgWeight: $initialAvgWeight, status: $status, notes: $notes)';
+    return 'Batch(id: $id, name: $name, createdAt: $createdAt, headcountStart: $headcountStart, corralId: $corralId, initialAvgWeight: $initialAvgWeight, status: $status, notes: $notes, imageUrl: $imageUrl)';
   }
 
   @override
@@ -266,7 +284,9 @@ class _$BatchImpl implements _Batch {
             (identical(other.initialAvgWeight, initialAvgWeight) ||
                 other.initialAvgWeight == initialAvgWeight) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.notes, notes) || other.notes == notes));
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -281,6 +301,7 @@ class _$BatchImpl implements _Batch {
     initialAvgWeight,
     status,
     notes,
+    imageUrl,
   );
 
   /// Create a copy of Batch
@@ -307,6 +328,7 @@ abstract class _Batch implements Batch {
     @JsonKey(name: 'initial_avg_weight') final double? initialAvgWeight,
     final String status,
     final String? notes,
+    @JsonKey(name: 'image_url') final String? imageUrl,
   }) = _$BatchImpl;
 
   factory _Batch.fromJson(Map<String, dynamic> json) = _$BatchImpl.fromJson;
@@ -331,6 +353,9 @@ abstract class _Batch implements Batch {
   String get status;
   @override
   String? get notes;
+  @override
+  @JsonKey(name: 'image_url')
+  String? get imageUrl;
 
   /// Create a copy of Batch
   /// with the given fields replaced by the non-null parameter values.

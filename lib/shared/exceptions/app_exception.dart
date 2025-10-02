@@ -4,7 +4,7 @@ enum AppExceptionType {
   notFound,
   database,
   validation,
-  unexpected
+  unexpected,
 }
 
 class AppException implements Exception {
@@ -12,11 +12,7 @@ class AppException implements Exception {
   final AppExceptionType type;
   final dynamic error;
 
-  AppException({
-    required this.message,
-    required this.type,
-    this.error,
-  });
+  AppException({required this.message, required this.type, this.error});
 
   @override
   String toString() => message;

@@ -28,7 +28,7 @@ class AnimalsRepository {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required double weight,
+    double? weight,
     String status = 'active',
   }) async {
     final currentTime = DateTime.now();
@@ -39,7 +39,7 @@ class AnimalsRepository {
           'identifier': identifier,
           'birth_date': birthDate.toIso8601String(),
           'breed': breed,
-          'weight': weight,
+          'weight_at_entry': weight,
           'status': status,
           'created_at': currentTime.toIso8601String(),
         })
@@ -54,7 +54,7 @@ class AnimalsRepository {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required double weight,
+    double? weight,
     required String status,
   }) async {
     final response = await supabase
@@ -63,7 +63,7 @@ class AnimalsRepository {
           'identifier': identifier,
           'birth_date': birthDate.toIso8601String(),
           'breed': breed,
-          'weight': weight,
+          'weight_at_entry': weight,
           'status': status,
         })
         .eq('id', id)

@@ -28,7 +28,8 @@ mixin _$Animal {
       throw _privateConstructorUsedError; // ID interno o número de arete
   @JsonKey(name: 'birth_date')
   DateTime get birthDate => throw _privateConstructorUsedError;
-  double get weight => throw _privateConstructorUsedError; // Peso inicial
+  @JsonKey(name: 'weight_at_entry')
+  double? get weight => throw _privateConstructorUsedError; // Peso inicial
   String get breed => throw _privateConstructorUsedError;
   @JsonKey(name: 'entry_date')
   DateTime get entryDate => throw _privateConstructorUsedError; // Fecha de ingreso al lote
@@ -57,7 +58,7 @@ abstract class $AnimalCopyWith<$Res> {
     @JsonKey(name: 'batch_id') String batchId,
     String identifier,
     @JsonKey(name: 'birth_date') DateTime birthDate,
-    double weight,
+    @JsonKey(name: 'weight_at_entry') double? weight,
     String breed,
     @JsonKey(name: 'entry_date') DateTime entryDate,
     @JsonKey(name: 'created_at') DateTime createdAt,
@@ -85,7 +86,7 @@ class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
     Object? batchId = null,
     Object? identifier = null,
     Object? birthDate = null,
-    Object? weight = null,
+    Object? weight = freezed,
     Object? breed = null,
     Object? entryDate = null,
     Object? createdAt = null,
@@ -110,10 +111,10 @@ class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
                 ? _value.birthDate
                 : birthDate // ignore: cast_nullable_to_non_nullable
                       as DateTime,
-            weight: null == weight
+            weight: freezed == weight
                 ? _value.weight
                 : weight // ignore: cast_nullable_to_non_nullable
-                      as double,
+                      as double?,
             breed: null == breed
                 ? _value.breed
                 : breed // ignore: cast_nullable_to_non_nullable
@@ -153,7 +154,7 @@ abstract class _$$AnimalImplCopyWith<$Res> implements $AnimalCopyWith<$Res> {
     @JsonKey(name: 'batch_id') String batchId,
     String identifier,
     @JsonKey(name: 'birth_date') DateTime birthDate,
-    double weight,
+    @JsonKey(name: 'weight_at_entry') double? weight,
     String breed,
     @JsonKey(name: 'entry_date') DateTime entryDate,
     @JsonKey(name: 'created_at') DateTime createdAt,
@@ -180,7 +181,7 @@ class __$$AnimalImplCopyWithImpl<$Res>
     Object? batchId = null,
     Object? identifier = null,
     Object? birthDate = null,
-    Object? weight = null,
+    Object? weight = freezed,
     Object? breed = null,
     Object? entryDate = null,
     Object? createdAt = null,
@@ -205,10 +206,10 @@ class __$$AnimalImplCopyWithImpl<$Res>
             ? _value.birthDate
             : birthDate // ignore: cast_nullable_to_non_nullable
                   as DateTime,
-        weight: null == weight
+        weight: freezed == weight
             ? _value.weight
             : weight // ignore: cast_nullable_to_non_nullable
-                  as double,
+                  as double?,
         breed: null == breed
             ? _value.breed
             : breed // ignore: cast_nullable_to_non_nullable
@@ -242,7 +243,7 @@ class _$AnimalImpl implements _Animal {
     @JsonKey(name: 'batch_id') required this.batchId,
     required this.identifier,
     @JsonKey(name: 'birth_date') required this.birthDate,
-    required this.weight,
+    @JsonKey(name: 'weight_at_entry') this.weight,
     required this.breed,
     @JsonKey(name: 'entry_date') required this.entryDate,
     @JsonKey(name: 'created_at') required this.createdAt,
@@ -265,7 +266,8 @@ class _$AnimalImpl implements _Animal {
   @JsonKey(name: 'birth_date')
   final DateTime birthDate;
   @override
-  final double weight;
+  @JsonKey(name: 'weight_at_entry')
+  final double? weight;
   // Peso inicial
   @override
   final String breed;
@@ -345,7 +347,7 @@ abstract class _Animal implements Animal {
     @JsonKey(name: 'batch_id') required final String batchId,
     required final String identifier,
     @JsonKey(name: 'birth_date') required final DateTime birthDate,
-    required final double weight,
+    @JsonKey(name: 'weight_at_entry') final double? weight,
     required final String breed,
     @JsonKey(name: 'entry_date') required final DateTime entryDate,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
@@ -366,7 +368,8 @@ abstract class _Animal implements Animal {
   @JsonKey(name: 'birth_date')
   DateTime get birthDate;
   @override
-  double get weight; // Peso inicial
+  @JsonKey(name: 'weight_at_entry')
+  double? get weight; // Peso inicial
   @override
   String get breed;
   @override

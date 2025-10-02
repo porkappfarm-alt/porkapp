@@ -14,6 +14,7 @@ class Batch with _$Batch {
     @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
     @Default('active') String status,
     String? notes,
+    @JsonKey(name: 'image_url') String? imageUrl,
   }) = _Batch;
 
   factory Batch.fromJson(Map<String, dynamic> json) => _$BatchFromJson(json);

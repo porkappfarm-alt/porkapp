@@ -10,7 +10,7 @@ class Animal with _$Animal {
     @JsonKey(name: 'batch_id') required String batchId,
     required String identifier, // ID interno o número de arete
     @JsonKey(name: 'birth_date') required DateTime birthDate,
-    required double weight, // Peso inicial
+    @JsonKey(name: 'weight_at_entry') double? weight, // Peso inicial
     required String breed,
     @JsonKey(name: 'entry_date')
     required DateTime entryDate, // Fecha de ingreso al lote

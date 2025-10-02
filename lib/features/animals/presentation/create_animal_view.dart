@@ -75,7 +75,9 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
               identifier: _identifierController.text,
               birthDate: _birthDate,
               breed: _breedController.text,
-              weight: double.parse(_weightController.text),
+              weight: _weightController.text.isEmpty
+                  ? null
+                  : double.tryParse(_weightController.text),
               status: _status,
             );
       } else {
@@ -86,7 +88,9 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
               identifier: _identifierController.text,
               birthDate: _birthDate,
               breed: _breedController.text,
-              weight: double.parse(_weightController.text),
+              weight: _weightController.text.isEmpty
+                  ? null
+                  : double.tryParse(_weightController.text),
             );
       }
 
@@ -210,8 +214,12 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingrese el peso';
                       }
-                      if (double.tryParse(value) == null) {
+                      final weight = double.tryParse(value);
+                      if (weight == null) {
                         return 'Por favor ingrese un número válido';
+                      }
+                      if (weight <= 0) {
+                        return 'El peso debe ser mayor a 0';
                       }
                       return null;
                     },

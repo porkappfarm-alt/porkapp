@@ -17,15 +17,19 @@ class AnimalRepositoryImpl implements AnimalRepository {
   AnimalRepositoryImpl(this._dataSource);
 
   @override
-  Future<Either<AppException, List<Animal>>> getAnimalsByBatch(String batchId) async {
+  Future<Either<AppException, List<Animal>>> getAnimalsByBatch(
+    String batchId,
+  ) async {
     try {
       final animals = await _dataSource.getAnimalsByBatch(batchId);
       return Right(animals);
     } catch (e) {
-      return Left(AppException(
-        message: 'Error al obtener los animales del lote: ${e.toString()}',
-        type: AppExceptionType.database,
-      ));
+      return Left(
+        AppException(
+          message: 'Error al obtener los animales del lote: ${e.toString()}',
+          type: AppExceptionType.database,
+        ),
+      );
     }
   }
 
@@ -35,10 +39,12 @@ class AnimalRepositoryImpl implements AnimalRepository {
       final animal = await _dataSource.getAnimal(id);
       return Right(animal);
     } catch (e) {
-      return Left(AppException(
-        message: 'Error al obtener el animal: ${e.toString()}',
-        type: AppExceptionType.database,
-      ));
+      return Left(
+        AppException(
+          message: 'Error al obtener el animal: ${e.toString()}',
+          type: AppExceptionType.database,
+        ),
+      );
     }
   }
 
@@ -48,10 +54,12 @@ class AnimalRepositoryImpl implements AnimalRepository {
       final createdAnimal = await _dataSource.createAnimal(animal);
       return Right(createdAnimal);
     } catch (e) {
-      return Left(AppException(
-        message: 'Error al crear el animal: ${e.toString()}',
-        type: AppExceptionType.database,
-      ));
+      return Left(
+        AppException(
+          message: 'Error al crear el animal: ${e.toString()}',
+          type: AppExceptionType.database,
+        ),
+      );
     }
   }
 
@@ -61,10 +69,12 @@ class AnimalRepositoryImpl implements AnimalRepository {
       final updatedAnimal = await _dataSource.updateAnimal(animal);
       return Right(updatedAnimal);
     } catch (e) {
-      return Left(AppException(
-        message: 'Error al actualizar el animal: ${e.toString()}',
-        type: AppExceptionType.database,
-      ));
+      return Left(
+        AppException(
+          message: 'Error al actualizar el animal: ${e.toString()}',
+          type: AppExceptionType.database,
+        ),
+      );
     }
   }
 
@@ -74,10 +84,12 @@ class AnimalRepositoryImpl implements AnimalRepository {
       await _dataSource.deleteAnimal(id);
       return const Right(null);
     } catch (e) {
-      return Left(AppException(
-        message: 'Error al eliminar el animal: ${e.toString()}',
-        type: AppExceptionType.database,
-      ));
+      return Left(
+        AppException(
+          message: 'Error al eliminar el animal: ${e.toString()}',
+          type: AppExceptionType.database,
+        ),
+      );
     }
   }
 }

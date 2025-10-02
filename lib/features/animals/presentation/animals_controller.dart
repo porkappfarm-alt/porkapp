@@ -23,7 +23,7 @@ class AnimalsController extends StateNotifier<AsyncValue<List<Animal>>> {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required double weight,
+    double? weight,
     String status = 'active',
   }) async {
     await ref
@@ -44,7 +44,7 @@ class AnimalsController extends StateNotifier<AsyncValue<List<Animal>>> {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required double weight,
+    double? weight,
     required String status,
   }) async {
     await ref

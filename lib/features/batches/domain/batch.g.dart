@@ -15,6 +15,7 @@ _$BatchImpl _$$BatchImplFromJson(Map<String, dynamic> json) => _$BatchImpl(
   initialAvgWeight: (json['initial_avg_weight'] as num?)?.toDouble(),
   status: json['status'] as String? ?? 'active',
   notes: json['notes'] as String?,
+  imageUrl: json['image_url'] as String?,
 );
 
 Map<String, dynamic> _$$BatchImplToJson(_$BatchImpl instance) =>
@@ -27,4 +28,5 @@ Map<String, dynamic> _$$BatchImplToJson(_$BatchImpl instance) =>
       'initial_avg_weight': instance.initialAvgWeight,
       'status': instance.status,
       'notes': instance.notes,
+      'image_url': instance.imageUrl,
     };

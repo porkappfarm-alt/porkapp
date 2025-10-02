@@ -10,10 +10,18 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
   final Ref ref;
 
   Future<void> loadBatches() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => ref.read(batchesRepositoryProvider).getBatches(),
-    );
+    try {
+      state = const AsyncValue.loading();
+      final batches = await ref.read(batchesRepositoryProvider).getBatches();
+      if (!mounted) return;
+      state = AsyncValue.data(batches);
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      state = AsyncValue.error(error, stackTrace);
+      // Retry after 3 seconds on error
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) loadBatches();
+    }
   }
 
   Future<void> createBatch({
@@ -72,6 +80,7 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
 }
 
 final batchesControllerProvider =
-    StateNotifierProvider<BatchesController, AsyncValue<List<Batch>>>((ref) {
-      return BatchesController(ref);
-    });
+    StateNotifierProvider<BatchesController, AsyncValue<List<Batch>>>(
+      (ref) => BatchesController(ref),
+      dependencies: [batchesRepositoryProvider],
+    );

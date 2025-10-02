@@ -6,7 +6,7 @@ import 'package:porkapp/features/auth/presentation/login_view.dart';
 import 'package:porkapp/features/dashboard/screens/dashboard_screen.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
 import 'package:porkapp/features/batches/presentation/batches_view.dart';
-import 'package:porkapp/features/animals/presentation/animals_view.dart';
+import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
 import 'package:porkapp/features/biometrics/presentation/biometrics_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
 
@@ -59,7 +59,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
     },
     routes: [
-      // Auth screen - shown outside of shell
+      // ===== Autenticación =====
+      // Ruta: /login
+      // - Pantalla de inicio de sesión
+      // - Se muestra fuera del shell principal
+      // - Redirige a /dashboard si ya está autenticado
       GoRoute(
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,
@@ -110,11 +114,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final batchId = state.pathParameters['batchId'] ?? '';
-                      final batchName = 'Lote $batchId';
-                      return AnimalsView(
-                        batchId: batchId,
-                        batchName: batchName,
-                      );
+                      return BatchDetailView(batchId: batchId);
                     },
                   ),
                 ],

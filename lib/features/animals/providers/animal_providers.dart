@@ -12,21 +12,21 @@ final animalRepositoryProvider = Provider<AnimalRepository>((ref) {
 });
 
 // Animal List Provider por Batch
-final animalListProvider = FutureProvider.family<List<Animal>, String>((ref, batchId) async {
+final animalListByBatchProvider = FutureProvider.family<List<Animal>, String>((
+  ref,
+  batchId,
+) async {
   final repository = ref.watch(animalRepositoryProvider);
   final result = await repository.getAnimalsByBatch(batchId);
-  return result.fold(
-    (error) => throw error,
-    (animals) => animals,
-  );
+  return result.fold((error) => throw error, (animals) => animals);
 });
 
 // Single Animal Provider
-final animalProvider = FutureProvider.family<Animal, String>((ref, animalId) async {
+final animalProvider = FutureProvider.family<Animal, String>((
+  ref,
+  animalId,
+) async {
   final repository = ref.watch(animalRepositoryProvider);
   final result = await repository.getAnimal(animalId);
-  return result.fold(
-    (error) => throw error,
-    (animal) => animal,
-  );
+  return result.fold((error) => throw error, (animal) => animal);
 });

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/auth/presentation/login_controller.dart';
 
 class LoginView extends ConsumerStatefulWidget {
@@ -13,7 +15,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -24,10 +26,12 @@ class _LoginViewState extends ConsumerState<LoginView> {
   Future<void> _onSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        await ref.read(loginControllerProvider.notifier).login(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+        await ref
+            .read(loginControllerProvider.notifier)
+            .login(
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+            );
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -44,7 +48,18 @@ class _LoginViewState extends ConsumerState<LoginView> {
   @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginControllerProvider);
-    
+    final authState = ref.watch(authStateProvider);
+
+    // Si el usuario está autenticado, redirigir al dashboard
+    if (authState == AuthState.authenticated) {
+      print('LoginView: Usuario autenticado, redirigiendo al dashboard...');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          context.go('/');
+        }
+      });
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -65,14 +80,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // App Name
                 const Text(
                   'PorkApp',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 32),
 
@@ -129,10 +141,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     ),
                     child: loginState.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Entrar',
-                            style: TextStyle(fontSize: 16),
-                          ),
+                        : const Text('Entrar', style: TextStyle(fontSize: 16)),
                   ),
                 ),
                 const SizedBox(height: 16),

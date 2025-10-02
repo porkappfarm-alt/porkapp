@@ -3,14 +3,19 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/auth/presentation/login_view.dart';
-import 'package:porkapp/features/auth/screens/blocked_screen.dart';
-import 'package:porkapp/features/auth/screens/pending_screen.dart';
-import 'package:porkapp/features/home/screens/home_screen.dart';
+import 'package:porkapp/features/dashboard/screens/dashboard_screen.dart';
+import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
+import 'package:porkapp/features/batches/presentation/batches_view.dart';
+import 'package:porkapp/features/animals/presentation/animals_view.dart';
+import 'package:porkapp/features/biometrics/presentation/biometrics_view.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
   print('Router: $message');
 }
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -18,67 +23,82 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/login',
     debugLogDiagnostics: true,
+    navigatorKey: _rootNavigatorKey,
     redirect: (context, state) {
       _printRouteInfo('Current auth state: $authState');
-      _printRouteInfo('Current path: ${state.path}');
-      
-      // Always allow access to login page when unauthenticated
-      if (authState == AuthState.unauthenticated && state.path == '/login') {
-        _printRouteInfo('Allowing access to login page');
-        return null;
-      }
+      _printRouteInfo('Current path: ${state.uri.path}');
+      _printRouteInfo('Full URI: ${state.uri}');
 
-      // Handle different auth states
+      final goingToLogin = state.uri.path == '/login';
+
+      // Handle authentication states
       switch (authState) {
         case AuthState.initial:
-          _printRouteInfo('Initial state - no redirect');
-          return null;
-          
-        case AuthState.unauthenticated:
-          _printRouteInfo('User is unauthenticated - redirecting to login');
+          // Siempre redirigir a login en el estado inicial
           return '/login';
-          
-        case AuthState.profilePending:
-          _printRouteInfo('Profile pending approval - redirecting to pending page');
-          return '/pending';
-          
-        case AuthState.profileBlocked:
-          _printRouteInfo('Profile blocked - redirecting to blocked page');
-          return '/blocked';
-          
-        case AuthState.profileApproved:
-          if (state.path == '/login') {
-            _printRouteInfo('User is authenticated - redirecting to home');
-            return '/';
-          }
-          _printRouteInfo('User is on a valid page');
-          return null;
-          
-        default:
-          _printRouteInfo('Unhandled state - no redirect');
+        case AuthState.unauthenticated:
+          // Si no está en login, redirigir a login
+          return goingToLogin ? null : '/login';
+        case AuthState.authenticated:
+          // Si está autenticado y va a login, redirigir a dashboard
+          if (goingToLogin) return '/dashboard';
+          // Si está en la ruta raíz, redirigir a dashboard
+          if (state.uri.path == '/') return '/dashboard';
           return null;
       }
     },
     routes: [
       // Auth screen
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginView(),
-      ),
-      // Pending approval screen
-      GoRoute(
-        path: '/pending',
-        builder: (context, state) => const PendingScreen(),
-      ),
-      // Blocked screen
-      GoRoute(
-        path: '/blocked',
-        builder: (context, state) => const BlockedScreen(),
-      ),
-      // Home screen (requires approved profile)
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
+      GoRoute(path: '/login', builder: (context, state) => const LoginView()),
+      // Main shell route for authenticated screens
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) => child,
+        routes: [
+          // Dashboard screen
+          // Dashboard route
+          GoRoute(
+            path: '/dashboard',
+            parentNavigatorKey: _shellNavigatorKey,
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          // Root route - redirects to dashboard
+          GoRoute(
+            path: '/',
+            parentNavigatorKey: _shellNavigatorKey,
+            redirect: (_, __) => '/dashboard',
+          ),
+          // Corrals screen
+          GoRoute(
+            path: '/corrals',
+            parentNavigatorKey: _shellNavigatorKey,
+            builder: (context, state) => const CorralsView(),
+          ),
+          // Lotes routes
+          GoRoute(
+            path: '/batches',
+            parentNavigatorKey: _shellNavigatorKey,
+            builder: (context, state) => const BatchesView(),
+            routes: [
+              // Animales en lote route
+              GoRoute(
+                path: ':batchId',
+                parentNavigatorKey: _shellNavigatorKey,
+                builder: (context, state) {
+                  final batchId = state.pathParameters['batchId'] ?? '';
+                  final batchName = 'Lote $batchId';
+                  return AnimalsView(batchId: batchId, batchName: batchName);
+                },
+              ),
+            ],
+          ),
+          // Biometrics screen
+          GoRoute(
+            path: '/biometrics',
+            parentNavigatorKey: _shellNavigatorKey,
+            builder: (context, state) => const BiometricsView(),
+          ),
+        ],
       ),
     ],
   );

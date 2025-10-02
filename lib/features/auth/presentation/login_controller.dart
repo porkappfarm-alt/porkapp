@@ -10,14 +10,21 @@ class LoginController extends StateNotifier<AsyncValue<void>> {
     required String email,
     required String password,
   }) async {
+    print('LoginController: Attempting login with email: $email');
     state = const AsyncValue.loading();
     
-    state = await AsyncValue.guard(() => 
-      ref.read(authRepositoryProvider).signInWithEmail(
+    try {
+      await ref.read(authRepositoryProvider).signInWithEmail(
         email: email,
         password: password,
-      )
-    );
+      );
+      state = const AsyncValue.data(null);
+      print('LoginController: Login successful');
+    } catch (e, st) {
+      print('LoginController: Login error: $e');
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 }
 

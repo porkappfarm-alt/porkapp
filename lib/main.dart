@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/router.dart';
+import 'package:porkapp/shared/design/app_theme.dart';
 import 'package:porkapp/supabase/supabase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Load environment variables
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     print('Warning: .env file not found');
   }
-  
+
   // Initialize Supabase
   await initializeSupabase();
 
@@ -29,12 +30,8 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'PorkApp',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepOrange,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       routerConfig: router,
     );
   }

@@ -20,7 +20,7 @@ class AnimalStatsView extends ConsumerWidget {
 
     final avgWeight = animals.isEmpty
         ? 0.0
-        : animals.map((a) => a.weight).reduce((a, b) => a + b) / animals.length;
+        : animals.map((a) => a.weight ?? 0.0).reduce((a, b) => a + b) / animals.length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),

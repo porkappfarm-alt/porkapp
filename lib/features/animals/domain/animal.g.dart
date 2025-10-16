@@ -7,28 +7,36 @@ part of 'animal.dart';
 // **************************************************************************
 
 _$AnimalImpl _$$AnimalImplFromJson(Map<String, dynamic> json) => _$AnimalImpl(
-  id: json['id'] as String,
-  batchId: json['batch_id'] as String,
-  identifier: json['identifier'] as String,
-  birthDate: DateTime.parse(json['birth_date'] as String),
-  weight: (json['weight_at_entry'] as num?)?.toDouble(),
-  breed: json['breed'] as String,
-  entryDate: DateTime.parse(json['entry_date'] as String),
-  createdAt: DateTime.parse(json['created_at'] as String),
-  status: json['status'] as String? ?? 'active',
-  notes: json['notes'] as String?,
-);
+      id: json['id'] as String,
+      batchId: json['batch_id'] as String,
+      identifier: json['identifier'] as String,
+      birthDate: _nullableDateFromString(json['birth_date'] as String?),
+      sex: json['sex'] as String?,
+      weight: (json['weight_at_entry'] as num?)?.toDouble(),
+      breed: json['breed'] as String,
+      type: json['animal_type'] as String,
+      entryDate: _nullableDateFromString(json['entry_date'] as String?),
+      createdAt: _nullableDateFromString(json['created_at'] as String?),
+      updatedAt: _nullableDateFromString(json['updated_at'] as String?),
+      gender: json['gender'] as String? ?? 'unknown',
+      status: json['status'] as String? ?? 'active',
+      notes: json['notes'] as String?,
+    );
 
 Map<String, dynamic> _$$AnimalImplToJson(_$AnimalImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'batch_id': instance.batchId,
       'identifier': instance.identifier,
-      'birth_date': instance.birthDate.toIso8601String(),
+      'birth_date': _nullableDateToString(instance.birthDate),
+      'sex': instance.sex,
       'weight_at_entry': instance.weight,
       'breed': instance.breed,
-      'entry_date': instance.entryDate.toIso8601String(),
-      'created_at': instance.createdAt.toIso8601String(),
+      'animal_type': instance.type,
+      'entry_date': _nullableDateToString(instance.entryDate),
+      'created_at': _nullableDateToString(instance.createdAt),
+      'updated_at': _nullableDateToString(instance.updatedAt),
+      'gender': instance.gender,
       'status': instance.status,
       'notes': instance.notes,
     };

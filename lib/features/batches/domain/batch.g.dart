@@ -7,16 +7,19 @@ part of 'batch.dart';
 // **************************************************************************
 
 _$BatchImpl _$$BatchImplFromJson(Map<String, dynamic> json) => _$BatchImpl(
-  id: json['id'] as String,
-  name: json['name'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
-  headcountStart: (json['headcount_start'] as num?)?.toInt() ?? 0,
-  corralId: json['corral_id'] as String?,
-  initialAvgWeight: (json['initial_avg_weight'] as num?)?.toDouble(),
-  status: json['status'] as String? ?? 'active',
-  notes: json['notes'] as String?,
-  imageUrl: json['image_url'] as String?,
-);
+      id: json['id'] as String,
+      name: json['name'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      headcountStart: (json['headcount_start'] as num?)?.toInt() ?? 0,
+      corralId: json['corral_id'] as String?,
+      initialAvgWeight: (json['initial_avg_weight'] as num?)?.toDouble(),
+      status: json['status'] as String? ?? 'active',
+      notes: json['notes'] as String?,
+      imageUrl: json['image_url'] as String?,
+      animals: json['animals'] == null
+          ? const []
+          : _animalsFromJson(json['animals'] as List?),
+    );
 
 Map<String, dynamic> _$$BatchImplToJson(_$BatchImpl instance) =>
     <String, dynamic>{
@@ -29,4 +32,5 @@ Map<String, dynamic> _$$BatchImplToJson(_$BatchImpl instance) =>
       'status': instance.status,
       'notes': instance.notes,
       'image_url': instance.imageUrl,
+      'animals': _animalsToJson(instance.animals),
     };

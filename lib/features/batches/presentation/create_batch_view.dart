@@ -137,7 +137,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
     final corralsState = ref.watch(corralsControllerProvider);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -145,7 +145,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
         ),
         title: Text(isEditing ? 'Editar Lote' : 'Nuevo Lote'),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
       ),
       body: Form(
         key: _formKey,
@@ -165,7 +165,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                   const SizedBox(height: 8),
                   corralsState.when(
                     data: (corrals) => DropdownButtonFormField<String>(
-                      value: _selectedCorralId,
+                      initialValue: _selectedCorralId,
                       decoration: InputDecoration(
                         hintText: 'Seleccione un corral',
                         hintStyle: TextStyle(

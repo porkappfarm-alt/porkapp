@@ -14,11 +14,8 @@ class AnimalsRepository {
   }
 
   Future<Animal> getAnimal(String id) async {
-    final response = await supabase
-        .from('animals')
-        .select()
-        .eq('id', id)
-        .single();
+    final response =
+        await supabase.from('animals').select().eq('id', id).single();
 
     return Animal.fromJson(response);
   }
@@ -28,6 +25,7 @@ class AnimalsRepository {
     required String identifier,
     required DateTime birthDate,
     required String breed,
+    required String type,
     double? weight,
     String status = 'active',
   }) async {
@@ -41,6 +39,7 @@ class AnimalsRepository {
           'breed': breed,
           'weight_at_entry': weight,
           'status': status,
+          'animal_type': type,
           'created_at': currentTime.toIso8601String(),
         })
         .select()
@@ -54,6 +53,7 @@ class AnimalsRepository {
     required String identifier,
     required DateTime birthDate,
     required String breed,
+    required String type,
     double? weight,
     required String status,
   }) async {
@@ -65,6 +65,7 @@ class AnimalsRepository {
           'breed': breed,
           'weight_at_entry': weight,
           'status': status,
+          'animal_type': type,
         })
         .eq('id', id)
         .select()

@@ -23,16 +23,16 @@ class AnimalsController extends StateNotifier<AsyncValue<List<Animal>>> {
     required String identifier,
     required DateTime birthDate,
     required String breed,
+    required String type,
     double? weight,
     String status = 'active',
   }) async {
-    await ref
-        .read(animalsRepositoryProvider)
-        .createAnimal(
+    await ref.read(animalsRepositoryProvider).createAnimal(
           batchId: batchId,
           identifier: identifier,
           birthDate: birthDate,
           breed: breed,
+          type: type,
           weight: weight,
           status: status,
         );
@@ -44,16 +44,16 @@ class AnimalsController extends StateNotifier<AsyncValue<List<Animal>>> {
     required String identifier,
     required DateTime birthDate,
     required String breed,
+    required String type,
     double? weight,
     required String status,
   }) async {
-    await ref
-        .read(animalsRepositoryProvider)
-        .updateAnimal(
+    await ref.read(animalsRepositoryProvider).updateAnimal(
           id: id,
           identifier: identifier,
           birthDate: birthDate,
           breed: breed,
+          type: type,
           weight: weight,
           status: status,
         );
@@ -72,5 +72,5 @@ class AnimalsController extends StateNotifier<AsyncValue<List<Animal>>> {
 
 final animalsControllerProvider =
     StateNotifierProvider<AnimalsController, AsyncValue<List<Animal>>>((ref) {
-      return AnimalsController(ref);
-    });
+  return AnimalsController(ref);
+});

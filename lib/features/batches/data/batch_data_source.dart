@@ -18,7 +18,7 @@ class SupabaseBatchDataSource implements BatchDataSource {
   Future<List<Batch>> getBatches() async {
     final response = await _client
         .from('batches')
-        .select()
+        .select('*, animals(*)')
         .order('created_at', ascending: false);
 
     return response.map((json) => Batch.fromJson(json)).toList();
@@ -28,7 +28,7 @@ class SupabaseBatchDataSource implements BatchDataSource {
   Future<Batch> getBatch(String id) async {
     final response = await _client
         .from('batches')
-        .select()
+        .select('*, animals(*)')
         .eq('id', id)
         .single();
 
@@ -37,11 +37,8 @@ class SupabaseBatchDataSource implements BatchDataSource {
 
   @override
   Future<Batch> createBatch(Batch batch) async {
-    final response = await _client
-        .from('batches')
-        .insert(batch.toJson())
-        .select()
-        .single();
+    final response =
+        await _client.from('batches').insert(batch.toJson()).select().single();
 
     return Batch.fromJson(response);
   }

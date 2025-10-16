@@ -1,268 +1,194 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:porkapp/features/batches/presentation/batches_controller.dart';
-import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
+import 'package:porkapp/features/batches/domain/batch.dart';
+import 'package:porkapp/features/batches/providers/batch_providers.dart';
+import 'package:porkapp/features/batches/presentation/widgets/batch_card.dart';
+import 'package:porkapp/features/batches/presentation/widgets/batch_form_dialog.dart';
 
 class BatchesView extends ConsumerWidget {
   const BatchesView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final batchesState = ref.watch(batchesControllerProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      body: batchesState.when(
-        data: (batches) => ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: batches.length,
-          addAutomaticKeepAlives: false,
-          addRepaintBoundaries: true,
-          itemBuilder: (context, index) {
-            final batch = batches[index];
-            return Slidable(
-              key: ValueKey(batch.id),
-              endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('¿Eliminar lote?'),
-                          content: Text(
-                            '¿Está seguro que desea eliminar el lote "${batch.name}"?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancelar'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                ref
-                                    .read(batchesControllerProvider.notifier)
-                                    .deleteBatch(batch.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Lote "${batch.name}" eliminado',
-                                    ),
-                                    action: SnackBarAction(
-                                      label: 'Deshacer',
-                                      onPressed: () {
-                                        // TODO: Implement undo
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                'Eliminar',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete,
-                    label: 'Eliminar',
-                  ),
-                  if (batch.status == 'active')
-                    SlidableAction(
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('¿Finalizar lote?'),
-                            content: Text(
-                              '¿Está seguro que desea finalizar el lote "${batch.name}"?\n\n'
-                              'Una vez finalizado, no podrá agregar más animales a este lote y '
-                              'el corral quedará disponible para un nuevo lote.',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  ref
-                                      .read(batchesControllerProvider.notifier)
-                                      .finishBatch(batch.id);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Lote "${batch.name}" finalizado',
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: const Text('Finalizar'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      icon: Icons.check_circle,
-                      label: 'Finalizar',
-                    ),
-                  SlidableAction(
-                    onPressed: (context) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => CreateBatchView(batch: batch),
-                        ),
-                      );
-                    },
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    icon: Icons.edit,
-                    label: 'Editar',
-                  ),
-                ],
-              ),
-              child: Card(
-                child: InkWell(
-                  onTap: () {
-                    context.go('/batches/${batch.id}');
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Lotes'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              // TODO: Implementar filtros
+            },
+            tooltip: 'Filtrar lotes',
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(batchListProvider);
+        },
+        child: ref.watch(batchListProvider).when(
+              data: (batches) {
+                if (batches.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: batch.status == 'active'
-                                          ? Colors.green
-                                          : Colors.grey,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    batch.status == 'active'
-                                        ? 'Activo'
-                                        : 'Finalizado',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: batch.status == 'active'
-                                          ? Colors.green
-                                          : Colors.grey,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                batch.name,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Fecha inicio: ${DateFormat('dd/MM/yyyy').format(batch.createdAt)}',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withOpacity(0.7),
-                                ),
-                              ),
-                              Text(
-                                'Cantidad inicial: ${batch.headcountStart} cerdos',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withOpacity(0.7),
-                                ),
-                              ),
-                              if (batch.initialAvgWeight != null)
-                                Text(
-                                  'Peso inicial promedio: ${batch.initialAvgWeight} kg',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withOpacity(0.7),
-                                  ),
-                                ),
-                            ],
+                        Icon(
+                          Icons.folder_open,
+                          size: 64,
+                          color: theme.colorScheme.primary.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No hay lotes creados',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: CachedNetworkImage(
-                            // TODO: Replace with actual image URL
-                            imageUrl:
-                                'https://lh3.googleusercontent.com/aida-public/AB6AXuB9AXXNRP9wpS4bnmZeIS0cSq9O7yh3L2QZSzzvkgYGXyjhELBN70WzXSb_p9p6BMHUTppfhn9OctPki_QYPVdYvFf1Oqmo7p_N782Z5SvUJoVRpRDsvHLBO5gNAyABkVy2cqCzKb0zVdD0sbHw9JQzOtU2Mr8LVsp0ht9SFdlL_ckiUMOOnnJHr5FOCIte-juHq3m90-8Vo7n39dtyYBqAGkrhMOryx7UhlkOTAjZCmoA0XtSbqEXJGA7tL-QnNBD5dKV6fmibZ7pM',
-                            width: 96,
-                            height: 96,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              width: 96,
-                              height: 96,
-                              color: theme.colorScheme.surface,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              width: 96,
-                              height: 96,
-                              color: theme.colorScheme.surface,
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: theme.colorScheme.onSurface.withOpacity(
-                                  0.5,
-                                ),
-                              ),
-                            ),
-                          ),
+                        const SizedBox(height: 8),
+                        ElevatedButton.icon(
+                          onPressed: () => _showCreateBatchDialog(context),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Crear Lote'),
                         ),
                       ],
                     ),
-                  ),
+                  );
+                }
+
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.only(top: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final batch = batches[index];
+                            return BatchCard(
+                              batch: batch,
+                              onTap: () => context.push('/batches/${batch.id}'),
+                              onEdit: () => _onBatchEdit(context, batch),
+                              onDelete: () => _onBatchDelete(context, batch),
+                            );
+                          },
+                          childCount: batches.length,
+                        ),
+                      ),
+                    ),
+                    // Espacio adicional al final de la lista
+                    const SliverPadding(padding: EdgeInsets.only(bottom: 80)),
+                  ],
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error al cargar los lotes',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.toString(),
+                      style: theme.textTheme.bodySmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        ref.invalidate(batchListProvider);
+                      },
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) =>
-            Center(child: Text('Error al cargar los lotes: $error')),
+            ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const CreateBatchView()),
-          );
-        },
+        onPressed: () => _showCreateBatchDialog(context),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo Lote'),
-        backgroundColor: theme.colorScheme.primary,
       ),
+    );
+  }
+
+  void _onBatchTap(BuildContext context, Batch batch) {
+    context.go('/batches/${batch.id}');
+  }
+
+  int _calculateCrossAxisCount(double width) {
+    if (width > 1200) return 4; // Pantallas grandes
+    if (width > 900) return 3; // Tablets horizontales
+    if (width > 600) return 2; // Tablets verticales
+    return 1; // Móviles
+  }
+
+  double _calculateHorizontalPadding(double width) {
+    if (width > 1200) return 32;
+    if (width > 900) return 24;
+    if (width > 600) return 16;
+    return 8;
+  }
+
+  double _calculateChildAspectRatio(double width) {
+    if (width > 1200) return 1.2;
+    if (width > 900) return 1.1;
+    if (width > 600) return 1.0;
+    return 0.9;
+  }
+
+  void _onBatchEdit(BuildContext context, Batch batch) {
+    context.push('/batches/edit/${batch.id}');
+  }
+
+  void _onBatchDelete(BuildContext context, Batch batch) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar lote?'),
+        content: Text(
+          '¿Está seguro que desea eliminar el lote "${batch.name}"?\n'
+          'Esta acción no se puede deshacer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              // TODO: Implementar eliminación del lote
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateBatchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const BatchFormDialog(),
     );
   }
 }

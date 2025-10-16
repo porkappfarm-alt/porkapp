@@ -18,9 +18,10 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
   final _formKey = GlobalKey<FormState>();
   final _identifierController = TextEditingController();
   final _breedController = TextEditingController();
-  DateTime _birthDate = DateTime.now();
+  late DateTime _birthDate = DateTime.now();
   final _weightController = TextEditingController();
   String _status = 'active';
+  String _type = 'fattening'; // valor por defecto para el tipo
   bool _isLoading = false;
 
   bool get isEditing => widget.animal != null;
@@ -30,10 +31,11 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
     super.initState();
     if (isEditing) {
       _identifierController.text = widget.animal!.identifier;
-      _breedController.text = widget.animal!.breed;
-      _birthDate = widget.animal!.birthDate;
+      _breedController.text = widget.animal!.breed ?? '';
+      _birthDate = widget.animal!.birthDate ?? DateTime.now();
       _weightController.text = widget.animal!.weight.toString();
       _status = widget.animal!.status;
+      _type = widget.animal!.type;
     }
   }
 
@@ -68,26 +70,24 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
 
     try {
       if (isEditing) {
-        await ref
-            .read(animalsControllerProvider.notifier)
-            .updateAnimal(
+        await ref.read(animalsControllerProvider.notifier).updateAnimal(
               id: widget.animal!.id,
               identifier: _identifierController.text,
               birthDate: _birthDate,
               breed: _breedController.text,
+              type: _type,
               weight: _weightController.text.isEmpty
                   ? null
                   : double.tryParse(_weightController.text),
               status: _status,
             );
       } else {
-        await ref
-            .read(animalsControllerProvider.notifier)
-            .createAnimal(
+        await ref.read(animalsControllerProvider.notifier).createAnimal(
               batchId: widget.batchId,
               identifier: _identifierController.text,
               birthDate: _birthDate,
               breed: _breedController.text,
+              type: _type,
               weight: _weightController.text.isEmpty
                   ? null
                   : double.tryParse(_weightController.text),
@@ -117,7 +117,7 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -125,7 +125,7 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
         ),
         title: Text(isEditing ? 'Editar Animal' : 'Agregar Animal'),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
       ),
       body: Form(
         key: _formKey,
@@ -198,7 +198,53 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
                     ],
                   ),
                   const SizedBox(height: 16),
-
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tipo de Animal',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        initialValue: _type,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: theme.colorScheme.surface,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'fattening',
+                            child: Text(
+                              'Engorde',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'breeding',
+                            child: Text(
+                              'Reproductora',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _type = value!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   _buildField(
                     controller: _weightController,
@@ -237,7 +283,7 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value: _status,
+                          initialValue: _status,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: theme.colorScheme.surface,

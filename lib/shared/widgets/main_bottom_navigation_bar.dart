@@ -16,7 +16,7 @@ class MainBottomNavigationBar extends StatelessWidget {
         border: Border(
           top: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
         ),
-        color: colorScheme.background.withOpacity(0.8),
+        color: colorScheme.surface.withOpacity(0.8),
       ),
       child: SafeArea(
         top: false,

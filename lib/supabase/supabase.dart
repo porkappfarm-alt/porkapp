@@ -22,10 +22,7 @@ Future<void> initializeSupabase() async {
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
       debug: true, // Enable debug mode
-      authOptions: FlutterAuthClientOptions(
-        // Deshabilitar persistencia de sesión
-        localStorage: const EmptyLocalStorage(),
-      ),
+      authOptions: FlutterAuthClientOptions(authFlowType: AuthFlowType.pkce),
     );
     print('Supabase initialized successfully');
 

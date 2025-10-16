@@ -1,40 +1,43 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
-import 'package:porkapp/supabase/supabase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:porkapp/features/animals/data/animal_repository.dart';
+import 'package:porkapp/features/animals/providers/animal_repository_provider.dart';
 
 // Estado para manejar los animales de un lote específico
-final batchAnimalsProvider =
-    StateNotifierProvider.family<
-      AnimalsNotifier,
-      AsyncValue<List<Animal>>,
-      String
-    >((ref, batchId) {
-      final supabase = ref.watch(supabaseProvider);
-      return AnimalsNotifier(supabase, batchId);
-    });
+final batchAnimalsProvider = StateNotifierProvider.family<AnimalsNotifier,
+    AsyncValue<List<Animal>>, String>((ref, batchId) {
+  final repository = ref.watch(animalRepositoryProvider);
+  return AnimalsNotifier(repository, batchId);
+});
 
 class AnimalsNotifier extends StateNotifier<AsyncValue<List<Animal>>> {
-  final SupabaseClient _supabase;
+  final AnimalRepository _repository;
   final String _batchId;
 
-  AnimalsNotifier(this._supabase, this._batchId)
-    : super(const AsyncValue.loading()) {
+  AnimalsNotifier(this._repository, this._batchId)
+      : super(const AsyncValue.loading()) {
     loadAnimals();
   }
 
   Future<void> loadAnimals() async {
     try {
+      print('Cargando animales para el lote: $_batchId'); // Debug log
       state = const AsyncValue.loading();
-      final response = await _supabase
-          .from('animals')
-          .select()
-          .eq('batch_id', _batchId)
-          .order('created_at', ascending: false);
+      final result = await _repository.getAnimalsByBatch(_batchId);
 
-      final animals = response.map((data) => Animal.fromJson(data)).toList();
-      state = AsyncValue.data(animals);
+      result.fold(
+        (error) {
+          print('Error al cargar animales: $error'); // Debug log
+          state = AsyncValue.error(error, StackTrace.current);
+        },
+        (animals) {
+          print(
+              'Animales cargados exitosamente: ${animals.length}'); // Debug log
+          state = AsyncValue.data(animals);
+        },
+      );
     } catch (e, stackTrace) {
+      print('Excepción al cargar animales: $e'); // Debug log
       state = AsyncValue.error(e, stackTrace);
     }
   }
@@ -46,32 +49,30 @@ class AnimalsNotifier extends StateNotifier<AsyncValue<List<Animal>>> {
     required String breed,
   }) async {
     try {
-      final currentTime = DateTime.now();
-      final newAnimal = {
-        'batch_id': _batchId,
-        'identifier': identifier,
-        'birth_date': birthDate.toIso8601String(),
-        'weight': weight,
-        'breed': breed,
-        'created_at': currentTime.toIso8601String(),
-        'status': 'active',
-      };
+      final newAnimal = Animal(
+        id: '', // Se generará en la base de datos
+        batchId: _batchId,
+        identifier: identifier,
+        birthDate: birthDate,
+        weight: weight,
+        breed: breed,
+        type: 'fattening',
+        entryDate: DateTime.now(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        gender: 'unknown',
+        status: 'active',
+      );
 
-      final response = await _supabase
-          .from('animals')
-          .insert(newAnimal)
-          .select()
-          .single();
+      final result = await _repository.createAnimal(newAnimal);
 
-      final animal = Animal.fromJson(response);
-      final currentAnimals = state.value ?? [];
-      state = AsyncValue.data([animal, ...currentAnimals]);
-
-      // Actualizar el contador de animales en el lote
-      await _supabase
-          .from('batches')
-          .update({'animal_count': currentAnimals.length + 1})
-          .eq('id', _batchId);
+      result.fold(
+        (error) => state = AsyncValue.error(error, StackTrace.current),
+        (animal) {
+          final currentAnimals = state.value ?? [];
+          state = AsyncValue.data([animal, ...currentAnimals]);
+        },
+      );
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }
@@ -79,18 +80,17 @@ class AnimalsNotifier extends StateNotifier<AsyncValue<List<Animal>>> {
 
   Future<void> deleteAnimal(String animalId) async {
     try {
-      await _supabase.from('animals').delete().eq('id', animalId);
+      final result = await _repository.deleteAnimal(animalId);
 
-      final currentAnimals = state.value ?? [];
-      state = AsyncValue.data(
-        currentAnimals.where((animal) => animal.id != animalId).toList(),
+      result.fold(
+        (error) => state = AsyncValue.error(error, StackTrace.current),
+        (_) {
+          final currentAnimals = state.value ?? [];
+          state = AsyncValue.data(
+            currentAnimals.where((animal) => animal.id != animalId).toList(),
+          );
+        },
       );
-
-      // Actualizar el contador de animales en el lote
-      await _supabase
-          .from('batches')
-          .update({'animal_count': currentAnimals.length - 1})
-          .eq('id', _batchId);
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }
@@ -98,19 +98,18 @@ class AnimalsNotifier extends StateNotifier<AsyncValue<List<Animal>>> {
 
   Future<void> updateAnimal(Animal animal) async {
     try {
-      final updatedAnimal = {
-        'identifier': animal.identifier,
-        'birth_date': animal.birthDate.toIso8601String(),
-        'weight': animal.weight,
-        'breed': animal.breed,
-        'status': animal.status,
-      };
+      final result = await _repository.updateAnimal(animal);
 
-      await _supabase.from('animals').update(updatedAnimal).eq('id', animal.id);
-
-      final currentAnimals = state.value ?? [];
-      state = AsyncValue.data(
-        currentAnimals.map((a) => a.id == animal.id ? animal : a).toList(),
+      result.fold(
+        (error) => state = AsyncValue.error(error, StackTrace.current),
+        (updatedAnimal) {
+          final currentAnimals = state.value ?? [];
+          state = AsyncValue.data(
+            currentAnimals
+                .map((a) => a.id == animal.id ? updatedAnimal : a)
+                .toList(),
+          );
+        },
       );
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);

@@ -8,11 +8,17 @@ class AnimalEvent with _$AnimalEvent {
   const factory AnimalEvent({
     required String id,
     required String animalId,
-    required DateTime date,
-    required String type, // weighing, treatment, mortality
+    @JsonKey(name: 'event_date') required DateTime date,
+    required String type, // weighing, treatment, mortality, etc.
     required Map<String, dynamic> data,
     String? notes,
     @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    double? weight,
+    @JsonKey(name: 'qty_feed') double? qtyFeed,
+    @JsonKey(name: 'death_cause') String? deathCause,
+    @JsonKey(name: 'batch_id') String? batchId,
+    String? description,
   }) = _AnimalEvent;
 
   factory AnimalEvent.fromJson(Map<String, dynamic> json) =>

@@ -7,8 +7,14 @@ import 'package:porkapp/features/dashboard/screens/dashboard_screen.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
 import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
+import 'package:porkapp/features/batches/presentation/views/batch_animals_view.dart';
+import 'package:porkapp/features/animals/presentation/views/animal_detail_view.dart';
+import 'package:porkapp/features/animals/presentation/views/animals_main_view.dart';
 import 'package:porkapp/features/biometrics/presentation/biometrics_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
+import 'package:porkapp/shared/widgets/placeholder_screen.dart';
+import 'package:porkapp/features/batches/providers/batch_provider.dart';
+import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
@@ -20,6 +26,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _dashboardNavigatorKey = GlobalKey<NavigatorState>();
 final _corralsNavigatorKey = GlobalKey<NavigatorState>();
 final _batchesNavigatorKey = GlobalKey<NavigatorState>();
+final _animalsNavigatorKey = GlobalKey<NavigatorState>();
 final _biometricsNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -109,26 +116,127 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const BatchesView(),
                 routes: [
                   GoRoute(
-                    // This will be displayed in full screen, above the shell
+                    path: 'create',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const CreateBatchView(),
+                  ),
+                  GoRoute(
+                    path: 'edit/:batchId',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final batchId = state.pathParameters['batchId'] ?? '';
+                      return CreateBatchView(
+                        batch: ref.read(batchProvider(batchId)).valueOrNull,
+                      );
+                    },
+                  ),
+                  GoRoute(
                     path: ':batchId',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final batchId = state.pathParameters['batchId'] ?? '';
                       return BatchDetailView(batchId: batchId);
                     },
+                    routes: [
+                      // Vista de lista de animales del lote
+                      GoRoute(
+                        path: 'animals',
+                        builder: (context, state) {
+                          final batchId = state.pathParameters['batchId'] ?? '';
+                          return BatchAnimalsView(batchId: batchId);
+                        },
+                        routes: [
+                          // Detalle individual del animal
+                          GoRoute(
+                            path: ':animalId',
+                            builder: (context, state) {
+                              final animalId =
+                                  state.pathParameters['animalId'] ?? '';
+                              return AnimalDetailView(animalId: animalId);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ],
           ),
 
-          // 4. Biometrics Branch
+          // 4. Animals Branch
+          StatefulShellBranch(
+            navigatorKey: _animalsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/animals',
+                builder: (context, state) => const AnimalsMainView(),
+                routes: [
+                  GoRoute(
+                    path: ':batchId',
+                    builder: (context, state) {
+                      final batchId = state.pathParameters['batchId'] ?? '';
+                      return BatchAnimalsView(batchId: batchId);
+                    },
+                    routes: [
+                      GoRoute(
+                        path: ':animalId',
+                        builder: (context, state) {
+                          final animalId =
+                              state.pathParameters['animalId'] ?? '';
+                          return AnimalDetailView(animalId: animalId);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // 5. Biometrics Branch
           StatefulShellBranch(
             navigatorKey: _biometricsNavigatorKey,
             routes: [
               GoRoute(
                 path: '/biometrics',
-                builder: (context, state) => const BiometricsView(),
+                pageBuilder: (context, state) {
+                  return CustomTransitionPage(
+                    key: state.pageKey,
+                    child: const PlaceholderScreen(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: ':batchId',
+                    pageBuilder: (context, state) {
+                      final batchId = state.pathParameters['batchId'] ?? '';
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: BiometricsView(batchId: batchId),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          return SlideTransition(
+                            position: animation.drive(
+                              Tween(
+                                begin: const Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).chain(CurveTween(curve: Curves.easeInOut)),
+                            ),
+                            child: child,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

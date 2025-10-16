@@ -12,8 +12,7 @@ part of 'corral.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 Corral _$CorralFromJson(Map<String, dynamic> json) {
   return _Corral.fromJson(json);
@@ -27,17 +26,17 @@ mixin _$Corral {
   int? get capacity => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   String? get imageUrl => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_by')
   String get createdBy => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
   int get activeBatchCount => throw _privateConstructorUsedError;
+  CorralStatus get status => throw _privateConstructorUsedError;
 
-  /// Serializes this Corral to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CorralCopyWith<Corral> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -46,18 +45,18 @@ abstract class $CorralCopyWith<$Res> {
   factory $CorralCopyWith(Corral value, $Res Function(Corral) then) =
       _$CorralCopyWithImpl<$Res, Corral>;
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String? location,
-    int? capacity,
-    String? notes,
-    String? imageUrl,
-    DateTime createdAt,
-    String createdBy,
-    DateTime updatedAt,
-    int activeBatchCount,
-  });
+  $Res call(
+      {String id,
+      String name,
+      String? location,
+      int? capacity,
+      String? notes,
+      String? imageUrl,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'created_by') String createdBy,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      int activeBatchCount,
+      CorralStatus status});
 }
 
 /// @nodoc
@@ -70,8 +69,6 @@ class _$CorralCopyWithImpl<$Res, $Val extends Corral>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -85,75 +82,76 @@ class _$CorralCopyWithImpl<$Res, $Val extends Corral>
     Object? createdBy = null,
     Object? updatedAt = null,
     Object? activeBatchCount = null,
+    Object? status = null,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
-                      as String,
-            location: freezed == location
-                ? _value.location
-                : location // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            capacity: freezed == capacity
-                ? _value.capacity
-                : capacity // ignore: cast_nullable_to_non_nullable
-                      as int?,
-            notes: freezed == notes
-                ? _value.notes
-                : notes // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            imageUrl: freezed == imageUrl
-                ? _value.imageUrl
-                : imageUrl // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            createdAt: null == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            createdBy: null == createdBy
-                ? _value.createdBy
-                : createdBy // ignore: cast_nullable_to_non_nullable
-                      as String,
-            updatedAt: null == updatedAt
-                ? _value.updatedAt
-                : updatedAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            activeBatchCount: null == activeBatchCount
-                ? _value.activeBatchCount
-                : activeBatchCount // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      capacity: freezed == capacity
+          ? _value.capacity
+          : capacity // ignore: cast_nullable_to_non_nullable
+              as int?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      createdBy: null == createdBy
+          ? _value.createdBy
+          : createdBy // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      activeBatchCount: null == activeBatchCount
+          ? _value.activeBatchCount
+          : activeBatchCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as CorralStatus,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$CorralImplCopyWith<$Res> implements $CorralCopyWith<$Res> {
   factory _$$CorralImplCopyWith(
-    _$CorralImpl value,
-    $Res Function(_$CorralImpl) then,
-  ) = __$$CorralImplCopyWithImpl<$Res>;
+          _$CorralImpl value, $Res Function(_$CorralImpl) then) =
+      __$$CorralImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String? location,
-    int? capacity,
-    String? notes,
-    String? imageUrl,
-    DateTime createdAt,
-    String createdBy,
-    DateTime updatedAt,
-    int activeBatchCount,
-  });
+  $Res call(
+      {String id,
+      String name,
+      String? location,
+      int? capacity,
+      String? notes,
+      String? imageUrl,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'created_by') String createdBy,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      int activeBatchCount,
+      CorralStatus status});
 }
 
 /// @nodoc
@@ -161,12 +159,9 @@ class __$$CorralImplCopyWithImpl<$Res>
     extends _$CorralCopyWithImpl<$Res, _$CorralImpl>
     implements _$$CorralImplCopyWith<$Res> {
   __$$CorralImplCopyWithImpl(
-    _$CorralImpl _value,
-    $Res Function(_$CorralImpl) _then,
-  ) : super(_value, _then);
+      _$CorralImpl _value, $Res Function(_$CorralImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -180,69 +175,72 @@ class __$$CorralImplCopyWithImpl<$Res>
     Object? createdBy = null,
     Object? updatedAt = null,
     Object? activeBatchCount = null,
+    Object? status = null,
   }) {
-    return _then(
-      _$CorralImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
-                  as String,
-        location: freezed == location
-            ? _value.location
-            : location // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        capacity: freezed == capacity
-            ? _value.capacity
-            : capacity // ignore: cast_nullable_to_non_nullable
-                  as int?,
-        notes: freezed == notes
-            ? _value.notes
-            : notes // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        imageUrl: freezed == imageUrl
-            ? _value.imageUrl
-            : imageUrl // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        createdAt: null == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        createdBy: null == createdBy
-            ? _value.createdBy
-            : createdBy // ignore: cast_nullable_to_non_nullable
-                  as String,
-        updatedAt: null == updatedAt
-            ? _value.updatedAt
-            : updatedAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        activeBatchCount: null == activeBatchCount
-            ? _value.activeBatchCount
-            : activeBatchCount // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+    return _then(_$CorralImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      capacity: freezed == capacity
+          ? _value.capacity
+          : capacity // ignore: cast_nullable_to_non_nullable
+              as int?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      createdBy: null == createdBy
+          ? _value.createdBy
+          : createdBy // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      activeBatchCount: null == activeBatchCount
+          ? _value.activeBatchCount
+          : activeBatchCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as CorralStatus,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$CorralImpl implements _Corral {
-  _$CorralImpl({
-    required this.id,
-    required this.name,
-    this.location,
-    this.capacity,
-    this.notes,
-    this.imageUrl,
-    required this.createdAt,
-    required this.createdBy,
-    required this.updatedAt,
-    this.activeBatchCount = 0,
-  });
+  _$CorralImpl(
+      {required this.id,
+      required this.name,
+      this.location,
+      this.capacity,
+      this.notes,
+      this.imageUrl,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'created_by') required this.createdBy,
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      this.activeBatchCount = 0,
+      this.status = CorralStatus.disponible});
 
   factory _$CorralImpl.fromJson(Map<String, dynamic> json) =>
       _$$CorralImplFromJson(json);
@@ -260,18 +258,24 @@ class _$CorralImpl implements _Corral {
   @override
   final String? imageUrl;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
+  @JsonKey(name: 'created_by')
   final String createdBy;
   @override
+  @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   @override
   @JsonKey()
   final int activeBatchCount;
+  @override
+  @JsonKey()
+  final CorralStatus status;
 
   @override
   String toString() {
-    return 'Corral(id: $id, name: $name, location: $location, capacity: $capacity, notes: $notes, imageUrl: $imageUrl, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, activeBatchCount: $activeBatchCount)';
+    return 'Corral(id: $id, name: $name, location: $location, capacity: $capacity, notes: $notes, imageUrl: $imageUrl, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, activeBatchCount: $activeBatchCount, status: $status)';
   }
 
   @override
@@ -295,28 +299,27 @@ class _$CorralImpl implements _Corral {
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.activeBatchCount, activeBatchCount) ||
-                other.activeBatchCount == activeBatchCount));
+                other.activeBatchCount == activeBatchCount) &&
+            (identical(other.status, status) || other.status == status));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    name,
-    location,
-    capacity,
-    notes,
-    imageUrl,
-    createdAt,
-    createdBy,
-    updatedAt,
-    activeBatchCount,
-  );
+      runtimeType,
+      id,
+      name,
+      location,
+      capacity,
+      notes,
+      imageUrl,
+      createdAt,
+      createdBy,
+      updatedAt,
+      activeBatchCount,
+      status);
 
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>
@@ -324,23 +327,25 @@ class _$CorralImpl implements _Corral {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CorralImplToJson(this);
+    return _$$CorralImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _Corral implements Corral {
-  factory _Corral({
-    required final String id,
-    required final String name,
-    final String? location,
-    final int? capacity,
-    final String? notes,
-    final String? imageUrl,
-    required final DateTime createdAt,
-    required final String createdBy,
-    required final DateTime updatedAt,
-    final int activeBatchCount,
-  }) = _$CorralImpl;
+  factory _Corral(
+      {required final String id,
+      required final String name,
+      final String? location,
+      final int? capacity,
+      final String? notes,
+      final String? imageUrl,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'created_by') required final String createdBy,
+      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      final int activeBatchCount,
+      final CorralStatus status}) = _$CorralImpl;
 
   factory _Corral.fromJson(Map<String, dynamic> json) = _$CorralImpl.fromJson;
 
@@ -357,18 +362,20 @@ abstract class _Corral implements Corral {
   @override
   String? get imageUrl;
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
+  @JsonKey(name: 'created_by')
   String get createdBy;
   @override
+  @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
   @override
   int get activeBatchCount;
-
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  CorralStatus get status;
+  @override
+  @JsonKey(ignore: true)
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

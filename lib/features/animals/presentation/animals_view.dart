@@ -18,7 +18,7 @@ class AnimalsView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -26,7 +26,7 @@ class AnimalsView extends ConsumerWidget {
         ),
         title: Text('Animales - $batchName'),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
       ),
       body: BatchAnimalsView(batchId: batchId),
       bottomNavigationBar: const MainBottomNavigationBar(currentIndex: 2),

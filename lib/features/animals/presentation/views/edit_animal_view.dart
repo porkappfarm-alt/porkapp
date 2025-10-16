@@ -19,6 +19,7 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
   late TextEditingController _identifierController;
   late TextEditingController _weightController;
   late TextEditingController _breedController;
+  late TextEditingController _typeController;
   late TextEditingController _notesController;
   late DateTime _birthDate;
   late DateTime _entryDate;
@@ -29,6 +30,7 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
     _identifierController = TextEditingController();
     _weightController = TextEditingController();
     _breedController = TextEditingController();
+    _typeController = TextEditingController();
     _notesController = TextEditingController();
     _birthDate = DateTime.now();
     _entryDate = DateTime.now();
@@ -46,6 +48,7 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
     _identifierController.dispose();
     _weightController.dispose();
     _breedController.dispose();
+    _typeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -53,9 +56,8 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
   Future<void> _loadAnimalData() async {
     if (widget.animalId == null) return;
 
-    final animalResult = await ref
-        .read(animalRepositoryProvider)
-        .getAnimal(widget.animalId!);
+    final animalResult =
+        await ref.read(animalRepositoryProvider).getAnimal(widget.animalId!);
 
     animalResult.fold(
       (error) {
@@ -71,10 +73,11 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
         setState(() {
           _identifierController.text = animal.identifier;
           _weightController.text = animal.weight.toString();
-          _breedController.text = animal.breed;
+          _breedController.text = animal.breed ?? '';
+          _typeController.text = animal.type;
           _notesController.text = animal.notes ?? '';
-          _birthDate = animal.birthDate;
-          _entryDate = animal.entryDate;
+          _birthDate = animal.birthDate ?? DateTime.now();
+          _entryDate = animal.entryDate ?? DateTime.now();
         });
       },
     );
@@ -108,11 +111,14 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
       identifier: _identifierController.text,
       weight: double.parse(_weightController.text),
       breed: _breedController.text,
+      type: _typeController.text,
       birthDate: _birthDate,
       entryDate: _entryDate,
       notes: _notesController.text.isEmpty ? null : _notesController.text,
       status: 'active',
       createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      gender: 'unknown', // You might want to add a field to capture gender in your form
     );
 
     final repository = ref.read(animalRepositoryProvider);
@@ -184,6 +190,22 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
                 }
                 if (double.tryParse(value) == null) {
                   return 'Ingrese un número válido';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            // Tipo de animal
+            TextFormField(
+              controller: _typeController,
+              decoration: const InputDecoration(
+                labelText: 'Tipo de Animal',
+                border: OutlineInputBorder(),
+                hintText: 'Ej: Cerdo de engorde, Reproductor, etc.',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El tipo de animal es requerido';
                 }
                 return null;
               },

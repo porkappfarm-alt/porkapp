@@ -36,7 +36,7 @@ class BatchesView extends ConsumerWidget {
                       Text(
                         'No hay lotes creados',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onBackground.withOpacity(
+                          color: theme.colorScheme.onSurface.withOpacity(
                             0.7,
                           ),
                         ),

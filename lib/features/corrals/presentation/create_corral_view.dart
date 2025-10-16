@@ -107,7 +107,7 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -115,7 +115,7 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
         ),
         title: Text(isEditing ? 'Editar Corral' : 'Nuevo Corral'),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
       ),
       body: Form(
         key: _formKey,

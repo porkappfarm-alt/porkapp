@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 
 class BatchDetailsView extends StatelessWidget {
@@ -11,7 +12,7 @@ class BatchDetailsView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -19,7 +20,7 @@ class BatchDetailsView extends StatelessWidget {
         ),
         title: const Text('Detalles de Lote'),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.background.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -79,7 +80,60 @@ class BatchDetailsView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          // TODO: Add animal list, statistics, and actions
+          // Sección de animales
+          Card(
+            child: InkWell(
+              onTap: () => context.go('/batches/${batch.id}/animals'),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Animales del Lote',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Ver y gestionar todos los animales asociados a este lote.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.pets,
+                          color: theme.colorScheme.primary,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${batch.headcountStart} animales registrados',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

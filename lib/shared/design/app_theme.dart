@@ -1,54 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:porkapp/shared/design/design_system.dart';
+import 'package:porkapp/shared/design/app_styles.dart';
+import 'package:porkapp/shared/design/app_theme_data.dart';
 
 abstract class AppTheme {
   static ThemeData get light => ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: DesignSystem.colors.primary,
-      background: DesignSystem.colors.backgroundLight,
-      surface: DesignSystem.colors.surfaceLight,
-      onSurface: DesignSystem.colors.textLight,
-      onBackground: DesignSystem.colors.textLight,
+    colorScheme: ColorScheme(
+      brightness: Brightness.light,
+      primary: AppColors.coral,
+      onPrimary: AppColors.white,
+      secondary: AppColors.verdeField,
+      onSecondary: AppColors.white,
+      error: AppColors.error,
+      onError: AppColors.white,
+      surface: AppColors.surfacePrimary,
+      onSurface: AppColors.textPrimary,
     ),
-    textTheme: GoogleFonts.interTextTheme(),
-    cardTheme: CardThemeData(
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    textTheme: TextTheme(
+      displayLarge: AppTextStyles.h1,
+      displayMedium: AppTextStyles.h2,
+      displaySmall: AppTextStyles.h3,
+      bodyLarge: AppTextStyles.body1,
+      bodyMedium: AppTextStyles.body2,
+      labelLarge: AppTextStyles.button,
+      labelMedium: AppTextStyles.caption,
     ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.surfacePrimary,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: const BorderSide(color: AppColors.borderDark),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: const BorderSide(color: AppColors.borderLight),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: const BorderSide(color: AppColors.coral, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: const BorderSide(color: AppColors.error),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: const BorderSide(color: AppColors.error, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
       ),
     ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: AppButtonStyles.primaryButton,
+    ),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+      ),
+      color: AppColors.surfacePrimary,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: AppColors.error,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
     ),
   );
 
-  static ThemeData get dark => ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: DesignSystem.colors.primary,
-      brightness: Brightness.dark,
-      background: DesignSystem.colors.backgroundDark,
-      surface: DesignSystem.colors.surfaceDark,
-      onSurface: DesignSystem.colors.textDark,
-      onBackground: DesignSystem.colors.textDark,
-    ),
-    textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
-    cardTheme: CardThemeData(
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
-  );
+  static ThemeData get dark => light; // Por ahora usamos el mismo tema
 }

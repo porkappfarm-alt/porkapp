@@ -12,8 +12,7 @@ part of 'animal_event.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 AnimalEvent _$AnimalEventFromJson(Map<String, dynamic> json) {
   return _AnimalEvent.fromJson(json);
@@ -23,20 +22,27 @@ AnimalEvent _$AnimalEventFromJson(Map<String, dynamic> json) {
 mixin _$AnimalEvent {
   String get id => throw _privateConstructorUsedError;
   String get animalId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'event_date')
   DateTime get date => throw _privateConstructorUsedError;
   String get type =>
-      throw _privateConstructorUsedError; // weighing, treatment, mortality
+      throw _privateConstructorUsedError; // weighing, treatment, mortality, etc.
   Map<String, dynamic> get data => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  double? get weight => throw _privateConstructorUsedError;
+  @JsonKey(name: 'qty_feed')
+  double? get qtyFeed => throw _privateConstructorUsedError;
+  @JsonKey(name: 'death_cause')
+  String? get deathCause => throw _privateConstructorUsedError;
+  @JsonKey(name: 'batch_id')
+  String? get batchId => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
 
-  /// Serializes this AnimalEvent to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AnimalEventCopyWith<AnimalEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -44,19 +50,23 @@ mixin _$AnimalEvent {
 /// @nodoc
 abstract class $AnimalEventCopyWith<$Res> {
   factory $AnimalEventCopyWith(
-    AnimalEvent value,
-    $Res Function(AnimalEvent) then,
-  ) = _$AnimalEventCopyWithImpl<$Res, AnimalEvent>;
+          AnimalEvent value, $Res Function(AnimalEvent) then) =
+      _$AnimalEventCopyWithImpl<$Res, AnimalEvent>;
   @useResult
-  $Res call({
-    String id,
-    String animalId,
-    DateTime date,
-    String type,
-    Map<String, dynamic> data,
-    String? notes,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-  });
+  $Res call(
+      {String id,
+      String animalId,
+      @JsonKey(name: 'event_date') DateTime date,
+      String type,
+      Map<String, dynamic> data,
+      String? notes,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      double? weight,
+      @JsonKey(name: 'qty_feed') double? qtyFeed,
+      @JsonKey(name: 'death_cause') String? deathCause,
+      @JsonKey(name: 'batch_id') String? batchId,
+      String? description});
 }
 
 /// @nodoc
@@ -69,8 +79,6 @@ class _$AnimalEventCopyWithImpl<$Res, $Val extends AnimalEvent>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -81,40 +89,67 @@ class _$AnimalEventCopyWithImpl<$Res, $Val extends AnimalEvent>
     Object? data = null,
     Object? notes = freezed,
     Object? createdAt = null,
+    Object? updatedAt = freezed,
+    Object? weight = freezed,
+    Object? qtyFeed = freezed,
+    Object? deathCause = freezed,
+    Object? batchId = freezed,
+    Object? description = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            animalId: null == animalId
-                ? _value.animalId
-                : animalId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            date: null == date
-                ? _value.date
-                : date // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            type: null == type
-                ? _value.type
-                : type // ignore: cast_nullable_to_non_nullable
-                      as String,
-            data: null == data
-                ? _value.data
-                : data // ignore: cast_nullable_to_non_nullable
-                      as Map<String, dynamic>,
-            notes: freezed == notes
-                ? _value.notes
-                : notes // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            createdAt: null == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      animalId: null == animalId
+          ? _value.animalId
+          : animalId // ignore: cast_nullable_to_non_nullable
+              as String,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      weight: freezed == weight
+          ? _value.weight
+          : weight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      qtyFeed: freezed == qtyFeed
+          ? _value.qtyFeed
+          : qtyFeed // ignore: cast_nullable_to_non_nullable
+              as double?,
+      deathCause: freezed == deathCause
+          ? _value.deathCause
+          : deathCause // ignore: cast_nullable_to_non_nullable
+              as String?,
+      batchId: freezed == batchId
+          ? _value.batchId
+          : batchId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
@@ -122,20 +157,24 @@ class _$AnimalEventCopyWithImpl<$Res, $Val extends AnimalEvent>
 abstract class _$$AnimalEventImplCopyWith<$Res>
     implements $AnimalEventCopyWith<$Res> {
   factory _$$AnimalEventImplCopyWith(
-    _$AnimalEventImpl value,
-    $Res Function(_$AnimalEventImpl) then,
-  ) = __$$AnimalEventImplCopyWithImpl<$Res>;
+          _$AnimalEventImpl value, $Res Function(_$AnimalEventImpl) then) =
+      __$$AnimalEventImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String animalId,
-    DateTime date,
-    String type,
-    Map<String, dynamic> data,
-    String? notes,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-  });
+  $Res call(
+      {String id,
+      String animalId,
+      @JsonKey(name: 'event_date') DateTime date,
+      String type,
+      Map<String, dynamic> data,
+      String? notes,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      double? weight,
+      @JsonKey(name: 'qty_feed') double? qtyFeed,
+      @JsonKey(name: 'death_cause') String? deathCause,
+      @JsonKey(name: 'batch_id') String? batchId,
+      String? description});
 }
 
 /// @nodoc
@@ -143,12 +182,9 @@ class __$$AnimalEventImplCopyWithImpl<$Res>
     extends _$AnimalEventCopyWithImpl<$Res, _$AnimalEventImpl>
     implements _$$AnimalEventImplCopyWith<$Res> {
   __$$AnimalEventImplCopyWithImpl(
-    _$AnimalEventImpl _value,
-    $Res Function(_$AnimalEventImpl) _then,
-  ) : super(_value, _then);
+      _$AnimalEventImpl _value, $Res Function(_$AnimalEventImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -159,54 +195,88 @@ class __$$AnimalEventImplCopyWithImpl<$Res>
     Object? data = null,
     Object? notes = freezed,
     Object? createdAt = null,
+    Object? updatedAt = freezed,
+    Object? weight = freezed,
+    Object? qtyFeed = freezed,
+    Object? deathCause = freezed,
+    Object? batchId = freezed,
+    Object? description = freezed,
   }) {
-    return _then(
-      _$AnimalEventImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        animalId: null == animalId
-            ? _value.animalId
-            : animalId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        date: null == date
-            ? _value.date
-            : date // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        type: null == type
-            ? _value.type
-            : type // ignore: cast_nullable_to_non_nullable
-                  as String,
-        data: null == data
-            ? _value._data
-            : data // ignore: cast_nullable_to_non_nullable
-                  as Map<String, dynamic>,
-        notes: freezed == notes
-            ? _value.notes
-            : notes // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        createdAt: null == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-      ),
-    );
+    return _then(_$AnimalEventImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      animalId: null == animalId
+          ? _value.animalId
+          : animalId // ignore: cast_nullable_to_non_nullable
+              as String,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      weight: freezed == weight
+          ? _value.weight
+          : weight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      qtyFeed: freezed == qtyFeed
+          ? _value.qtyFeed
+          : qtyFeed // ignore: cast_nullable_to_non_nullable
+              as double?,
+      deathCause: freezed == deathCause
+          ? _value.deathCause
+          : deathCause // ignore: cast_nullable_to_non_nullable
+              as String?,
+      batchId: freezed == batchId
+          ? _value.batchId
+          : batchId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$AnimalEventImpl implements _AnimalEvent {
-  const _$AnimalEventImpl({
-    required this.id,
-    required this.animalId,
-    required this.date,
-    required this.type,
-    required final Map<String, dynamic> data,
-    this.notes,
-    @JsonKey(name: 'created_at') required this.createdAt,
-  }) : _data = data;
+  const _$AnimalEventImpl(
+      {required this.id,
+      required this.animalId,
+      @JsonKey(name: 'event_date') required this.date,
+      required this.type,
+      required final Map<String, dynamic> data,
+      this.notes,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      this.weight,
+      @JsonKey(name: 'qty_feed') this.qtyFeed,
+      @JsonKey(name: 'death_cause') this.deathCause,
+      @JsonKey(name: 'batch_id') this.batchId,
+      this.description})
+      : _data = data;
 
   factory _$AnimalEventImpl.fromJson(Map<String, dynamic> json) =>
       _$$AnimalEventImplFromJson(json);
@@ -216,12 +286,13 @@ class _$AnimalEventImpl implements _AnimalEvent {
   @override
   final String animalId;
   @override
+  @JsonKey(name: 'event_date')
   final DateTime date;
   @override
   final String type;
-  // weighing, treatment, mortality
+// weighing, treatment, mortality, etc.
   final Map<String, dynamic> _data;
-  // weighing, treatment, mortality
+// weighing, treatment, mortality, etc.
   @override
   Map<String, dynamic> get data {
     if (_data is EqualUnmodifiableMapView) return _data;
@@ -234,10 +305,26 @@ class _$AnimalEventImpl implements _AnimalEvent {
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
+  @override
+  final double? weight;
+  @override
+  @JsonKey(name: 'qty_feed')
+  final double? qtyFeed;
+  @override
+  @JsonKey(name: 'death_cause')
+  final String? deathCause;
+  @override
+  @JsonKey(name: 'batch_id')
+  final String? batchId;
+  @override
+  final String? description;
 
   @override
   String toString() {
-    return 'AnimalEvent(id: $id, animalId: $animalId, date: $date, type: $type, data: $data, notes: $notes, createdAt: $createdAt)';
+    return 'AnimalEvent(id: $id, animalId: $animalId, date: $date, type: $type, data: $data, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, weight: $weight, qtyFeed: $qtyFeed, deathCause: $deathCause, batchId: $batchId, description: $description)';
   }
 
   @override
@@ -253,25 +340,37 @@ class _$AnimalEventImpl implements _AnimalEvent {
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.weight, weight) || other.weight == weight) &&
+            (identical(other.qtyFeed, qtyFeed) || other.qtyFeed == qtyFeed) &&
+            (identical(other.deathCause, deathCause) ||
+                other.deathCause == deathCause) &&
+            (identical(other.batchId, batchId) || other.batchId == batchId) &&
+            (identical(other.description, description) ||
+                other.description == description));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    animalId,
-    date,
-    type,
-    const DeepCollectionEquality().hash(_data),
-    notes,
-    createdAt,
-  );
+      runtimeType,
+      id,
+      animalId,
+      date,
+      type,
+      const DeepCollectionEquality().hash(_data),
+      notes,
+      createdAt,
+      updatedAt,
+      weight,
+      qtyFeed,
+      deathCause,
+      batchId,
+      description);
 
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalEventImplCopyWith<_$AnimalEventImpl> get copyWith =>
@@ -279,20 +378,27 @@ class _$AnimalEventImpl implements _AnimalEvent {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AnimalEventImplToJson(this);
+    return _$$AnimalEventImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _AnimalEvent implements AnimalEvent {
-  const factory _AnimalEvent({
-    required final String id,
-    required final String animalId,
-    required final DateTime date,
-    required final String type,
-    required final Map<String, dynamic> data,
-    final String? notes,
-    @JsonKey(name: 'created_at') required final DateTime createdAt,
-  }) = _$AnimalEventImpl;
+  const factory _AnimalEvent(
+      {required final String id,
+      required final String animalId,
+      @JsonKey(name: 'event_date') required final DateTime date,
+      required final String type,
+      required final Map<String, dynamic> data,
+      final String? notes,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      final double? weight,
+      @JsonKey(name: 'qty_feed') final double? qtyFeed,
+      @JsonKey(name: 'death_cause') final String? deathCause,
+      @JsonKey(name: 'batch_id') final String? batchId,
+      final String? description}) = _$AnimalEventImpl;
 
   factory _AnimalEvent.fromJson(Map<String, dynamic> json) =
       _$AnimalEventImpl.fromJson;
@@ -302,21 +408,35 @@ abstract class _AnimalEvent implements AnimalEvent {
   @override
   String get animalId;
   @override
+  @JsonKey(name: 'event_date')
   DateTime get date;
   @override
-  String get type; // weighing, treatment, mortality
-  @override
+  String get type;
+  @override // weighing, treatment, mortality, etc.
   Map<String, dynamic> get data;
   @override
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
-
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt;
+  @override
+  double? get weight;
+  @override
+  @JsonKey(name: 'qty_feed')
+  double? get qtyFeed;
+  @override
+  @JsonKey(name: 'death_cause')
+  String? get deathCause;
+  @override
+  @JsonKey(name: 'batch_id')
+  String? get batchId;
+  @override
+  String? get description;
+  @override
+  @JsonKey(ignore: true)
   _$$AnimalEventImplCopyWith<_$AnimalEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

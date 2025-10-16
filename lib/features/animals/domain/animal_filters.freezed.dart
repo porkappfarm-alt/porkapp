@@ -12,8 +12,7 @@ part of 'animal_filters.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 AnimalFilters _$AnimalFiltersFromJson(Map<String, dynamic> json) {
   return _AnimalFilters.fromJson(json);
@@ -21,11 +20,13 @@ AnimalFilters _$AnimalFiltersFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AnimalFilters {
-  // Tipo de animal
+// Tipo de animal
   @AnimalTypeConverter()
-  AnimalType? get type => throw _privateConstructorUsedError; // Estado del animal
+  AnimalType? get type =>
+      throw _privateConstructorUsedError; // Estado del animal
   @AnimalStatusConverter()
-  AnimalStatus? get status => throw _privateConstructorUsedError; // Rango de fechas
+  AnimalStatus? get status =>
+      throw _privateConstructorUsedError; // Rango de fechas
   DateTime? get dateFrom => throw _privateConstructorUsedError;
   DateTime? get dateTo =>
       throw _privateConstructorUsedError; // Filtros adicionales
@@ -36,12 +37,8 @@ mixin _$AnimalFilters {
   bool? get isMale => throw _privateConstructorUsedError;
   String? get searchQuery => throw _privateConstructorUsedError;
 
-  /// Serializes this AnimalFilters to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AnimalFiltersCopyWith<AnimalFilters> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -49,22 +46,20 @@ mixin _$AnimalFilters {
 /// @nodoc
 abstract class $AnimalFiltersCopyWith<$Res> {
   factory $AnimalFiltersCopyWith(
-    AnimalFilters value,
-    $Res Function(AnimalFilters) then,
-  ) = _$AnimalFiltersCopyWithImpl<$Res, AnimalFilters>;
+          AnimalFilters value, $Res Function(AnimalFilters) then) =
+      _$AnimalFiltersCopyWithImpl<$Res, AnimalFilters>;
   @useResult
-  $Res call({
-    @AnimalTypeConverter() AnimalType? type,
-    @AnimalStatusConverter() AnimalStatus? status,
-    DateTime? dateFrom,
-    DateTime? dateTo,
-    String? batchId,
-    String? corralId,
-    double? minWeight,
-    double? maxWeight,
-    bool? isMale,
-    String? searchQuery,
-  });
+  $Res call(
+      {@AnimalTypeConverter() AnimalType? type,
+      @AnimalStatusConverter() AnimalStatus? status,
+      DateTime? dateFrom,
+      DateTime? dateTo,
+      String? batchId,
+      String? corralId,
+      double? minWeight,
+      double? maxWeight,
+      bool? isMale,
+      String? searchQuery});
 
   $AnimalTypeCopyWith<$Res>? get type;
   $AnimalStatusCopyWith<$Res>? get status;
@@ -80,8 +75,6 @@ class _$AnimalFiltersCopyWithImpl<$Res, $Val extends AnimalFilters>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -96,55 +89,50 @@ class _$AnimalFiltersCopyWithImpl<$Res, $Val extends AnimalFilters>
     Object? isMale = freezed,
     Object? searchQuery = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            type: freezed == type
-                ? _value.type
-                : type // ignore: cast_nullable_to_non_nullable
-                      as AnimalType?,
-            status: freezed == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as AnimalStatus?,
-            dateFrom: freezed == dateFrom
-                ? _value.dateFrom
-                : dateFrom // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            dateTo: freezed == dateTo
-                ? _value.dateTo
-                : dateTo // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            batchId: freezed == batchId
-                ? _value.batchId
-                : batchId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            corralId: freezed == corralId
-                ? _value.corralId
-                : corralId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            minWeight: freezed == minWeight
-                ? _value.minWeight
-                : minWeight // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            maxWeight: freezed == maxWeight
-                ? _value.maxWeight
-                : maxWeight // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            isMale: freezed == isMale
-                ? _value.isMale
-                : isMale // ignore: cast_nullable_to_non_nullable
-                      as bool?,
-            searchQuery: freezed == searchQuery
-                ? _value.searchQuery
-                : searchQuery // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as AnimalType?,
+      status: freezed == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as AnimalStatus?,
+      dateFrom: freezed == dateFrom
+          ? _value.dateFrom
+          : dateFrom // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      dateTo: freezed == dateTo
+          ? _value.dateTo
+          : dateTo // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      batchId: freezed == batchId
+          ? _value.batchId
+          : batchId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      corralId: freezed == corralId
+          ? _value.corralId
+          : corralId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      minWeight: freezed == minWeight
+          ? _value.minWeight
+          : minWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      maxWeight: freezed == maxWeight
+          ? _value.maxWeight
+          : maxWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      isMale: freezed == isMale
+          ? _value.isMale
+          : isMale // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      searchQuery: freezed == searchQuery
+          ? _value.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $AnimalTypeCopyWith<$Res>? get type {
@@ -157,8 +145,6 @@ class _$AnimalFiltersCopyWithImpl<$Res, $Val extends AnimalFilters>
     });
   }
 
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $AnimalStatusCopyWith<$Res>? get status {
@@ -176,23 +162,21 @@ class _$AnimalFiltersCopyWithImpl<$Res, $Val extends AnimalFilters>
 abstract class _$$AnimalFiltersImplCopyWith<$Res>
     implements $AnimalFiltersCopyWith<$Res> {
   factory _$$AnimalFiltersImplCopyWith(
-    _$AnimalFiltersImpl value,
-    $Res Function(_$AnimalFiltersImpl) then,
-  ) = __$$AnimalFiltersImplCopyWithImpl<$Res>;
+          _$AnimalFiltersImpl value, $Res Function(_$AnimalFiltersImpl) then) =
+      __$$AnimalFiltersImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @AnimalTypeConverter() AnimalType? type,
-    @AnimalStatusConverter() AnimalStatus? status,
-    DateTime? dateFrom,
-    DateTime? dateTo,
-    String? batchId,
-    String? corralId,
-    double? minWeight,
-    double? maxWeight,
-    bool? isMale,
-    String? searchQuery,
-  });
+  $Res call(
+      {@AnimalTypeConverter() AnimalType? type,
+      @AnimalStatusConverter() AnimalStatus? status,
+      DateTime? dateFrom,
+      DateTime? dateTo,
+      String? batchId,
+      String? corralId,
+      double? minWeight,
+      double? maxWeight,
+      bool? isMale,
+      String? searchQuery});
 
   @override
   $AnimalTypeCopyWith<$Res>? get type;
@@ -205,12 +189,9 @@ class __$$AnimalFiltersImplCopyWithImpl<$Res>
     extends _$AnimalFiltersCopyWithImpl<$Res, _$AnimalFiltersImpl>
     implements _$$AnimalFiltersImplCopyWith<$Res> {
   __$$AnimalFiltersImplCopyWithImpl(
-    _$AnimalFiltersImpl _value,
-    $Res Function(_$AnimalFiltersImpl) _then,
-  ) : super(_value, _then);
+      _$AnimalFiltersImpl _value, $Res Function(_$AnimalFiltersImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -225,86 +206,83 @@ class __$$AnimalFiltersImplCopyWithImpl<$Res>
     Object? isMale = freezed,
     Object? searchQuery = freezed,
   }) {
-    return _then(
-      _$AnimalFiltersImpl(
-        type: freezed == type
-            ? _value.type
-            : type // ignore: cast_nullable_to_non_nullable
-                  as AnimalType?,
-        status: freezed == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as AnimalStatus?,
-        dateFrom: freezed == dateFrom
-            ? _value.dateFrom
-            : dateFrom // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        dateTo: freezed == dateTo
-            ? _value.dateTo
-            : dateTo // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        batchId: freezed == batchId
-            ? _value.batchId
-            : batchId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        corralId: freezed == corralId
-            ? _value.corralId
-            : corralId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        minWeight: freezed == minWeight
-            ? _value.minWeight
-            : minWeight // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        maxWeight: freezed == maxWeight
-            ? _value.maxWeight
-            : maxWeight // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        isMale: freezed == isMale
-            ? _value.isMale
-            : isMale // ignore: cast_nullable_to_non_nullable
-                  as bool?,
-        searchQuery: freezed == searchQuery
-            ? _value.searchQuery
-            : searchQuery // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$AnimalFiltersImpl(
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as AnimalType?,
+      status: freezed == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as AnimalStatus?,
+      dateFrom: freezed == dateFrom
+          ? _value.dateFrom
+          : dateFrom // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      dateTo: freezed == dateTo
+          ? _value.dateTo
+          : dateTo // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      batchId: freezed == batchId
+          ? _value.batchId
+          : batchId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      corralId: freezed == corralId
+          ? _value.corralId
+          : corralId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      minWeight: freezed == minWeight
+          ? _value.minWeight
+          : minWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      maxWeight: freezed == maxWeight
+          ? _value.maxWeight
+          : maxWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      isMale: freezed == isMale
+          ? _value.isMale
+          : isMale // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      searchQuery: freezed == searchQuery
+          ? _value.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$AnimalFiltersImpl implements _AnimalFilters {
-  const _$AnimalFiltersImpl({
-    @AnimalTypeConverter() this.type,
-    @AnimalStatusConverter() this.status,
-    this.dateFrom,
-    this.dateTo,
-    this.batchId,
-    this.corralId,
-    this.minWeight,
-    this.maxWeight,
-    this.isMale,
-    this.searchQuery,
-  });
+  const _$AnimalFiltersImpl(
+      {@AnimalTypeConverter() this.type,
+      @AnimalStatusConverter() this.status,
+      this.dateFrom,
+      this.dateTo,
+      this.batchId,
+      this.corralId,
+      this.minWeight,
+      this.maxWeight,
+      this.isMale,
+      this.searchQuery});
 
   factory _$AnimalFiltersImpl.fromJson(Map<String, dynamic> json) =>
       _$$AnimalFiltersImplFromJson(json);
 
-  // Tipo de animal
+// Tipo de animal
   @override
   @AnimalTypeConverter()
   final AnimalType? type;
-  // Estado del animal
+// Estado del animal
   @override
   @AnimalStatusConverter()
   final AnimalStatus? status;
-  // Rango de fechas
+// Rango de fechas
   @override
   final DateTime? dateFrom;
   @override
   final DateTime? dateTo;
-  // Filtros adicionales
+// Filtros adicionales
   @override
   final String? batchId;
   @override
@@ -345,25 +323,12 @@ class _$AnimalFiltersImpl implements _AnimalFilters {
                 other.searchQuery == searchQuery));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    type,
-    status,
-    dateFrom,
-    dateTo,
-    batchId,
-    corralId,
-    minWeight,
-    maxWeight,
-    isMale,
-    searchQuery,
-  );
+  int get hashCode => Object.hash(runtimeType, type, status, dateFrom, dateTo,
+      batchId, corralId, minWeight, maxWeight, isMale, searchQuery);
 
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalFiltersImplCopyWith<_$AnimalFiltersImpl> get copyWith =>
@@ -371,39 +336,39 @@ class _$AnimalFiltersImpl implements _AnimalFilters {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AnimalFiltersImplToJson(this);
+    return _$$AnimalFiltersImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _AnimalFilters implements AnimalFilters {
-  const factory _AnimalFilters({
-    @AnimalTypeConverter() final AnimalType? type,
-    @AnimalStatusConverter() final AnimalStatus? status,
-    final DateTime? dateFrom,
-    final DateTime? dateTo,
-    final String? batchId,
-    final String? corralId,
-    final double? minWeight,
-    final double? maxWeight,
-    final bool? isMale,
-    final String? searchQuery,
-  }) = _$AnimalFiltersImpl;
+  const factory _AnimalFilters(
+      {@AnimalTypeConverter() final AnimalType? type,
+      @AnimalStatusConverter() final AnimalStatus? status,
+      final DateTime? dateFrom,
+      final DateTime? dateTo,
+      final String? batchId,
+      final String? corralId,
+      final double? minWeight,
+      final double? maxWeight,
+      final bool? isMale,
+      final String? searchQuery}) = _$AnimalFiltersImpl;
 
   factory _AnimalFilters.fromJson(Map<String, dynamic> json) =
       _$AnimalFiltersImpl.fromJson;
 
-  // Tipo de animal
-  @override
+  @override // Tipo de animal
   @AnimalTypeConverter()
-  AnimalType? get type; // Estado del animal
-  @override
+  AnimalType? get type;
+  @override // Estado del animal
   @AnimalStatusConverter()
-  AnimalStatus? get status; // Rango de fechas
-  @override
+  AnimalStatus? get status;
+  @override // Rango de fechas
   DateTime? get dateFrom;
   @override
-  DateTime? get dateTo; // Filtros adicionales
-  @override
+  DateTime? get dateTo;
+  @override // Filtros adicionales
   String? get batchId;
   @override
   String? get corralId;
@@ -415,11 +380,8 @@ abstract class _AnimalFilters implements AnimalFilters {
   bool? get isMale;
   @override
   String? get searchQuery;
-
-  /// Create a copy of AnimalFilters
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AnimalFiltersImplCopyWith<_$AnimalFiltersImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -432,14 +394,16 @@ mixin _$AnimalType {
     required TResult Function() sow,
     required TResult Function() boar,
     required TResult Function() fattening,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? piglet,
     TResult? Function()? sow,
     TResult? Function()? boar,
     TResult? Function()? fattening,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? piglet,
@@ -447,21 +411,24 @@ mixin _$AnimalType {
     TResult Function()? boar,
     TResult Function()? fattening,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AnimalTypePiglet value) piglet,
     required TResult Function(AnimalTypeSow value) sow,
     required TResult Function(AnimalTypeBoar value) boar,
     required TResult Function(AnimalTypeFattening value) fattening,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AnimalTypePiglet value)? piglet,
     TResult? Function(AnimalTypeSow value)? sow,
     TResult? Function(AnimalTypeBoar value)? boar,
     TResult? Function(AnimalTypeFattening value)? fattening,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AnimalTypePiglet value)? piglet,
@@ -469,15 +436,15 @@ mixin _$AnimalType {
     TResult Function(AnimalTypeBoar value)? boar,
     TResult Function(AnimalTypeFattening value)? fattening,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $AnimalTypeCopyWith<$Res> {
   factory $AnimalTypeCopyWith(
-    AnimalType value,
-    $Res Function(AnimalType) then,
-  ) = _$AnimalTypeCopyWithImpl<$Res, AnimalType>;
+          AnimalType value, $Res Function(AnimalType) then) =
+      _$AnimalTypeCopyWithImpl<$Res, AnimalType>;
 }
 
 /// @nodoc
@@ -489,30 +456,22 @@ class _$AnimalTypeCopyWithImpl<$Res, $Val extends AnimalType>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of AnimalType
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 abstract class _$$AnimalTypePigletImplCopyWith<$Res> {
-  factory _$$AnimalTypePigletImplCopyWith(
-    _$AnimalTypePigletImpl value,
-    $Res Function(_$AnimalTypePigletImpl) then,
-  ) = __$$AnimalTypePigletImplCopyWithImpl<$Res>;
+  factory _$$AnimalTypePigletImplCopyWith(_$AnimalTypePigletImpl value,
+          $Res Function(_$AnimalTypePigletImpl) then) =
+      __$$AnimalTypePigletImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalTypePigletImplCopyWithImpl<$Res>
     extends _$AnimalTypeCopyWithImpl<$Res, _$AnimalTypePigletImpl>
     implements _$$AnimalTypePigletImplCopyWith<$Res> {
-  __$$AnimalTypePigletImplCopyWithImpl(
-    _$AnimalTypePigletImpl _value,
-    $Res Function(_$AnimalTypePigletImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalType
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalTypePigletImplCopyWithImpl(_$AnimalTypePigletImpl _value,
+      $Res Function(_$AnimalTypePigletImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -616,9 +575,8 @@ abstract class AnimalTypePiglet implements AnimalType {
 /// @nodoc
 abstract class _$$AnimalTypeSowImplCopyWith<$Res> {
   factory _$$AnimalTypeSowImplCopyWith(
-    _$AnimalTypeSowImpl value,
-    $Res Function(_$AnimalTypeSowImpl) then,
-  ) = __$$AnimalTypeSowImplCopyWithImpl<$Res>;
+          _$AnimalTypeSowImpl value, $Res Function(_$AnimalTypeSowImpl) then) =
+      __$$AnimalTypeSowImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -626,12 +584,8 @@ class __$$AnimalTypeSowImplCopyWithImpl<$Res>
     extends _$AnimalTypeCopyWithImpl<$Res, _$AnimalTypeSowImpl>
     implements _$$AnimalTypeSowImplCopyWith<$Res> {
   __$$AnimalTypeSowImplCopyWithImpl(
-    _$AnimalTypeSowImpl _value,
-    $Res Function(_$AnimalTypeSowImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalType
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalTypeSowImpl _value, $Res Function(_$AnimalTypeSowImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -734,10 +688,9 @@ abstract class AnimalTypeSow implements AnimalType {
 
 /// @nodoc
 abstract class _$$AnimalTypeBoarImplCopyWith<$Res> {
-  factory _$$AnimalTypeBoarImplCopyWith(
-    _$AnimalTypeBoarImpl value,
-    $Res Function(_$AnimalTypeBoarImpl) then,
-  ) = __$$AnimalTypeBoarImplCopyWithImpl<$Res>;
+  factory _$$AnimalTypeBoarImplCopyWith(_$AnimalTypeBoarImpl value,
+          $Res Function(_$AnimalTypeBoarImpl) then) =
+      __$$AnimalTypeBoarImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -745,12 +698,8 @@ class __$$AnimalTypeBoarImplCopyWithImpl<$Res>
     extends _$AnimalTypeCopyWithImpl<$Res, _$AnimalTypeBoarImpl>
     implements _$$AnimalTypeBoarImplCopyWith<$Res> {
   __$$AnimalTypeBoarImplCopyWithImpl(
-    _$AnimalTypeBoarImpl _value,
-    $Res Function(_$AnimalTypeBoarImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalType
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalTypeBoarImpl _value, $Res Function(_$AnimalTypeBoarImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -853,23 +802,18 @@ abstract class AnimalTypeBoar implements AnimalType {
 
 /// @nodoc
 abstract class _$$AnimalTypeFatteningImplCopyWith<$Res> {
-  factory _$$AnimalTypeFatteningImplCopyWith(
-    _$AnimalTypeFatteningImpl value,
-    $Res Function(_$AnimalTypeFatteningImpl) then,
-  ) = __$$AnimalTypeFatteningImplCopyWithImpl<$Res>;
+  factory _$$AnimalTypeFatteningImplCopyWith(_$AnimalTypeFatteningImpl value,
+          $Res Function(_$AnimalTypeFatteningImpl) then) =
+      __$$AnimalTypeFatteningImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalTypeFatteningImplCopyWithImpl<$Res>
     extends _$AnimalTypeCopyWithImpl<$Res, _$AnimalTypeFatteningImpl>
     implements _$$AnimalTypeFatteningImplCopyWith<$Res> {
-  __$$AnimalTypeFatteningImplCopyWithImpl(
-    _$AnimalTypeFatteningImpl _value,
-    $Res Function(_$AnimalTypeFatteningImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalType
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalTypeFatteningImplCopyWithImpl(_$AnimalTypeFatteningImpl _value,
+      $Res Function(_$AnimalTypeFatteningImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -979,14 +923,16 @@ mixin _$AnimalStatus {
     required TResult Function() sold,
     required TResult Function() dead,
     required TResult Function() transferred,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? active,
     TResult? Function()? sold,
     TResult? Function()? dead,
     TResult? Function()? transferred,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? active,
@@ -994,21 +940,24 @@ mixin _$AnimalStatus {
     TResult Function()? dead,
     TResult Function()? transferred,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AnimalStatusActive value) active,
     required TResult Function(AnimalStatusSold value) sold,
     required TResult Function(AnimalStatusDead value) dead,
     required TResult Function(AnimalStatusTransferred value) transferred,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AnimalStatusActive value)? active,
     TResult? Function(AnimalStatusSold value)? sold,
     TResult? Function(AnimalStatusDead value)? dead,
     TResult? Function(AnimalStatusTransferred value)? transferred,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AnimalStatusActive value)? active,
@@ -1016,15 +965,15 @@ mixin _$AnimalStatus {
     TResult Function(AnimalStatusDead value)? dead,
     TResult Function(AnimalStatusTransferred value)? transferred,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $AnimalStatusCopyWith<$Res> {
   factory $AnimalStatusCopyWith(
-    AnimalStatus value,
-    $Res Function(AnimalStatus) then,
-  ) = _$AnimalStatusCopyWithImpl<$Res, AnimalStatus>;
+          AnimalStatus value, $Res Function(AnimalStatus) then) =
+      _$AnimalStatusCopyWithImpl<$Res, AnimalStatus>;
 }
 
 /// @nodoc
@@ -1036,30 +985,22 @@ class _$AnimalStatusCopyWithImpl<$Res, $Val extends AnimalStatus>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of AnimalStatus
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 abstract class _$$AnimalStatusActiveImplCopyWith<$Res> {
-  factory _$$AnimalStatusActiveImplCopyWith(
-    _$AnimalStatusActiveImpl value,
-    $Res Function(_$AnimalStatusActiveImpl) then,
-  ) = __$$AnimalStatusActiveImplCopyWithImpl<$Res>;
+  factory _$$AnimalStatusActiveImplCopyWith(_$AnimalStatusActiveImpl value,
+          $Res Function(_$AnimalStatusActiveImpl) then) =
+      __$$AnimalStatusActiveImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalStatusActiveImplCopyWithImpl<$Res>
     extends _$AnimalStatusCopyWithImpl<$Res, _$AnimalStatusActiveImpl>
     implements _$$AnimalStatusActiveImplCopyWith<$Res> {
-  __$$AnimalStatusActiveImplCopyWithImpl(
-    _$AnimalStatusActiveImpl _value,
-    $Res Function(_$AnimalStatusActiveImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalStatus
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalStatusActiveImplCopyWithImpl(_$AnimalStatusActiveImpl _value,
+      $Res Function(_$AnimalStatusActiveImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1162,23 +1103,18 @@ abstract class AnimalStatusActive implements AnimalStatus {
 
 /// @nodoc
 abstract class _$$AnimalStatusSoldImplCopyWith<$Res> {
-  factory _$$AnimalStatusSoldImplCopyWith(
-    _$AnimalStatusSoldImpl value,
-    $Res Function(_$AnimalStatusSoldImpl) then,
-  ) = __$$AnimalStatusSoldImplCopyWithImpl<$Res>;
+  factory _$$AnimalStatusSoldImplCopyWith(_$AnimalStatusSoldImpl value,
+          $Res Function(_$AnimalStatusSoldImpl) then) =
+      __$$AnimalStatusSoldImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalStatusSoldImplCopyWithImpl<$Res>
     extends _$AnimalStatusCopyWithImpl<$Res, _$AnimalStatusSoldImpl>
     implements _$$AnimalStatusSoldImplCopyWith<$Res> {
-  __$$AnimalStatusSoldImplCopyWithImpl(
-    _$AnimalStatusSoldImpl _value,
-    $Res Function(_$AnimalStatusSoldImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalStatus
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalStatusSoldImplCopyWithImpl(_$AnimalStatusSoldImpl _value,
+      $Res Function(_$AnimalStatusSoldImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1281,23 +1217,18 @@ abstract class AnimalStatusSold implements AnimalStatus {
 
 /// @nodoc
 abstract class _$$AnimalStatusDeadImplCopyWith<$Res> {
-  factory _$$AnimalStatusDeadImplCopyWith(
-    _$AnimalStatusDeadImpl value,
-    $Res Function(_$AnimalStatusDeadImpl) then,
-  ) = __$$AnimalStatusDeadImplCopyWithImpl<$Res>;
+  factory _$$AnimalStatusDeadImplCopyWith(_$AnimalStatusDeadImpl value,
+          $Res Function(_$AnimalStatusDeadImpl) then) =
+      __$$AnimalStatusDeadImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalStatusDeadImplCopyWithImpl<$Res>
     extends _$AnimalStatusCopyWithImpl<$Res, _$AnimalStatusDeadImpl>
     implements _$$AnimalStatusDeadImplCopyWith<$Res> {
-  __$$AnimalStatusDeadImplCopyWithImpl(
-    _$AnimalStatusDeadImpl _value,
-    $Res Function(_$AnimalStatusDeadImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalStatus
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalStatusDeadImplCopyWithImpl(_$AnimalStatusDeadImpl _value,
+      $Res Function(_$AnimalStatusDeadImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1401,9 +1332,9 @@ abstract class AnimalStatusDead implements AnimalStatus {
 /// @nodoc
 abstract class _$$AnimalStatusTransferredImplCopyWith<$Res> {
   factory _$$AnimalStatusTransferredImplCopyWith(
-    _$AnimalStatusTransferredImpl value,
-    $Res Function(_$AnimalStatusTransferredImpl) then,
-  ) = __$$AnimalStatusTransferredImplCopyWithImpl<$Res>;
+          _$AnimalStatusTransferredImpl value,
+          $Res Function(_$AnimalStatusTransferredImpl) then) =
+      __$$AnimalStatusTransferredImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -1411,12 +1342,9 @@ class __$$AnimalStatusTransferredImplCopyWithImpl<$Res>
     extends _$AnimalStatusCopyWithImpl<$Res, _$AnimalStatusTransferredImpl>
     implements _$$AnimalStatusTransferredImplCopyWith<$Res> {
   __$$AnimalStatusTransferredImplCopyWithImpl(
-    _$AnimalStatusTransferredImpl _value,
-    $Res Function(_$AnimalStatusTransferredImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalStatus
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalStatusTransferredImpl _value,
+      $Res Function(_$AnimalStatusTransferredImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1528,7 +1456,8 @@ mixin _$AnimalEventType {
     required TResult Function() sale,
     required TResult Function() transfer,
     required TResult Function() vaccination,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? weighing,
@@ -1537,7 +1466,8 @@ mixin _$AnimalEventType {
     TResult? Function()? sale,
     TResult? Function()? transfer,
     TResult? Function()? vaccination,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? weighing,
@@ -1547,7 +1477,8 @@ mixin _$AnimalEventType {
     TResult Function()? transfer,
     TResult Function()? vaccination,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AnimalEventTypeWeighing value) weighing,
@@ -1556,7 +1487,8 @@ mixin _$AnimalEventType {
     required TResult Function(AnimalEventTypeSale value) sale,
     required TResult Function(AnimalEventTypeTransfer value) transfer,
     required TResult Function(AnimalEventTypeVaccination value) vaccination,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AnimalEventTypeWeighing value)? weighing,
@@ -1565,7 +1497,8 @@ mixin _$AnimalEventType {
     TResult? Function(AnimalEventTypeSale value)? sale,
     TResult? Function(AnimalEventTypeTransfer value)? transfer,
     TResult? Function(AnimalEventTypeVaccination value)? vaccination,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AnimalEventTypeWeighing value)? weighing,
@@ -1575,15 +1508,15 @@ mixin _$AnimalEventType {
     TResult Function(AnimalEventTypeTransfer value)? transfer,
     TResult Function(AnimalEventTypeVaccination value)? vaccination,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $AnimalEventTypeCopyWith<$Res> {
   factory $AnimalEventTypeCopyWith(
-    AnimalEventType value,
-    $Res Function(AnimalEventType) then,
-  ) = _$AnimalEventTypeCopyWithImpl<$Res, AnimalEventType>;
+          AnimalEventType value, $Res Function(AnimalEventType) then) =
+      _$AnimalEventTypeCopyWithImpl<$Res, AnimalEventType>;
 }
 
 /// @nodoc
@@ -1595,17 +1528,14 @@ class _$AnimalEventTypeCopyWithImpl<$Res, $Val extends AnimalEventType>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 abstract class _$$AnimalEventTypeWeighingImplCopyWith<$Res> {
   factory _$$AnimalEventTypeWeighingImplCopyWith(
-    _$AnimalEventTypeWeighingImpl value,
-    $Res Function(_$AnimalEventTypeWeighingImpl) then,
-  ) = __$$AnimalEventTypeWeighingImplCopyWithImpl<$Res>;
+          _$AnimalEventTypeWeighingImpl value,
+          $Res Function(_$AnimalEventTypeWeighingImpl) then) =
+      __$$AnimalEventTypeWeighingImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -1613,12 +1543,9 @@ class __$$AnimalEventTypeWeighingImplCopyWithImpl<$Res>
     extends _$AnimalEventTypeCopyWithImpl<$Res, _$AnimalEventTypeWeighingImpl>
     implements _$$AnimalEventTypeWeighingImplCopyWith<$Res> {
   __$$AnimalEventTypeWeighingImplCopyWithImpl(
-    _$AnimalEventTypeWeighingImpl _value,
-    $Res Function(_$AnimalEventTypeWeighingImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalEventTypeWeighingImpl _value,
+      $Res Function(_$AnimalEventTypeWeighingImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1735,9 +1662,9 @@ abstract class AnimalEventTypeWeighing implements AnimalEventType {
 /// @nodoc
 abstract class _$$AnimalEventTypeTreatmentImplCopyWith<$Res> {
   factory _$$AnimalEventTypeTreatmentImplCopyWith(
-    _$AnimalEventTypeTreatmentImpl value,
-    $Res Function(_$AnimalEventTypeTreatmentImpl) then,
-  ) = __$$AnimalEventTypeTreatmentImplCopyWithImpl<$Res>;
+          _$AnimalEventTypeTreatmentImpl value,
+          $Res Function(_$AnimalEventTypeTreatmentImpl) then) =
+      __$$AnimalEventTypeTreatmentImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -1745,12 +1672,9 @@ class __$$AnimalEventTypeTreatmentImplCopyWithImpl<$Res>
     extends _$AnimalEventTypeCopyWithImpl<$Res, _$AnimalEventTypeTreatmentImpl>
     implements _$$AnimalEventTypeTreatmentImplCopyWith<$Res> {
   __$$AnimalEventTypeTreatmentImplCopyWithImpl(
-    _$AnimalEventTypeTreatmentImpl _value,
-    $Res Function(_$AnimalEventTypeTreatmentImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalEventTypeTreatmentImpl _value,
+      $Res Function(_$AnimalEventTypeTreatmentImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1866,23 +1790,18 @@ abstract class AnimalEventTypeTreatment implements AnimalEventType {
 
 /// @nodoc
 abstract class _$$AnimalEventTypeDeathImplCopyWith<$Res> {
-  factory _$$AnimalEventTypeDeathImplCopyWith(
-    _$AnimalEventTypeDeathImpl value,
-    $Res Function(_$AnimalEventTypeDeathImpl) then,
-  ) = __$$AnimalEventTypeDeathImplCopyWithImpl<$Res>;
+  factory _$$AnimalEventTypeDeathImplCopyWith(_$AnimalEventTypeDeathImpl value,
+          $Res Function(_$AnimalEventTypeDeathImpl) then) =
+      __$$AnimalEventTypeDeathImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalEventTypeDeathImplCopyWithImpl<$Res>
     extends _$AnimalEventTypeCopyWithImpl<$Res, _$AnimalEventTypeDeathImpl>
     implements _$$AnimalEventTypeDeathImplCopyWith<$Res> {
-  __$$AnimalEventTypeDeathImplCopyWithImpl(
-    _$AnimalEventTypeDeathImpl _value,
-    $Res Function(_$AnimalEventTypeDeathImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalEventTypeDeathImplCopyWithImpl(_$AnimalEventTypeDeathImpl _value,
+      $Res Function(_$AnimalEventTypeDeathImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1998,23 +1917,18 @@ abstract class AnimalEventTypeDeath implements AnimalEventType {
 
 /// @nodoc
 abstract class _$$AnimalEventTypeSaleImplCopyWith<$Res> {
-  factory _$$AnimalEventTypeSaleImplCopyWith(
-    _$AnimalEventTypeSaleImpl value,
-    $Res Function(_$AnimalEventTypeSaleImpl) then,
-  ) = __$$AnimalEventTypeSaleImplCopyWithImpl<$Res>;
+  factory _$$AnimalEventTypeSaleImplCopyWith(_$AnimalEventTypeSaleImpl value,
+          $Res Function(_$AnimalEventTypeSaleImpl) then) =
+      __$$AnimalEventTypeSaleImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalEventTypeSaleImplCopyWithImpl<$Res>
     extends _$AnimalEventTypeCopyWithImpl<$Res, _$AnimalEventTypeSaleImpl>
     implements _$$AnimalEventTypeSaleImplCopyWith<$Res> {
-  __$$AnimalEventTypeSaleImplCopyWithImpl(
-    _$AnimalEventTypeSaleImpl _value,
-    $Res Function(_$AnimalEventTypeSaleImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
+  __$$AnimalEventTypeSaleImplCopyWithImpl(_$AnimalEventTypeSaleImpl _value,
+      $Res Function(_$AnimalEventTypeSaleImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -2131,9 +2045,9 @@ abstract class AnimalEventTypeSale implements AnimalEventType {
 /// @nodoc
 abstract class _$$AnimalEventTypeTransferImplCopyWith<$Res> {
   factory _$$AnimalEventTypeTransferImplCopyWith(
-    _$AnimalEventTypeTransferImpl value,
-    $Res Function(_$AnimalEventTypeTransferImpl) then,
-  ) = __$$AnimalEventTypeTransferImplCopyWithImpl<$Res>;
+          _$AnimalEventTypeTransferImpl value,
+          $Res Function(_$AnimalEventTypeTransferImpl) then) =
+      __$$AnimalEventTypeTransferImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -2141,12 +2055,9 @@ class __$$AnimalEventTypeTransferImplCopyWithImpl<$Res>
     extends _$AnimalEventTypeCopyWithImpl<$Res, _$AnimalEventTypeTransferImpl>
     implements _$$AnimalEventTypeTransferImplCopyWith<$Res> {
   __$$AnimalEventTypeTransferImplCopyWithImpl(
-    _$AnimalEventTypeTransferImpl _value,
-    $Res Function(_$AnimalEventTypeTransferImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalEventTypeTransferImpl _value,
+      $Res Function(_$AnimalEventTypeTransferImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -2263,23 +2174,20 @@ abstract class AnimalEventTypeTransfer implements AnimalEventType {
 /// @nodoc
 abstract class _$$AnimalEventTypeVaccinationImplCopyWith<$Res> {
   factory _$$AnimalEventTypeVaccinationImplCopyWith(
-    _$AnimalEventTypeVaccinationImpl value,
-    $Res Function(_$AnimalEventTypeVaccinationImpl) then,
-  ) = __$$AnimalEventTypeVaccinationImplCopyWithImpl<$Res>;
+          _$AnimalEventTypeVaccinationImpl value,
+          $Res Function(_$AnimalEventTypeVaccinationImpl) then) =
+      __$$AnimalEventTypeVaccinationImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$AnimalEventTypeVaccinationImplCopyWithImpl<$Res>
-    extends
-        _$AnimalEventTypeCopyWithImpl<$Res, _$AnimalEventTypeVaccinationImpl>
+    extends _$AnimalEventTypeCopyWithImpl<$Res,
+        _$AnimalEventTypeVaccinationImpl>
     implements _$$AnimalEventTypeVaccinationImplCopyWith<$Res> {
   __$$AnimalEventTypeVaccinationImplCopyWithImpl(
-    _$AnimalEventTypeVaccinationImpl _value,
-    $Res Function(_$AnimalEventTypeVaccinationImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of AnimalEventType
-  /// with the given fields replaced by the non-null parameter values.
+      _$AnimalEventTypeVaccinationImpl _value,
+      $Res Function(_$AnimalEventTypeVaccinationImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc

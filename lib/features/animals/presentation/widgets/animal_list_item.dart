@@ -7,19 +7,24 @@ class AnimalListItem extends ConsumerWidget {
   final Animal animal;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onAddEvent;
+  final VoidCallback? onTap;
 
   const AnimalListItem({
     super.key,
     required this.animal,
     this.onEdit,
     this.onDelete,
+    this.onAddEvent,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    return Slidable(
+    return Material(
+      child: Slidable(
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
@@ -39,16 +44,26 @@ class AnimalListItem extends ConsumerWidget {
               icon: Icons.delete,
               label: 'Eliminar',
             ),
+          if (onAddEvent != null)
+            SlidableAction(
+              onPressed: (_) => onAddEvent?.call(),
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              icon: Icons.event_note,
+              label: 'Evento',
+            ),
         ],
       ),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          border: Border(
-            bottom: BorderSide(color: theme.dividerColor, width: 0.5),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            border: Border(
+              bottom: BorderSide(color: theme.dividerColor, width: 0.5),
+            ),
           ),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -98,7 +113,7 @@ class AnimalListItem extends ConsumerWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Ingreso: ${_formatDate(animal.entryDate)}',
+                  'Ingreso: ${_formatDate(animal.entryDate ?? DateTime.now())}',
                   style: theme.textTheme.bodyMedium,
                 ),
               ],
@@ -115,7 +130,8 @@ class AnimalListItem extends ConsumerWidget {
           ],
         ),
       ),
-    );
+    ),
+  ));
   }
 
   String _formatDate(DateTime date) {

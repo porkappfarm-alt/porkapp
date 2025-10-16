@@ -1,0 +1,25 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'animal.freezed.dart';
+part 'animal.g.dart';
+
+@freezed
+class Animal with _$Animal {
+  factory Animal({
+    required String id,
+    @JsonKey(name: 'batch_id') required String batchId,
+    required String identifier, // ID interno o número de arete
+    @JsonKey(name: 'birth_date') DateTime? birthDate,
+    @JsonKey(name: 'weight_at_entry') double? weight, // Peso inicial
+    required String breed,
+    @JsonKey(name: 'animal_type', defaultValue: 'fattening')
+    String type = 'fattening', // Tipo de animal (ej: cerdo de engorde, reproductor, etc)
+    @JsonKey(name: 'entry_date')
+    DateTime? entryDate, // Fecha de ingreso al lote
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @Default('active') String status, // active, sold, deceased, removed
+    String? notes,
+  }) = _Animal;
+
+  factory Animal.fromJson(Map<String, dynamic> json) => _$AnimalFromJson(json);
+}

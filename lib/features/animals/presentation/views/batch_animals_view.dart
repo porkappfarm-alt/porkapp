@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
+import 'package:porkapp/features/animals/presentation/animal_details_view.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_filters.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_list_item.dart';
 import 'package:porkapp/features/animals/presentation/views/animal_stats_view.dart';
 import 'package:porkapp/features/animals/presentation/views/edit_animal_view.dart';
+import 'package:porkapp/features/animals/presentation/views/animal_events_view.dart';
 import 'package:porkapp/features/animals/providers/animals_provider.dart';
 import 'package:porkapp/features/animals/data/animals_repository.dart';
 
@@ -40,8 +42,8 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
 
       // Filtro por fecha
       if (_dateFilter != null) {
-        if (animal.entryDate.isBefore(_dateFilter!.start) ||
-            animal.entryDate.isAfter(_dateFilter!.end)) {
+        if (animal.entryDate?.isBefore(_dateFilter!.start) == true ||
+            animal.entryDate?.isAfter(_dateFilter!.end) == true) {
           return false;
         }
       }
@@ -52,6 +54,7 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
 
   @override
   Widget build(BuildContext context) {
+    print('BatchAnimalsView - batchId: ${widget.batchId}'); // Debug log
     return Scaffold(
       body: Column(
         children: [
@@ -65,9 +68,7 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
 
           // Lista de animales
           Expanded(
-            child: ref
-                .watch(batchAnimalsProvider(widget.batchId))
-                .when(
+            child: ref.watch(batchAnimalsProvider(widget.batchId)).when(
                   data: (animals) {
                     final filteredAnimals = _filterAnimals(animals);
 
@@ -86,7 +87,9 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
                               animals.isEmpty
                                   ? 'No hay animales en este lote'
                                   : 'No se encontraron animales con los filtros actuales',
-                              style: Theme.of(context).textTheme.titleMedium
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
                                   ?.copyWith(color: Colors.grey),
                             ),
                             if (animals.isEmpty) ...[
@@ -112,12 +115,15 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
                         itemBuilder: (context, index) {
                           final animal = filteredAnimals[index];
                           return AnimalListItem(
-                            animal: animal,
-                            onEdit: () =>
-                                _showEditAnimalDialog(context, animal.id),
-                            onDelete: () =>
-                                _confirmDeleteAnimal(context, animal),
-                          );
+                              onTap: () => _showAnimalDetails(context, animal),
+                              animal: animal,
+                              onEdit: () =>
+                                  _showEditAnimalDialog(context, animal.id),
+                              onDelete: () =>
+                                  _confirmDeleteAnimal(context, animal),
+                              onAddEvent: () =>
+                                  _showAddEventDialog(context, animal),
+                            );
                         },
                       ),
                     );
@@ -165,20 +171,30 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
         children: [
           // Botón de estadísticas
           FloatingActionButton.small(
-            heroTag: 'stats',
+            heroTag: 'stats_${widget.batchId}',
             onPressed: () => _showStatsDialog(context),
             child: const Icon(Icons.bar_chart),
           ),
           const SizedBox(height: 8),
           // Botón de agregar animal
           FloatingActionButton(
-            heroTag: 'add',
+            heroTag: 'add_${widget.batchId}',
             onPressed: () => _showAddAnimalDialog(context),
             child: const Icon(Icons.add),
           ),
         ],
       ),
     );
+  }
+
+  void _showAnimalDetails(BuildContext context, Animal animal) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AnimalDetailsView(animalId: animal.id),
+      ),
+    );
+    // Recargar la lista de animales al volver
+    ref.invalidate(batchAnimalsProvider(widget.batchId));
   }
 
   void _showAddAnimalDialog(BuildContext context) {
@@ -246,6 +262,12 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
         }
       }
     }
+  }
+
+  void _showAddEventDialog(BuildContext context, Animal animal) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => AnimalEventsView(animal: animal)),
+    );
   }
 
   void _showStatsDialog(BuildContext context) {

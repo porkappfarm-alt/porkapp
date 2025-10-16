@@ -12,8 +12,7 @@ part of 'batch.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 Batch _$BatchFromJson(Map<String, dynamic> json) {
   return _Batch.fromJson(json);
@@ -35,13 +34,11 @@ mixin _$Batch {
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'image_url')
   String? get imageUrl => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+  List<Animal> get animals => throw _privateConstructorUsedError;
 
-  /// Serializes this Batch to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BatchCopyWith<Batch> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -50,17 +47,18 @@ abstract class $BatchCopyWith<$Res> {
   factory $BatchCopyWith(Batch value, $Res Function(Batch) then) =
       _$BatchCopyWithImpl<$Res, Batch>;
   @useResult
-  $Res call({
-    String id,
-    String name,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-    @JsonKey(name: 'headcount_start') int headcountStart,
-    @JsonKey(name: 'corral_id') String? corralId,
-    @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
-    String status,
-    String? notes,
-    @JsonKey(name: 'image_url') String? imageUrl,
-  });
+  $Res call(
+      {String id,
+      String name,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'headcount_start') int headcountStart,
+      @JsonKey(name: 'corral_id') String? corralId,
+      @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
+      String status,
+      String? notes,
+      @JsonKey(name: 'image_url') String? imageUrl,
+      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      List<Animal> animals});
 }
 
 /// @nodoc
@@ -73,8 +71,6 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -87,70 +83,72 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
     Object? status = null,
     Object? notes = freezed,
     Object? imageUrl = freezed,
+    Object? animals = null,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
-                      as String,
-            createdAt: null == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            headcountStart: null == headcountStart
-                ? _value.headcountStart
-                : headcountStart // ignore: cast_nullable_to_non_nullable
-                      as int,
-            corralId: freezed == corralId
-                ? _value.corralId
-                : corralId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            initialAvgWeight: freezed == initialAvgWeight
-                ? _value.initialAvgWeight
-                : initialAvgWeight // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String,
-            notes: freezed == notes
-                ? _value.notes
-                : notes // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            imageUrl: freezed == imageUrl
-                ? _value.imageUrl
-                : imageUrl // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      headcountStart: null == headcountStart
+          ? _value.headcountStart
+          : headcountStart // ignore: cast_nullable_to_non_nullable
+              as int,
+      corralId: freezed == corralId
+          ? _value.corralId
+          : corralId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      initialAvgWeight: freezed == initialAvgWeight
+          ? _value.initialAvgWeight
+          : initialAvgWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      animals: null == animals
+          ? _value.animals
+          : animals // ignore: cast_nullable_to_non_nullable
+              as List<Animal>,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$BatchImplCopyWith<$Res> implements $BatchCopyWith<$Res> {
   factory _$$BatchImplCopyWith(
-    _$BatchImpl value,
-    $Res Function(_$BatchImpl) then,
-  ) = __$$BatchImplCopyWithImpl<$Res>;
+          _$BatchImpl value, $Res Function(_$BatchImpl) then) =
+      __$$BatchImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String name,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-    @JsonKey(name: 'headcount_start') int headcountStart,
-    @JsonKey(name: 'corral_id') String? corralId,
-    @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
-    String status,
-    String? notes,
-    @JsonKey(name: 'image_url') String? imageUrl,
-  });
+  $Res call(
+      {String id,
+      String name,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'headcount_start') int headcountStart,
+      @JsonKey(name: 'corral_id') String? corralId,
+      @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
+      String status,
+      String? notes,
+      @JsonKey(name: 'image_url') String? imageUrl,
+      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      List<Animal> animals});
 }
 
 /// @nodoc
@@ -158,12 +156,9 @@ class __$$BatchImplCopyWithImpl<$Res>
     extends _$BatchCopyWithImpl<$Res, _$BatchImpl>
     implements _$$BatchImplCopyWith<$Res> {
   __$$BatchImplCopyWithImpl(
-    _$BatchImpl _value,
-    $Res Function(_$BatchImpl) _then,
-  ) : super(_value, _then);
+      _$BatchImpl _value, $Res Function(_$BatchImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -176,64 +171,69 @@ class __$$BatchImplCopyWithImpl<$Res>
     Object? status = null,
     Object? notes = freezed,
     Object? imageUrl = freezed,
+    Object? animals = null,
   }) {
-    return _then(
-      _$BatchImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
-                  as String,
-        createdAt: null == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        headcountStart: null == headcountStart
-            ? _value.headcountStart
-            : headcountStart // ignore: cast_nullable_to_non_nullable
-                  as int,
-        corralId: freezed == corralId
-            ? _value.corralId
-            : corralId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        initialAvgWeight: freezed == initialAvgWeight
-            ? _value.initialAvgWeight
-            : initialAvgWeight // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String,
-        notes: freezed == notes
-            ? _value.notes
-            : notes // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        imageUrl: freezed == imageUrl
-            ? _value.imageUrl
-            : imageUrl // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$BatchImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      headcountStart: null == headcountStart
+          ? _value.headcountStart
+          : headcountStart // ignore: cast_nullable_to_non_nullable
+              as int,
+      corralId: freezed == corralId
+          ? _value.corralId
+          : corralId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      initialAvgWeight: freezed == initialAvgWeight
+          ? _value.initialAvgWeight
+          : initialAvgWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      animals: null == animals
+          ? _value._animals
+          : animals // ignore: cast_nullable_to_non_nullable
+              as List<Animal>,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$BatchImpl implements _Batch {
-  _$BatchImpl({
-    required this.id,
-    required this.name,
-    @JsonKey(name: 'created_at') required this.createdAt,
-    @JsonKey(name: 'headcount_start') this.headcountStart = 0,
-    @JsonKey(name: 'corral_id') this.corralId,
-    @JsonKey(name: 'initial_avg_weight') this.initialAvgWeight,
-    this.status = 'active',
-    this.notes,
-    @JsonKey(name: 'image_url') this.imageUrl,
-  });
+  _$BatchImpl(
+      {required this.id,
+      required this.name,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'headcount_start') this.headcountStart = 0,
+      @JsonKey(name: 'corral_id') this.corralId,
+      @JsonKey(name: 'initial_avg_weight') this.initialAvgWeight,
+      this.status = 'active',
+      this.notes,
+      @JsonKey(name: 'image_url') this.imageUrl,
+      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      final List<Animal> animals = const []})
+      : _animals = animals;
 
   factory _$BatchImpl.fromJson(Map<String, dynamic> json) =>
       _$$BatchImplFromJson(json);
@@ -262,10 +262,18 @@ class _$BatchImpl implements _Batch {
   @override
   @JsonKey(name: 'image_url')
   final String? imageUrl;
+  final List<Animal> _animals;
+  @override
+  @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+  List<Animal> get animals {
+    if (_animals is EqualUnmodifiableListView) return _animals;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_animals);
+  }
 
   @override
   String toString() {
-    return 'Batch(id: $id, name: $name, createdAt: $createdAt, headcountStart: $headcountStart, corralId: $corralId, initialAvgWeight: $initialAvgWeight, status: $status, notes: $notes, imageUrl: $imageUrl)';
+    return 'Batch(id: $id, name: $name, createdAt: $createdAt, headcountStart: $headcountStart, corralId: $corralId, initialAvgWeight: $initialAvgWeight, status: $status, notes: $notes, imageUrl: $imageUrl, animals: $animals)';
   }
 
   @override
@@ -286,27 +294,26 @@ class _$BatchImpl implements _Batch {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl));
+                other.imageUrl == imageUrl) &&
+            const DeepCollectionEquality().equals(other._animals, _animals));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    name,
-    createdAt,
-    headcountStart,
-    corralId,
-    initialAvgWeight,
-    status,
-    notes,
-    imageUrl,
-  );
+      runtimeType,
+      id,
+      name,
+      createdAt,
+      headcountStart,
+      corralId,
+      initialAvgWeight,
+      status,
+      notes,
+      imageUrl,
+      const DeepCollectionEquality().hash(_animals));
 
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BatchImplCopyWith<_$BatchImpl> get copyWith =>
@@ -314,22 +321,25 @@ class _$BatchImpl implements _Batch {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$BatchImplToJson(this);
+    return _$$BatchImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _Batch implements Batch {
-  factory _Batch({
-    required final String id,
-    required final String name,
-    @JsonKey(name: 'created_at') required final DateTime createdAt,
-    @JsonKey(name: 'headcount_start') final int headcountStart,
-    @JsonKey(name: 'corral_id') final String? corralId,
-    @JsonKey(name: 'initial_avg_weight') final double? initialAvgWeight,
-    final String status,
-    final String? notes,
-    @JsonKey(name: 'image_url') final String? imageUrl,
-  }) = _$BatchImpl;
+  factory _Batch(
+      {required final String id,
+      required final String name,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'headcount_start') final int headcountStart,
+      @JsonKey(name: 'corral_id') final String? corralId,
+      @JsonKey(name: 'initial_avg_weight') final double? initialAvgWeight,
+      final String status,
+      final String? notes,
+      @JsonKey(name: 'image_url') final String? imageUrl,
+      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      final List<Animal> animals}) = _$BatchImpl;
 
   factory _Batch.fromJson(Map<String, dynamic> json) = _$BatchImpl.fromJson;
 
@@ -356,11 +366,11 @@ abstract class _Batch implements Batch {
   @override
   @JsonKey(name: 'image_url')
   String? get imageUrl;
-
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+  List<Animal> get animals;
+  @override
+  @JsonKey(ignore: true)
   _$$BatchImplCopyWith<_$BatchImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -7,17 +7,19 @@ part of 'corral.dart';
 // **************************************************************************
 
 _$CorralImpl _$$CorralImplFromJson(Map<String, dynamic> json) => _$CorralImpl(
-  id: json['id'] as String,
-  name: json['name'] as String,
-  location: json['location'] as String?,
-  capacity: (json['capacity'] as num?)?.toInt(),
-  notes: json['notes'] as String?,
-  imageUrl: json['imageUrl'] as String?,
-  createdAt: DateTime.parse(json['createdAt'] as String),
-  createdBy: json['createdBy'] as String,
-  updatedAt: DateTime.parse(json['updatedAt'] as String),
-  activeBatchCount: (json['activeBatchCount'] as num?)?.toInt() ?? 0,
-);
+      id: json['id'] as String,
+      name: json['name'] as String,
+      location: json['location'] as String?,
+      capacity: (json['capacity'] as num?)?.toInt(),
+      notes: json['notes'] as String?,
+      imageUrl: json['imageUrl'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      createdBy: json['created_by'] as String,
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      activeBatchCount: (json['activeBatchCount'] as num?)?.toInt() ?? 0,
+      status: $enumDecodeNullable(_$CorralStatusEnumMap, json['status']) ??
+          CorralStatus.disponible,
+    );
 
 Map<String, dynamic> _$$CorralImplToJson(_$CorralImpl instance) =>
     <String, dynamic>{
@@ -27,8 +29,15 @@ Map<String, dynamic> _$$CorralImplToJson(_$CorralImpl instance) =>
       'capacity': instance.capacity,
       'notes': instance.notes,
       'imageUrl': instance.imageUrl,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'createdBy': instance.createdBy,
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'created_by': instance.createdBy,
+      'updated_at': instance.updatedAt.toIso8601String(),
       'activeBatchCount': instance.activeBatchCount,
+      'status': _$CorralStatusEnumMap[instance.status]!,
     };
+
+const _$CorralStatusEnumMap = {
+  CorralStatus.disponible: 'disponible',
+  CorralStatus.ocupado: 'ocupado',
+  CorralStatus.mantenimiento: 'mantenimiento',
+};

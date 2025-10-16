@@ -3,6 +3,16 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'corral.freezed.dart';
 part 'corral.g.dart';
 
+@JsonEnum(fieldRename: FieldRename.none)
+enum CorralStatus {
+  @JsonValue('disponible')
+  disponible,
+  @JsonValue('ocupado')
+  ocupado,
+  @JsonValue('mantenimiento')
+  mantenimiento
+}
+
 @freezed
 class Corral with _$Corral {
   factory Corral({
@@ -12,16 +22,12 @@ class Corral with _$Corral {
     int? capacity,
     String? notes,
     String? imageUrl,
-    required DateTime createdAt,
-    required String createdBy,
-    required DateTime updatedAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'created_by') required String createdBy,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
     @Default(0) int activeBatchCount,
+    @Default(CorralStatus.disponible) CorralStatus status,
   }) = _Corral;
 
-  factory Corral.fromJson(Map<String, dynamic> json) => _$CorralFromJson({
-    ...json,
-    'createdAt': json['created_at'],
-    'createdBy': json['created_by'],
-    'updatedAt': json['updated_at'],
-  });
+  factory Corral.fromJson(Map<String, dynamic> json) => _$CorralFromJson(json);
 }

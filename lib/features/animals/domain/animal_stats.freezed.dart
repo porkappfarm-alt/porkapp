@@ -12,8 +12,7 @@ part of 'animal_stats.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 AnimalStats _$AnimalStatsFromJson(Map<String, dynamic> json) {
   return _AnimalStats.fromJson(json);
@@ -21,31 +20,27 @@ AnimalStats _$AnimalStatsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AnimalStats {
-  // Ganancia de peso
+// Ganancia de peso
   double get currentWeight => throw _privateConstructorUsedError;
   double get initialWeight => throw _privateConstructorUsedError;
   double? get lastWeightGain =>
       throw _privateConstructorUsedError; // kg/día desde última medición
   double get avgWeightGain =>
       throw _privateConstructorUsedError; // kg/día promedio total
-  // Edad
+// Edad
   DateTime get birthDate => throw _privateConstructorUsedError;
   int get ageInDays =>
       throw _privateConstructorUsedError; // Mortalidad (si aplica al lote)
   int? get initialCount => throw _privateConstructorUsedError;
   int? get currentCount => throw _privateConstructorUsedError;
   double? get mortalityRate => throw _privateConstructorUsedError; // Porcentaje
-  // Métricas adicionales
+// Métricas adicionales
   double? get feedConversionRatio =>
       throw _privateConstructorUsedError; // kg alimento / kg ganancia
   double? get dailyFeedIntake => throw _privateConstructorUsedError;
 
-  /// Serializes this AnimalStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AnimalStatsCopyWith<AnimalStats> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -53,23 +48,21 @@ mixin _$AnimalStats {
 /// @nodoc
 abstract class $AnimalStatsCopyWith<$Res> {
   factory $AnimalStatsCopyWith(
-    AnimalStats value,
-    $Res Function(AnimalStats) then,
-  ) = _$AnimalStatsCopyWithImpl<$Res, AnimalStats>;
+          AnimalStats value, $Res Function(AnimalStats) then) =
+      _$AnimalStatsCopyWithImpl<$Res, AnimalStats>;
   @useResult
-  $Res call({
-    double currentWeight,
-    double initialWeight,
-    double? lastWeightGain,
-    double avgWeightGain,
-    DateTime birthDate,
-    int ageInDays,
-    int? initialCount,
-    int? currentCount,
-    double? mortalityRate,
-    double? feedConversionRatio,
-    double? dailyFeedIntake,
-  });
+  $Res call(
+      {double currentWeight,
+      double initialWeight,
+      double? lastWeightGain,
+      double avgWeightGain,
+      DateTime birthDate,
+      int ageInDays,
+      int? initialCount,
+      int? currentCount,
+      double? mortalityRate,
+      double? feedConversionRatio,
+      double? dailyFeedIntake});
 }
 
 /// @nodoc
@@ -82,8 +75,6 @@ class _$AnimalStatsCopyWithImpl<$Res, $Val extends AnimalStats>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -99,55 +90,52 @@ class _$AnimalStatsCopyWithImpl<$Res, $Val extends AnimalStats>
     Object? feedConversionRatio = freezed,
     Object? dailyFeedIntake = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            currentWeight: null == currentWeight
-                ? _value.currentWeight
-                : currentWeight // ignore: cast_nullable_to_non_nullable
-                      as double,
-            initialWeight: null == initialWeight
-                ? _value.initialWeight
-                : initialWeight // ignore: cast_nullable_to_non_nullable
-                      as double,
-            lastWeightGain: freezed == lastWeightGain
-                ? _value.lastWeightGain
-                : lastWeightGain // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            avgWeightGain: null == avgWeightGain
-                ? _value.avgWeightGain
-                : avgWeightGain // ignore: cast_nullable_to_non_nullable
-                      as double,
-            birthDate: null == birthDate
-                ? _value.birthDate
-                : birthDate // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            ageInDays: null == ageInDays
-                ? _value.ageInDays
-                : ageInDays // ignore: cast_nullable_to_non_nullable
-                      as int,
-            initialCount: freezed == initialCount
-                ? _value.initialCount
-                : initialCount // ignore: cast_nullable_to_non_nullable
-                      as int?,
-            currentCount: freezed == currentCount
-                ? _value.currentCount
-                : currentCount // ignore: cast_nullable_to_non_nullable
-                      as int?,
-            mortalityRate: freezed == mortalityRate
-                ? _value.mortalityRate
-                : mortalityRate // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            feedConversionRatio: freezed == feedConversionRatio
-                ? _value.feedConversionRatio
-                : feedConversionRatio // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            dailyFeedIntake: freezed == dailyFeedIntake
-                ? _value.dailyFeedIntake
-                : dailyFeedIntake // ignore: cast_nullable_to_non_nullable
-                      as double?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      currentWeight: null == currentWeight
+          ? _value.currentWeight
+          : currentWeight // ignore: cast_nullable_to_non_nullable
+              as double,
+      initialWeight: null == initialWeight
+          ? _value.initialWeight
+          : initialWeight // ignore: cast_nullable_to_non_nullable
+              as double,
+      lastWeightGain: freezed == lastWeightGain
+          ? _value.lastWeightGain
+          : lastWeightGain // ignore: cast_nullable_to_non_nullable
+              as double?,
+      avgWeightGain: null == avgWeightGain
+          ? _value.avgWeightGain
+          : avgWeightGain // ignore: cast_nullable_to_non_nullable
+              as double,
+      birthDate: null == birthDate
+          ? _value.birthDate
+          : birthDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      ageInDays: null == ageInDays
+          ? _value.ageInDays
+          : ageInDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      initialCount: freezed == initialCount
+          ? _value.initialCount
+          : initialCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      currentCount: freezed == currentCount
+          ? _value.currentCount
+          : currentCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      mortalityRate: freezed == mortalityRate
+          ? _value.mortalityRate
+          : mortalityRate // ignore: cast_nullable_to_non_nullable
+              as double?,
+      feedConversionRatio: freezed == feedConversionRatio
+          ? _value.feedConversionRatio
+          : feedConversionRatio // ignore: cast_nullable_to_non_nullable
+              as double?,
+      dailyFeedIntake: freezed == dailyFeedIntake
+          ? _value.dailyFeedIntake
+          : dailyFeedIntake // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ) as $Val);
   }
 }
 
@@ -155,24 +143,22 @@ class _$AnimalStatsCopyWithImpl<$Res, $Val extends AnimalStats>
 abstract class _$$AnimalStatsImplCopyWith<$Res>
     implements $AnimalStatsCopyWith<$Res> {
   factory _$$AnimalStatsImplCopyWith(
-    _$AnimalStatsImpl value,
-    $Res Function(_$AnimalStatsImpl) then,
-  ) = __$$AnimalStatsImplCopyWithImpl<$Res>;
+          _$AnimalStatsImpl value, $Res Function(_$AnimalStatsImpl) then) =
+      __$$AnimalStatsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    double currentWeight,
-    double initialWeight,
-    double? lastWeightGain,
-    double avgWeightGain,
-    DateTime birthDate,
-    int ageInDays,
-    int? initialCount,
-    int? currentCount,
-    double? mortalityRate,
-    double? feedConversionRatio,
-    double? dailyFeedIntake,
-  });
+  $Res call(
+      {double currentWeight,
+      double initialWeight,
+      double? lastWeightGain,
+      double avgWeightGain,
+      DateTime birthDate,
+      int ageInDays,
+      int? initialCount,
+      int? currentCount,
+      double? mortalityRate,
+      double? feedConversionRatio,
+      double? dailyFeedIntake});
 }
 
 /// @nodoc
@@ -180,12 +166,9 @@ class __$$AnimalStatsImplCopyWithImpl<$Res>
     extends _$AnimalStatsCopyWithImpl<$Res, _$AnimalStatsImpl>
     implements _$$AnimalStatsImplCopyWith<$Res> {
   __$$AnimalStatsImplCopyWithImpl(
-    _$AnimalStatsImpl _value,
-    $Res Function(_$AnimalStatsImpl) _then,
-  ) : super(_value, _then);
+      _$AnimalStatsImpl _value, $Res Function(_$AnimalStatsImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -201,105 +184,102 @@ class __$$AnimalStatsImplCopyWithImpl<$Res>
     Object? feedConversionRatio = freezed,
     Object? dailyFeedIntake = freezed,
   }) {
-    return _then(
-      _$AnimalStatsImpl(
-        currentWeight: null == currentWeight
-            ? _value.currentWeight
-            : currentWeight // ignore: cast_nullable_to_non_nullable
-                  as double,
-        initialWeight: null == initialWeight
-            ? _value.initialWeight
-            : initialWeight // ignore: cast_nullable_to_non_nullable
-                  as double,
-        lastWeightGain: freezed == lastWeightGain
-            ? _value.lastWeightGain
-            : lastWeightGain // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        avgWeightGain: null == avgWeightGain
-            ? _value.avgWeightGain
-            : avgWeightGain // ignore: cast_nullable_to_non_nullable
-                  as double,
-        birthDate: null == birthDate
-            ? _value.birthDate
-            : birthDate // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        ageInDays: null == ageInDays
-            ? _value.ageInDays
-            : ageInDays // ignore: cast_nullable_to_non_nullable
-                  as int,
-        initialCount: freezed == initialCount
-            ? _value.initialCount
-            : initialCount // ignore: cast_nullable_to_non_nullable
-                  as int?,
-        currentCount: freezed == currentCount
-            ? _value.currentCount
-            : currentCount // ignore: cast_nullable_to_non_nullable
-                  as int?,
-        mortalityRate: freezed == mortalityRate
-            ? _value.mortalityRate
-            : mortalityRate // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        feedConversionRatio: freezed == feedConversionRatio
-            ? _value.feedConversionRatio
-            : feedConversionRatio // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        dailyFeedIntake: freezed == dailyFeedIntake
-            ? _value.dailyFeedIntake
-            : dailyFeedIntake // ignore: cast_nullable_to_non_nullable
-                  as double?,
-      ),
-    );
+    return _then(_$AnimalStatsImpl(
+      currentWeight: null == currentWeight
+          ? _value.currentWeight
+          : currentWeight // ignore: cast_nullable_to_non_nullable
+              as double,
+      initialWeight: null == initialWeight
+          ? _value.initialWeight
+          : initialWeight // ignore: cast_nullable_to_non_nullable
+              as double,
+      lastWeightGain: freezed == lastWeightGain
+          ? _value.lastWeightGain
+          : lastWeightGain // ignore: cast_nullable_to_non_nullable
+              as double?,
+      avgWeightGain: null == avgWeightGain
+          ? _value.avgWeightGain
+          : avgWeightGain // ignore: cast_nullable_to_non_nullable
+              as double,
+      birthDate: null == birthDate
+          ? _value.birthDate
+          : birthDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      ageInDays: null == ageInDays
+          ? _value.ageInDays
+          : ageInDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      initialCount: freezed == initialCount
+          ? _value.initialCount
+          : initialCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      currentCount: freezed == currentCount
+          ? _value.currentCount
+          : currentCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      mortalityRate: freezed == mortalityRate
+          ? _value.mortalityRate
+          : mortalityRate // ignore: cast_nullable_to_non_nullable
+              as double?,
+      feedConversionRatio: freezed == feedConversionRatio
+          ? _value.feedConversionRatio
+          : feedConversionRatio // ignore: cast_nullable_to_non_nullable
+              as double?,
+      dailyFeedIntake: freezed == dailyFeedIntake
+          ? _value.dailyFeedIntake
+          : dailyFeedIntake // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$AnimalStatsImpl implements _AnimalStats {
-  const _$AnimalStatsImpl({
-    required this.currentWeight,
-    required this.initialWeight,
-    this.lastWeightGain,
-    required this.avgWeightGain,
-    required this.birthDate,
-    required this.ageInDays,
-    this.initialCount,
-    this.currentCount,
-    this.mortalityRate,
-    this.feedConversionRatio,
-    this.dailyFeedIntake,
-  });
+  const _$AnimalStatsImpl(
+      {required this.currentWeight,
+      required this.initialWeight,
+      this.lastWeightGain,
+      required this.avgWeightGain,
+      required this.birthDate,
+      required this.ageInDays,
+      this.initialCount,
+      this.currentCount,
+      this.mortalityRate,
+      this.feedConversionRatio,
+      this.dailyFeedIntake});
 
   factory _$AnimalStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$AnimalStatsImplFromJson(json);
 
-  // Ganancia de peso
+// Ganancia de peso
   @override
   final double currentWeight;
   @override
   final double initialWeight;
   @override
   final double? lastWeightGain;
-  // kg/día desde última medición
+// kg/día desde última medición
   @override
   final double avgWeightGain;
-  // kg/día promedio total
-  // Edad
+// kg/día promedio total
+// Edad
   @override
   final DateTime birthDate;
   @override
   final int ageInDays;
-  // Mortalidad (si aplica al lote)
+// Mortalidad (si aplica al lote)
   @override
   final int? initialCount;
   @override
   final int? currentCount;
   @override
   final double? mortalityRate;
-  // Porcentaje
-  // Métricas adicionales
+// Porcentaje
+// Métricas adicionales
   @override
   final double? feedConversionRatio;
-  // kg alimento / kg ganancia
+// kg alimento / kg ganancia
   @override
   final double? dailyFeedIntake;
 
@@ -337,26 +317,23 @@ class _$AnimalStatsImpl implements _AnimalStats {
                 other.dailyFeedIntake == dailyFeedIntake));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    currentWeight,
-    initialWeight,
-    lastWeightGain,
-    avgWeightGain,
-    birthDate,
-    ageInDays,
-    initialCount,
-    currentCount,
-    mortalityRate,
-    feedConversionRatio,
-    dailyFeedIntake,
-  );
+      runtimeType,
+      currentWeight,
+      initialWeight,
+      lastWeightGain,
+      avgWeightGain,
+      birthDate,
+      ageInDays,
+      initialCount,
+      currentCount,
+      mortalityRate,
+      feedConversionRatio,
+      dailyFeedIntake);
 
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalStatsImplCopyWith<_$AnimalStatsImpl> get copyWith =>
@@ -364,58 +341,55 @@ class _$AnimalStatsImpl implements _AnimalStats {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AnimalStatsImplToJson(this);
+    return _$$AnimalStatsImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _AnimalStats implements AnimalStats {
-  const factory _AnimalStats({
-    required final double currentWeight,
-    required final double initialWeight,
-    final double? lastWeightGain,
-    required final double avgWeightGain,
-    required final DateTime birthDate,
-    required final int ageInDays,
-    final int? initialCount,
-    final int? currentCount,
-    final double? mortalityRate,
-    final double? feedConversionRatio,
-    final double? dailyFeedIntake,
-  }) = _$AnimalStatsImpl;
+  const factory _AnimalStats(
+      {required final double currentWeight,
+      required final double initialWeight,
+      final double? lastWeightGain,
+      required final double avgWeightGain,
+      required final DateTime birthDate,
+      required final int ageInDays,
+      final int? initialCount,
+      final int? currentCount,
+      final double? mortalityRate,
+      final double? feedConversionRatio,
+      final double? dailyFeedIntake}) = _$AnimalStatsImpl;
 
   factory _AnimalStats.fromJson(Map<String, dynamic> json) =
       _$AnimalStatsImpl.fromJson;
 
-  // Ganancia de peso
-  @override
+  @override // Ganancia de peso
   double get currentWeight;
   @override
   double get initialWeight;
   @override
-  double? get lastWeightGain; // kg/día desde última medición
-  @override
-  double get avgWeightGain; // kg/día promedio total
-  // Edad
-  @override
+  double? get lastWeightGain;
+  @override // kg/día desde última medición
+  double get avgWeightGain;
+  @override // kg/día promedio total
+// Edad
   DateTime get birthDate;
   @override
-  int get ageInDays; // Mortalidad (si aplica al lote)
-  @override
+  int get ageInDays;
+  @override // Mortalidad (si aplica al lote)
   int? get initialCount;
   @override
   int? get currentCount;
   @override
-  double? get mortalityRate; // Porcentaje
-  // Métricas adicionales
-  @override
-  double? get feedConversionRatio; // kg alimento / kg ganancia
-  @override
+  double? get mortalityRate;
+  @override // Porcentaje
+// Métricas adicionales
+  double? get feedConversionRatio;
+  @override // kg alimento / kg ganancia
   double? get dailyFeedIntake;
-
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AnimalStatsImplCopyWith<_$AnimalStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

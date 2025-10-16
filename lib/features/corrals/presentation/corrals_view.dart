@@ -1,214 +1,328 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:porkapp/features/corrals/presentation/corrals_controller.dart';
+import 'package:porkapp/features/corrals/presentation/corral_details_view.dart';
 import 'package:porkapp/features/corrals/presentation/create_corral_view.dart';
+import 'package:porkapp/features/corrals/presentation/widgets/change_corral_status_dialog.dart';
+import 'package:porkapp/features/corrals/presentation/widgets/corral_status_badge.dart';
+import 'package:porkapp/features/corrals/providers/corral_providers.dart';
+import 'package:porkapp/features/corrals/domain/corral.dart';
 
 class CorralsView extends ConsumerWidget {
   const CorralsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final corralsState = ref.watch(corralsControllerProvider);
-    final theme = Theme.of(context);
+    final corralsAsyncValue = ref.watch(corralsProvider);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      body: corralsState.when(
-        data: (corrals) => ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: corrals.length,
-          itemBuilder: (context, index) {
-            final corral = corrals[index];
-            return Slidable(
-              key: ValueKey(corral.id),
-              endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('¿Eliminar corral?'),
-                          content: Text(
-                            '¿Está seguro que desea eliminar el corral "${corral.name}"?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancelar'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                ref
-                                    .read(corralsControllerProvider.notifier)
-                                    .deleteCorral(corral.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Corral "${corral.name}" eliminado',
-                                    ),
-                                    action: SnackBarAction(
-                                      label: 'Deshacer',
-                                      onPressed: () {
-                                        ref
-                                            .read(
-                                              corralsControllerProvider
-                                                  .notifier,
-                                            )
-                                            .createCorral(
-                                              name: corral.name,
-                                              location: corral.location,
-                                              capacity: corral.capacity,
-                                              notes: corral.notes,
-                                            );
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                'Eliminar',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete,
-                    label: 'Eliminar',
-                  ),
-                  SlidableAction(
-                    onPressed: (context) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              CreateCorralView(corral: corral),
-                        ),
-                      );
-                    },
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    icon: Icons.edit,
-                    label: 'Editar',
-                  ),
-                ],
+      appBar: AppBar(
+        title: ref.watch(corralsProvider).when(
+              data: (corrals) => Text(
+                'Corrales (${corrals.length})',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
-              child: Card(
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => CreateCorralView(corral: corral),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                corral.name,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              if (corral.location != null)
-                                Text(
-                                  'Ubicación: ${corral.location}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withOpacity(0.7),
-                                  ),
-                                ),
-                              if (corral.capacity != null)
-                                Text(
-                                  'Capacidad: ${corral.capacity}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withOpacity(0.7),
-                                  ),
-                                ),
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary.withOpacity(
-                                    0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  corral.activeBatchCount == 0
-                                      ? 'Sin lotes activos'
-                                      : '${corral.activeBatchCount} ${corral.activeBatchCount == 1 ? 'lote activo' : 'lotes activos'}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.primary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
+              loading: () => const Text('Cargando...'),
+              error: (error, stack) => const Text('Error'),
+            ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              // TODO: Implementar filtros
+            },
+            tooltip: 'Filtrar corrales',
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CreateCorralView(),
+                ),
+              );
+            },
+            tooltip: 'Añadir corral',
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(corralsProvider);
+          },
+          child: ref.watch(corralsProvider).when(
+                data: (corrals) {
+                  if (corrals.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.fence,
+                            size: 64,
+                            color: Colors.grey,
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            // TODO: Replace with actual image URL from backend
-                            'https://lh3.googleusercontent.com/aida-public/AB6AXuB9AXXNRP9wpS4bnmZeIS0cSq9O7yh3L2QZSzzvkgYGXyjhELBN70WzXSb_p9p6BMHUTppfhn9OctPki_QYPVdYvFf1Oqmo7p_N782Z5SvUJoVRpRDsvHLBO5gNAyABkVy2cqCzKb0zVdD0sbHw9JQzOtU2Mr8LVsp0ht9SFdlL_ckiUMOOnnJHr5FOCIte-juHq3m90-8Vo7n39dtyYBqAGkrhMOryx7UhlkOTAjZCmoA0XtSbqEXJGA7tL-QnNBD5dKV6fmibZ7pM',
-                            width: 96,
-                            height: 96,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 96,
-                                height: 96,
-                                color: theme.colorScheme.surface,
-                                child: Icon(
-                                  Icons.broken_image_outlined,
-                                  color: theme.colorScheme.onSurface
-                                      .withOpacity(0.5),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No hay corrales disponibles',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateCorralView(),
                                 ),
                               );
                             },
+                            icon: const Icon(Icons.add),
+                            label: const Text('Crear corral'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.all(16.0),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                MediaQuery.of(context).size.width > 900
+                                    ? 4
+                                    : MediaQuery.of(context).size.width > 600
+                                        ? 3
+                                        : 1, // Cambiado a 1 para móviles
+                            mainAxisSpacing: 16.0,
+                            crossAxisSpacing: 16.0,
+                            childAspectRatio: MediaQuery.of(context)
+                                        .size
+                                        .width >
+                                    600
+                                ? 1.3
+                                : 2.0, // Ajustado para mejor visualización en móviles
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final corral = corrals[index];
+
+                              return CorralCard(
+                                corral: corral,
+                                onTap: () {
+                                  final corralMap = {
+                                    'id': corral.id,
+                                    'nombre': corral.name,
+                                    'ubicacion': corral.location ?? '',
+                                    'capacidad': corral.capacity ?? 0,
+                                    'notas': corral.notes ?? '',
+                                    'imagen_url': corral.imageUrl,
+                                    'estado': 'Activo',
+                                    'ocupacion': corral.activeBatchCount,
+                                    'creado_en':
+                                        corral.createdAt.toIso8601String(),
+                                    'creado_por': corral.createdBy,
+                                    'actualizado_en':
+                                        corral.updatedAt.toIso8601String(),
+                                  };
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CorralDetailsView(
+                                        corral: corralMap,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            childCount: corrals.length,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    ],
+                  );
+                },
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (error, stack) => Center(
+                  child: Text('Error: $error'),
                 ),
               ),
-            );
-          },
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) =>
-            Center(child: Text('Error al cargar los corrales: $error')),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const CreateCorralView()),
+            MaterialPageRoute(
+              builder: (context) => const CreateCorralView(),
+            ),
           );
         },
         icon: const Icon(Icons.add),
         label: const Text('Nuevo Corral'),
-        backgroundColor: theme.colorScheme.primary,
+      ),
+    );
+  }
+}
+
+class CorralCard extends ConsumerWidget {
+  final Corral corral;
+  final VoidCallback onTap;
+
+  const CorralCard({
+    super.key,
+    required this.corral,
+    required this.onTap,
+  });
+
+  Color _getOccupancyColor(double percentage) {
+    if (percentage >= 90) return Colors.red;
+    if (percentage >= 75) return Colors.orange;
+    return Colors.green;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ocupacionPorcentaje = corral.capacity != null && corral.capacity! > 0
+        ? (corral.activeBatchCount / corral.capacity! * 100)
+        : 0.0;
+
+    return Card(
+      elevation: 2,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Encabezado con color de fondo basado en ocupación
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              decoration: BoxDecoration(
+                color: _getOccupancyColor(ocupacionPorcentaje).withOpacity(0.1),
+                border: Border(
+                  bottom: BorderSide(
+                    color: _getOccupancyColor(ocupacionPorcentaje)
+                        .withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisSize:
+                    MainAxisSize.max, // Asegura que la Row ocupe todo el ancho
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 2, // Da más espacio al nombre
+                    child: Text(
+                      corral.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4), // Reducido el espaciado
+                  Flexible(
+                    flex: 1, // Da menos espacio al badge
+                    child: InkWell(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => ChangeCorralStatusDialog(
+                            corral: corral,
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: CorralStatusBadge(status: corral.status),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Contenido
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Información de ocupación
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Ocupación',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${corral.activeBatchCount}/${corral.capacity ?? "∞"}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: _getOccupancyColor(ocupacionPorcentaje),
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Barra de progreso
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: ocupacionPorcentaje / 100,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _getOccupancyColor(ocupacionPorcentaje),
+                        ),
+                        minHeight: 8,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Porcentaje
+                    Text(
+                      '${ocupacionPorcentaje.toStringAsFixed(1)}% ocupado',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: _getOccupancyColor(ocupacionPorcentaje),
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

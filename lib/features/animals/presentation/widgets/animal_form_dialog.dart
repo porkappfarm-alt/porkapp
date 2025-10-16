@@ -38,7 +38,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
     _notesController = TextEditingController(text: widget.animal?.notes);
 
     if (widget.animal != null) {
-      _birthDate = widget.animal!.birthDate;
+      _birthDate = widget.animal!.birthDate ?? DateTime.now();
     }
   }
 
@@ -69,10 +69,13 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
       birthDate: _birthDate,
       weight: double.parse(_weightController.text),
       breed: _breedController.text,
+      type: _getAnimalTypeLabel(_selectedType),
       entryDate: DateTime.now(),
       createdAt: widget.animal?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
       batchId: widget.preselectedBatchId ?? widget.animal?.batchId ?? '',
       status: 'active',
+      gender: _isMale ? 'male' : 'female',
       notes: _notesController.text.isNotEmpty ? _notesController.text : null,
     );
 
@@ -83,19 +86,21 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
         await repository.updateAnimal(
           id: animal.id,
           identifier: animal.identifier,
-          birthDate: animal.birthDate,
-          breed: animal.breed,
+          birthDate: animal.birthDate ?? DateTime.now(),
+          breed: animal.breed ?? '',
           weight: animal.weight,
           status: animal.status,
+          type: animal.type,
         );
       } else {
         await repository.createAnimal(
           batchId: animal.batchId,
           identifier: animal.identifier,
-          birthDate: animal.birthDate,
-          breed: animal.breed,
+          birthDate: animal.birthDate ?? DateTime.now(),
+          breed: animal.breed ?? '',
           weight: animal.weight,
           status: animal.status,
+          type: animal.type,
         );
       }
 
@@ -150,23 +155,22 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
 
                 // Tipo de animal
                 DropdownButtonFormField<AnimalType>(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Tipo de animal',
                     border: OutlineInputBorder(),
                   ),
-                  items:
-                      [
-                        AnimalType.piglet(),
-                        AnimalType.sow(),
-                        AnimalType.boar(),
-                        AnimalType.fattening(),
-                      ].map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(_getAnimalTypeLabel(type)),
-                        );
-                      }).toList(),
+                  items: [
+                    AnimalType.piglet(),
+                    AnimalType.sow(),
+                    AnimalType.boar(),
+                    AnimalType.fattening(),
+                  ].map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Text(_getAnimalTypeLabel(type)),
+                    );
+                  }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {

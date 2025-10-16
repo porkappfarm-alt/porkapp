@@ -20,7 +20,7 @@ class AnimalDetailsView extends ConsumerWidget {
   Future<void> _showAddEventDialog(BuildContext context) async {
     await showDialog(
       context: context,
-      builder: (context) =>   (animalId: animalId),
+      builder: (context) => AddEventDialog(animalId: animalId),
     );
   }
 

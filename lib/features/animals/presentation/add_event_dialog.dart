@@ -48,7 +48,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
               ),
               const SizedBox(height: 24),
               DropdownButtonFormField<String>(
-                initialValue: _eventType,
+                value: _eventType,
                 decoration: const InputDecoration(labelText: 'Tipo de Evento'),
                 items: const [
                   DropdownMenuItem(value: 'weighing', child: Text('Pesaje')),
@@ -155,30 +155,29 @@ class _AddEventDialogState extends State<AddEventDialog> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final date = DateTime.parse(_dateController.text);
-              final notes = _notesController.text.isEmpty
-                  ? null
-                  : _notesController.text;
+              final notes =
+                  _notesController.text.isEmpty ? null : _notesController.text;
 
               final event = switch (_eventType) {
                 'weighing' => AnimalEventHelpers.createWeighing(
-                  animalId: widget.animalId,
-                  date: date,
-                  weight: double.parse(_weightController.text),
-                  notes: notes,
-                ),
+                    animalId: widget.animalId,
+                    date: date,
+                    weight: double.parse(_weightController.text),
+                    notes: notes,
+                  ),
                 'treatment' => AnimalEventHelpers.createTreatment(
-                  animalId: widget.animalId,
-                  date: date,
-                  treatmentType: _treatmentTypeController.text,
-                  description: _descriptionController.text,
-                  notes: notes,
-                ),
+                    animalId: widget.animalId,
+                    date: date,
+                    treatmentType: _treatmentTypeController.text,
+                    description: _descriptionController.text,
+                    notes: notes,
+                  ),
                 'mortality' => AnimalEventHelpers.createMortality(
-                  animalId: widget.animalId,
-                  date: date,
-                  cause: _causeController.text,
-                  notes: notes,
-                ),
+                    animalId: widget.animalId,
+                    date: date,
+                    cause: _causeController.text,
+                    notes: notes,
+                  ),
                 _ => throw Exception('Invalid event type'),
               };
 

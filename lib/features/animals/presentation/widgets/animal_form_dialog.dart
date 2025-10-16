@@ -155,7 +155,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
 
                 // Tipo de animal
                 DropdownButtonFormField<AnimalType>(
-                  initialValue: _selectedType,
+                  value: _selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Tipo de animal',
                     border: OutlineInputBorder(),

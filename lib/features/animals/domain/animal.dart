@@ -7,12 +7,9 @@ DateTime? _nullableDateFromString(String? date) =>
     date == null ? null : DateTime.parse(date);
 String? _nullableDateToString(DateTime? date) => date?.toIso8601String();
 
-DateTime _dateFromString(String date) => DateTime.parse(date);
-String _dateToString(DateTime date) => date.toIso8601String();
-
 @freezed
 class Animal with _$Animal {
-  factory Animal({
+  const factory Animal({
     required String id,
     @JsonKey(name: 'batch_id') required String batchId,
     required String identifier, // ID interno o número de arete

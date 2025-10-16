@@ -15,7 +15,7 @@ enum CorralStatus {
 
 @freezed
 class Corral with _$Corral {
-  factory Corral({
+  const factory Corral({
     required String id,
     required String name,
     String? location,

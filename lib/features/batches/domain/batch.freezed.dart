@@ -37,8 +37,12 @@ mixin _$Batch {
   @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
   List<Animal> get animals => throw _privateConstructorUsedError;
 
+  /// Serializes this Batch to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Batch
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $BatchCopyWith<Batch> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -71,6 +75,8 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Batch
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -159,6 +165,8 @@ class __$$BatchImplCopyWithImpl<$Res>
       _$BatchImpl _value, $Res Function(_$BatchImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Batch
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -221,7 +229,7 @@ class __$$BatchImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$BatchImpl implements _Batch {
-  _$BatchImpl(
+  const _$BatchImpl(
       {required this.id,
       required this.name,
       @JsonKey(name: 'created_at') required this.createdAt,
@@ -298,7 +306,7 @@ class _$BatchImpl implements _Batch {
             const DeepCollectionEquality().equals(other._animals, _animals));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -313,7 +321,9 @@ class _$BatchImpl implements _Batch {
       imageUrl,
       const DeepCollectionEquality().hash(_animals));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Batch
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$BatchImplCopyWith<_$BatchImpl> get copyWith =>
@@ -328,7 +338,7 @@ class _$BatchImpl implements _Batch {
 }
 
 abstract class _Batch implements Batch {
-  factory _Batch(
+  const factory _Batch(
       {required final String id,
       required final String name,
       @JsonKey(name: 'created_at') required final DateTime createdAt,
@@ -369,8 +379,11 @@ abstract class _Batch implements Batch {
   @override
   @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
   List<Animal> get animals;
+
+  /// Create a copy of Batch
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BatchImplCopyWith<_$BatchImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

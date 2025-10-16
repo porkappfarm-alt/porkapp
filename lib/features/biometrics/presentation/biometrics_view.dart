@@ -112,9 +112,11 @@ class _MetricCard extends StatelessWidget {
                     padding: const EdgeInsets.all(6), // Reducido de 8 a 6
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10), // Reducido de 12 a 10
+                      borderRadius:
+                          BorderRadius.circular(10), // Reducido de 12 a 10
                     ),
-                    child: Icon(icon, color: color, size: 18), // Reducido de 20 a 18
+                    child: Icon(icon,
+                        color: color, size: 18), // Reducido de 20 a 18
                   ),
                   const SizedBox(width: 8), // Reducido de 12 a 8
                   Expanded(
@@ -147,14 +149,16 @@ class _MetricCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: (trendPositive ? AppColors.success : AppColors.danger)
                       .withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10), // Reducido de 12 a 10
+                  borderRadius:
+                      BorderRadius.circular(10), // Reducido de 12 a 10
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       trendPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                      color: trendPositive ? AppColors.success : AppColors.danger,
+                      color:
+                          trendPositive ? AppColors.success : AppColors.danger,
                       size: 14, // Reducido de 16 a 14
                     ),
                     const SizedBox(width: 4), // Reducido de 6 a 4
@@ -321,11 +325,11 @@ class BiometricsContent extends StatelessWidget {
     final maxWeight = weightTimeline
         .map((point) => point.avgWeight)
         .reduce((a, b) => a > b ? a : b);
-    
+
     // Calcular el intervalo para las líneas horizontales
     final range = maxWeight - minWeight;
     final interval = range > 50 ? 20.0 : (range > 20 ? 10.0 : 5.0);
-    
+
     // Ajustar los límites para que haya espacio en el gráfico
     final minY = (minWeight - interval).clamp(0.0, double.infinity);
     final maxY = maxWeight + interval;
@@ -526,10 +530,10 @@ class BiometricsContent extends StatelessWidget {
                     enabled: true,
                     touchTooltipData: LineTouchTooltipData(
                       tooltipBorder: BorderSide.none,
-                      tooltipBgColor: AppColors.primary.withOpacity(0.8),
+                      // tooltipBgColor: AppColors.primary.withOpacity(0.8), // Deprecated in fl_chart 0.69.2
                       tooltipPadding: const EdgeInsets.all(10),
                       tooltipMargin: 8,
-                      tooltipRoundedRadius: 8,
+                      // tooltipRoundedRadius: 8, // Deprecated in fl_chart 0.69.2
                       maxContentWidth: 200,
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((LineBarSpot touchedSpot) {
@@ -579,8 +583,9 @@ class BiometricsContent extends StatelessWidget {
       ),
     );
   }
-  
-  void _showFullScreenChart(BuildContext context, List<WeightPoint> weightTimeline) {
+
+  void _showFullScreenChart(
+      BuildContext context, List<WeightPoint> weightTimeline) {
     // Calcular el peso mínimo y máximo para mejorar la visualización
     final minWeight = weightTimeline
         .map((point) => point.avgWeight)
@@ -588,11 +593,11 @@ class BiometricsContent extends StatelessWidget {
     final maxWeight = weightTimeline
         .map((point) => point.avgWeight)
         .reduce((a, b) => a > b ? a : b);
-    
+
     // Calcular el intervalo para las líneas horizontales
     final range = maxWeight - minWeight;
     final interval = range > 50 ? 20.0 : (range > 20 ? 10.0 : 5.0);
-    
+
     // Ajustar los límites para que haya espacio en el gráfico
     final minY = (minWeight - interval).clamp(0.0, double.infinity);
     final maxY = maxWeight + interval;
@@ -793,10 +798,10 @@ class BiometricsContent extends StatelessWidget {
                       enabled: true,
                       touchTooltipData: LineTouchTooltipData(
                         tooltipBorder: BorderSide.none,
-                        tooltipBgColor: AppColors.primary.withOpacity(0.8),
+                        // tooltipBgColor: AppColors.primary.withOpacity(0.8), // Deprecated in fl_chart 0.69.2
                         tooltipPadding: const EdgeInsets.all(10),
                         tooltipMargin: 8,
-                        tooltipRoundedRadius: 8,
+                        // tooltipRoundedRadius: 8, // Deprecated in fl_chart 0.69.2
                         maxContentWidth: 200,
                         getTooltipItems: (List<LineBarSpot> touchedSpots) {
                           return touchedSpots.map((LineBarSpot touchedSpot) {
@@ -864,7 +869,7 @@ class BiometricsContent extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
@@ -975,71 +980,75 @@ class BiometricsContent extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                    icon: const Icon(Icons.fullscreen),
-                    onPressed: () {
-                      // Calcular el total de mortalidad
-                      final totalMortality = mortalityByCause.fold(0, (sum, item) => sum + item.count);
-                      
-                      // Encontrar la causa principal
-                      final principalCause = mortalityByCause.reduce((a, b) => a.count > b.count ? a : b);
-                      
-                      showDialog(
-                        context: context,
-                        builder: (context) => Dialog.fullscreen(
-                          child: Scaffold(
-                            appBar: AppBar(
-                              title: const Text('Mortalidad por Causa'),
-                              leading: IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () => Navigator.of(context).pop(),
-                              ),
+                  icon: const Icon(Icons.fullscreen),
+                  onPressed: () {
+                    // Calcular el total de mortalidad
+                    final totalMortality = mortalityByCause.fold(
+                        0, (sum, item) => sum + item.count);
+
+                    // Encontrar la causa principal
+                    final principalCause = mortalityByCause
+                        .reduce((a, b) => a.count > b.count ? a : b);
+
+                    showDialog(
+                      context: context,
+                      builder: (context) => Dialog.fullscreen(
+                        child: Scaffold(
+                          appBar: AppBar(
+                            title: const Text('Mortalidad por Causa'),
+                            leading: IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () => Navigator.of(context).pop(),
                             ),
-                            body: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Estadísticas resumen
-                                  Card(
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                        children: [
-                                          _buildStatColumn(
-                                            'Mortalidad Total',
-                                            '$totalMortality animales',
-                                            Icons.warning_amber_outlined,
-                                            AppColors.danger,
-                                          ),
-                                          _buildStatColumn(
-                                            'Causa Principal',
-                                            principalCause.cause,
-                                            Icons.priority_high_outlined,
-                                            Colors.orange,
-                                          ),
-                                        ],
-                                      ),
+                          ),
+                          body: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Estadísticas resumen
+                                Card(
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        _buildStatColumn(
+                                          'Mortalidad Total',
+                                          '$totalMortality animales',
+                                          Icons.warning_amber_outlined,
+                                          AppColors.danger,
+                                        ),
+                                        _buildStatColumn(
+                                          'Causa Principal',
+                                          principalCause.cause,
+                                          Icons.priority_high_outlined,
+                                          Colors.orange,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 24),
-                                  // Gráfico ampliado
-                                  Expanded(
-                                    child: _buildMortalityChart(context, mortalityByCause),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 24),
+                                // Gráfico ampliado
+                                Expanded(
+                                  child: _buildMortalityChart(
+                                      context, mortalityByCause),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    },
-                    tooltip: 'Ver en pantalla completa',
-                  ),
+                      ),
+                    );
+                  },
+                  tooltip: 'Ver en pantalla completa',
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -1053,10 +1062,10 @@ class BiometricsContent extends StatelessWidget {
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
                       tooltipBorder: BorderSide.none,
-                      tooltipBgColor: AppColors.danger.withOpacity(0.8),
+                      // tooltipBgColor: AppColors.danger.withOpacity(0.8), // Deprecated in fl_chart 0.69.2
                       tooltipPadding: const EdgeInsets.all(10),
                       tooltipMargin: 8,
-                      tooltipRoundedRadius: 8,
+                      // tooltipRoundedRadius: 8, // Deprecated in fl_chart 0.69.2
                       maxContentWidth: 200,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         return BarTooltipItem(
@@ -1224,7 +1233,7 @@ class BiometricsContent extends StatelessWidget {
       ],
     );
   }
-  
+
   Widget _buildStatColumn(
     String title,
     String value,

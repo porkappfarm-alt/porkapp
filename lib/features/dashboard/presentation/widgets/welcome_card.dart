@@ -19,7 +19,7 @@ class WelcomeCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO: Obtener datos del usuario del provider
     const userName = 'Usuario';
-    const userRole = 'Administrador';
+    const userRole = 'Granjero';
     const lastActivity = 'Hace 5 minutos';
 
     return Card(

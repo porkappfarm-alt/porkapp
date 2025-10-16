@@ -15,7 +15,7 @@ List<Map<String, dynamic>> _animalsToJson(List<Animal> animals) {
 
 @freezed
 class Batch with _$Batch {
-  factory Batch({
+  const factory Batch({
     required String id,
     required String name,
     @JsonKey(name: 'created_at') required DateTime createdAt,

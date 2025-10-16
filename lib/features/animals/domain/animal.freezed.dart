@@ -58,8 +58,12 @@ mixin _$Animal {
       throw _privateConstructorUsedError; // active, sold, deceased, removed
   String? get notes => throw _privateConstructorUsedError;
 
+  /// Serializes this Animal to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Animal
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $AnimalCopyWith<Animal> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -111,6 +115,8 @@ class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Animal
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -238,6 +244,8 @@ class __$$AnimalImplCopyWithImpl<$Res>
       _$AnimalImpl _value, $Res Function(_$AnimalImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Animal
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -320,7 +328,7 @@ class __$$AnimalImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$AnimalImpl implements _Animal {
-  _$AnimalImpl(
+  const _$AnimalImpl(
       {required this.id,
       @JsonKey(name: 'batch_id') required this.batchId,
       required this.identifier,
@@ -441,7 +449,7 @@ class _$AnimalImpl implements _Animal {
             (identical(other.notes, notes) || other.notes == notes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -460,7 +468,9 @@ class _$AnimalImpl implements _Animal {
       status,
       notes);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Animal
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalImplCopyWith<_$AnimalImpl> get copyWith =>
@@ -475,7 +485,7 @@ class _$AnimalImpl implements _Animal {
 }
 
 abstract class _Animal implements Animal {
-  factory _Animal(
+  const factory _Animal(
       {required final String id,
       @JsonKey(name: 'batch_id') required final String batchId,
       required final String identifier,
@@ -515,8 +525,8 @@ abstract class _Animal implements Animal {
   @JsonKey(name: 'batch_id')
   String get batchId;
   @override
-  String get identifier;
-  @override // ID interno o número de arete
+  String get identifier; // ID interno o número de arete
+  @override
   @JsonKey(
       name: 'birth_date',
       fromJson: _nullableDateFromString,
@@ -526,19 +536,19 @@ abstract class _Animal implements Animal {
   String? get sex;
   @override
   @JsonKey(name: 'weight_at_entry')
-  double? get weight;
-  @override // Peso inicial
+  double? get weight; // Peso inicial
+  @override
   String get breed;
   @override
   @JsonKey(name: 'animal_type')
-  String get type;
-  @override // Tipo de animal (ej: cerdo de engorde, reproductor, etc)
+  String get type; // Tipo de animal (ej: cerdo de engorde, reproductor, etc)
+  @override
   @JsonKey(
       name: 'entry_date',
       fromJson: _nullableDateFromString,
       toJson: _nullableDateToString)
-  DateTime? get entryDate;
-  @override // Fecha de ingreso al lote
+  DateTime? get entryDate; // Fecha de ingreso al lote
+  @override
   @JsonKey(
       name: 'created_at',
       fromJson: _nullableDateFromString,
@@ -553,11 +563,14 @@ abstract class _Animal implements Animal {
   @override
   String get gender;
   @override
-  String get status;
-  @override // active, sold, deceased, removed
-  String? get notes;
+  String get status; // active, sold, deceased, removed
   @override
-  @JsonKey(ignore: true)
+  String? get notes;
+
+  /// Create a copy of Animal
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AnimalImplCopyWith<_$AnimalImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

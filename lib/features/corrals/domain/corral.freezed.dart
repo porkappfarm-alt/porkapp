@@ -35,8 +35,12 @@ mixin _$Corral {
   int get activeBatchCount => throw _privateConstructorUsedError;
   CorralStatus get status => throw _privateConstructorUsedError;
 
+  /// Serializes this Corral to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Corral
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CorralCopyWith<Corral> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -69,6 +73,8 @@ class _$CorralCopyWithImpl<$Res, $Val extends Corral>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Corral
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -162,6 +168,8 @@ class __$$CorralImplCopyWithImpl<$Res>
       _$CorralImpl _value, $Res Function(_$CorralImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Corral
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -229,7 +237,7 @@ class __$$CorralImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$CorralImpl implements _Corral {
-  _$CorralImpl(
+  const _$CorralImpl(
       {required this.id,
       required this.name,
       this.location,
@@ -303,7 +311,7 @@ class _$CorralImpl implements _Corral {
             (identical(other.status, status) || other.status == status));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -319,7 +327,9 @@ class _$CorralImpl implements _Corral {
       activeBatchCount,
       status);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Corral
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>
@@ -334,7 +344,7 @@ class _$CorralImpl implements _Corral {
 }
 
 abstract class _Corral implements Corral {
-  factory _Corral(
+  const factory _Corral(
       {required final String id,
       required final String name,
       final String? location,
@@ -374,8 +384,11 @@ abstract class _Corral implements Corral {
   int get activeBatchCount;
   @override
   CorralStatus get status;
+
+  /// Create a copy of Corral
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

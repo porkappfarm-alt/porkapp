@@ -31,7 +31,7 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
     super.initState();
     if (isEditing) {
       _identifierController.text = widget.animal!.identifier;
-      _breedController.text = widget.animal!.breed ?? '';
+      _breedController.text = widget.animal!.breed;
       _birthDate = widget.animal!.birthDate ?? DateTime.now();
       _weightController.text = widget.animal!.weight.toString();
       _status = widget.animal!.status;
@@ -209,7 +209,7 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        initialValue: _type,
+                        value: _type,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: theme.colorScheme.surface,
@@ -283,7 +283,7 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          initialValue: _status,
+                          value: _status,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: theme.colorScheme.surface,

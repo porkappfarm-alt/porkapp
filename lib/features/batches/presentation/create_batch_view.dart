@@ -81,9 +81,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
 
     try {
       if (isEditing) {
-        await ref
-            .read(batchesControllerProvider.notifier)
-            .updateBatch(
+        await ref.read(batchesControllerProvider.notifier).updateBatch(
               id: widget.batch!.id,
               name: _nameController.text,
               corralId: _selectedCorralId!,
@@ -92,14 +90,11 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
               initialAvgWeight: _weightController.text.isEmpty
                   ? null
                   : double.parse(_weightController.text),
-              notes: _notesController.text.isEmpty
-                  ? null
-                  : _notesController.text,
+              notes:
+                  _notesController.text.isEmpty ? null : _notesController.text,
             );
       } else {
-        await ref
-            .read(batchesControllerProvider.notifier)
-            .createBatch(
+        await ref.read(batchesControllerProvider.notifier).createBatch(
               name: _nameController.text,
               corralId: _selectedCorralId!,
               createdAt: _selectedDate,
@@ -107,9 +102,8 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
               initialAvgWeight: _weightController.text.isEmpty
                   ? null
                   : double.parse(_weightController.text),
-              notes: _notesController.text.isEmpty
-                  ? null
-                  : _notesController.text,
+              notes:
+                  _notesController.text.isEmpty ? null : _notesController.text,
             );
       }
 
@@ -165,7 +159,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                   const SizedBox(height: 8),
                   corralsState.when(
                     data: (corrals) => DropdownButtonFormField<String>(
-                      initialValue: _selectedCorralId,
+                      value: _selectedCorralId,
                       decoration: InputDecoration(
                         hintText: 'Seleccione un corral',
                         hintStyle: TextStyle(

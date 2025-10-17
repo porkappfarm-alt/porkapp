@@ -45,8 +45,6 @@ class _BatchAnimalsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    // TODO: Implementar la lógica para agrupar animales
     final groupedAnimals = batch.animals;
 
     if (groupedAnimals.isEmpty) {
@@ -61,7 +59,6 @@ class _BatchAnimalsList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // Información resumen del lote
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -80,25 +77,18 @@ class _BatchAnimalsList extends StatelessWidget {
                   label: 'Total de animales',
                   value: '${batch.animals.length}',
                 ),
-                // TODO: Agregar más métricas relevantes
               ],
             ),
           ),
         ),
         const SizedBox(height: 16),
-        // Lista de animales agrupados
-        ...groupedAnimals.map((animal) => _AnimalCard(
-              animal: animal,
+        ...groupedAnimals.map((animal) => GestureDetector(
               onTap: () {
-                print('Navigating to animal: ${animal.id}'); // Debug log
-                context.pushNamed(
-                  'animal-detail',
-                  pathParameters: {
-                    'batchId': batch.id,
-                    'animalId': animal.id,
-                  },
-                );
+                final route = '/batches/${batch.id}/animals/${animal.id}';
+                print('Navigating to route: $route'); // Debug log
+                context.go(route);
               },
+              child: _AnimalCard(animal: animal),
             )),
       ],
     );
@@ -135,12 +125,8 @@ class _BatchAnimalsList extends StatelessWidget {
 
 class _AnimalCard extends StatelessWidget {
   final Animal animal;
-  final VoidCallback onTap;
 
-  const _AnimalCard({
-    required this.animal,
-    required this.onTap,
-  });
+  const _AnimalCard({required this.animal});
 
   @override
   Widget build(BuildContext context) {
@@ -148,88 +134,78 @@ class _AnimalCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            print('Tapped animal with id: ${animal.id}'); // Debug log
-            onTap();
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
-                child: Text(
-                  animal.identifier.substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+              child: Text(
+                animal.identifier.substring(0, 1).toUpperCase(),
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    animal.identifier,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      animal.identifier,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Peso: ${animal.weight?.toStringAsFixed(1) ?? "N/A"} kg',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Peso: ${animal.weight?.toStringAsFixed(1) ?? "N/A"} kg',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.7),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
+                        decoration: BoxDecoration(
+                          color: animal.status == 'active'
+                              ? Colors.green.withOpacity(0.1)
+                              : Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          animal.status,
+                          style: theme.textTheme.bodySmall?.copyWith(
                             color: animal.status == 'active'
-                                ? Colors.green.withOpacity(0.1)
-                                : Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            animal.status,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: animal.status == 'active'
-                                  ? Colors.green
-                                  : Colors.red,
-                              fontWeight: FontWeight.w500,
-                            ),
+                                ? Colors.green
+                                : Colors.red,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.chevron_right,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
         ),
       ),
     );

@@ -4,60 +4,60 @@ import 'package:porkapp/shared/design/app_styles.dart';
 
 abstract class AppTextStyles {
   static TextStyle get h1 => GoogleFonts.poppins(
-    fontSize: 26,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-    height: 1.2,
-  );
+        fontSize: 26,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+        height: 1.2,
+      );
 
   static TextStyle get h2 => GoogleFonts.poppins(
-    fontSize: 22,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-    height: 1.2,
-  );
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+        height: 1.2,
+      );
 
   static TextStyle get h3 => GoogleFonts.poppins(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-    height: 1.2,
-  );
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        height: 1.2,
+      );
 
   static TextStyle get body1 => GoogleFonts.poppins(
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textPrimary,
-    height: 1.5,
-  );
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textPrimary,
+        height: 1.5,
+      );
 
   static TextStyle get body2 => GoogleFonts.poppins(
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textPrimary,
-    height: 1.5,
-  );
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textPrimary,
+        height: 1.5,
+      );
 
   static TextStyle get button => GoogleFonts.poppins(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: AppColors.white,
-    height: 1.25,
-  );
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.white,
+        height: 1.25,
+      );
 
   static TextStyle get caption => GoogleFonts.poppins(
-    fontSize: 12,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textSecondary,
-    height: 1.5,
-  );
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textSecondary,
+        height: 1.5,
+      );
 
   static TextStyle get numeric => GoogleFonts.robotoMono(
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textPrimary,
-    height: 1.5,
-  );
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textPrimary,
+        height: 1.5,
+      );
 }
 
 abstract class AppInputDecorations {
@@ -107,7 +107,7 @@ abstract class AppButtonStyles {
     backgroundColor: AppColors.coral,
     foregroundColor: AppColors.white,
     elevation: 2,
-    shadowColor: AppColors.coral.withOpacity(0.5),
+    shadowColor: AppColors.coral.withAlpha(128), // 0.5 opacity = 128/255
     padding: const EdgeInsets.symmetric(
       horizontal: AppSpacing.lg,
       vertical: AppSpacing.md,
@@ -121,7 +121,7 @@ abstract class AppButtonStyles {
     backgroundColor: AppColors.verdeField,
     foregroundColor: AppColors.white,
     elevation: 2,
-    shadowColor: AppColors.verdeField.withOpacity(0.5),
+    shadowColor: AppColors.verdeField.withAlpha(128), // 0.5 opacity = 128/255
     padding: const EdgeInsets.symmetric(
       horizontal: AppSpacing.lg,
       vertical: AppSpacing.md,

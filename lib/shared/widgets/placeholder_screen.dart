@@ -39,7 +39,7 @@ class PlaceholderScreen extends ConsumerWidget {
                     Icon(
                       Icons.analytics_outlined,
                       size: 64,
-                      color: theme.colorScheme.primary.withOpacity(0.5),
+                      color: theme.colorScheme.primaryContainer,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -65,14 +65,15 @@ class PlaceholderScreen extends ConsumerWidget {
                   Text(
                     'Selecciona un lote para ver sus biometrías',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onBackground.withOpacity(0.7),
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: _calculateCrossAxisCount(MediaQuery.of(context).size.width),
+                        crossAxisCount: _calculateCrossAxisCount(
+                            MediaQuery.of(context).size.width),
                         childAspectRatio: 1.2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -134,17 +135,17 @@ class _BatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final createdDate = batch.createdAt.toLocal().toString().split(' ')[0];
-    
+
     // Calcular días transcurridos
     final daysSinceCreation = DateTime.now().difference(batch.createdAt).inDays;
-    
+
     return Card(
       elevation: 4,
-      shadowColor: theme.colorScheme.primary.withOpacity(0.3),
+      shadowColor: theme.colorScheme.primaryContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: theme.colorScheme.primary.withOpacity(0.1),
+          color: theme.colorScheme.surfaceVariant,
           width: 1,
         ),
       ),
@@ -160,7 +161,7 @@ class _BatchCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 theme.colorScheme.surface,
-                theme.colorScheme.primary.withOpacity(0.05),
+                theme.colorScheme.surfaceVariant,
               ],
             ),
           ),
@@ -183,7 +184,7 @@ class _BatchCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.secondaryContainer,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -200,7 +201,7 @@ class _BatchCard extends StatelessWidget {
                   Icon(
                     Icons.calendar_today,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -209,9 +210,10 @@ class _BatchCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: AppColors.verdeField.withOpacity(0.1),
+                      color: AppColors.verdeField.withValues(alpha: 64),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -230,7 +232,7 @@ class _BatchCard extends StatelessWidget {
                   Icon(
                     Icons.pets,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -242,9 +244,10 @@ class _BatchCard extends StatelessWidget {
               const Spacer(),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

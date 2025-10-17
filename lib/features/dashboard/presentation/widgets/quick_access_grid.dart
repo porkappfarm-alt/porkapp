@@ -31,8 +31,8 @@ class QuickAccessGrid extends StatelessWidget {
         QuickAccessCard(
           icon: Icons.pets,
           title: 'Animales',
-          subtitle: 'Registro individual',
-          onTap: () => context.go('/animals'),
+          subtitle: 'Ver por lotes',
+          onTap: () => context.go('/batches'),
           color: Colors.green,
         ),
         QuickAccessCard(

@@ -118,7 +118,8 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
       status: 'active',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      gender: 'unknown', // You might want to add a field to capture gender in your form
+      gender:
+          'unknown', // You might want to add a field to capture gender in your form
     );
 
     final repository = ref.read(animalRepositoryProvider);

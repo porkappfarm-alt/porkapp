@@ -2,6 +2,7 @@ import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AnimalDataSource {
+  Future<List<Animal>> getAnimals();
   Future<List<Animal>> getAnimalsByBatch(String batchId);
   Future<Animal> getAnimal(String id);
   Future<Animal> createAnimal(Animal animal);
@@ -13,6 +14,16 @@ class SupabaseAnimalDataSource implements AnimalDataSource {
   final SupabaseClient _client;
 
   SupabaseAnimalDataSource(this._client);
+
+  @override
+  Future<List<Animal>> getAnimals() async {
+    final response = await _client
+        .from('animals')
+        .select()
+        .order('created_at');
+
+    return response.map((json) => Animal.fromJson(json)).toList();
+  }
 
   @override
   Future<List<Animal>> getAnimalsByBatch(String batchId) async {

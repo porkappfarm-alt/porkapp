@@ -4,6 +4,7 @@ import 'package:porkapp/shared/exceptions/app_exception.dart';
 import 'package:porkapp/features/animals/data/animal_data_source.dart';
 
 abstract class AnimalRepository {
+  Future<Either<AppException, List<Animal>>> getAnimals();
   Future<Either<AppException, List<Animal>>> getAnimalsByBatch(String batchId);
   Future<Either<AppException, Animal>> getAnimal(String id);
   Future<Either<AppException, Animal>> createAnimal(Animal animal);
@@ -15,6 +16,21 @@ class AnimalRepositoryImpl implements AnimalRepository {
   final AnimalDataSource _dataSource;
 
   AnimalRepositoryImpl(this._dataSource);
+
+  @override
+  Future<Either<AppException, List<Animal>>> getAnimals() async {
+    try {
+      final animals = await _dataSource.getAnimals();
+      return Right(animals);
+    } catch (e) {
+      return Left(
+        AppException(
+          message: 'Error al obtener los animales: ${e.toString()}',
+          type: AppExceptionType.database,
+        ),
+      );
+    }
+  }
 
   @override
   Future<Either<AppException, List<Animal>>> getAnimalsByBatch(

@@ -46,6 +46,37 @@ class Animal with _$Animal {
     @Default('unknown') String gender,
     @Default('active') String status, // active, sold, deceased, removed
     String? notes,
+
+    // Campos específicos por tipo
+    @JsonKey(name: 'target_weight') double? targetWeight,
+    @JsonKey(
+      name: 'estimated_sale_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString,
+    )
+    DateTime? estimatedSaleDate,
+    @JsonKey(name: 'parity_number') int? parityNumber,
+    @JsonKey(
+      name: 'last_farrowing_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString,
+    )
+    DateTime? lastFarrowingDate,
+    @JsonKey(name: 'total_born_alive') int? totalBornAlive,
+    @JsonKey(name: 'service_count') int? serviceCount,
+    @JsonKey(
+      name: 'last_service_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString,
+    )
+    DateTime? lastServiceDate,
+    @JsonKey(
+      name: 'weaning_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString,
+    )
+    DateTime? weaningDate,
+    @JsonKey(name: 'birth_weight') double? birthWeight,
   }) = _Animal;
 
   factory Animal.fromJson(Map<String, dynamic> json) => _$AnimalFromJson(json);

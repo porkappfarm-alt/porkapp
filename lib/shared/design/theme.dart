@@ -26,7 +26,6 @@ final lightTheme = ThemeData(
     primaryContainer: AppColors.primaryLight,
     secondary: AppColors.primaryDark,
     error: AppColors.danger,
-    background: AppColors.background,
     surface: AppColors.surface,
     onPrimary: Colors.white,
     onSecondary: Colors.white,

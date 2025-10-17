@@ -4,6 +4,10 @@ import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/animals/domain/animal_filters.dart';
 import 'package:porkapp/features/animals/providers/animals_provider.dart';
 import 'package:porkapp/features/animals/data/animals_repository.dart';
+import 'package:porkapp/features/animals/presentation/widgets/animal_type_fields.dart';
+import 'package:porkapp/features/animals/presentation/widgets/animal_status_change.dart';
+import 'package:porkapp/features/animals/presentation/widgets/form_feedback.dart';
+import 'package:porkapp/features/animals/presentation/controllers/animal_form_controller.dart';
 
 class AnimalFormDialog extends ConsumerStatefulWidget {
   final Animal? animal;
@@ -17,29 +21,41 @@ class AnimalFormDialog extends ConsumerStatefulWidget {
 
 class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
   final _formKey = GlobalKey<FormState>();
+  final _formController = AnimalFormController();
   late TextEditingController _identifierController;
   late TextEditingController _weightController;
   late TextEditingController _breedController;
   late TextEditingController _notesController;
-  DateTime _birthDate = DateTime.now();
+  late final DateTime _birthDate;
   bool _isMale = true;
   AnimalType _selectedType = const AnimalType.piglet();
 
   @override
   void initState() {
     super.initState();
-    _identifierController = TextEditingController(
-      text: widget.animal?.identifier,
-    );
-    _weightController = TextEditingController(
-      text: widget.animal?.weight.toString() ?? '',
-    );
-    _breedController = TextEditingController(text: widget.animal?.breed);
-    _notesController = TextEditingController(text: widget.animal?.notes);
+    _birthDate = widget.animal?.birthDate ?? DateTime.now();
+    _identifierController =
+        TextEditingController(text: widget.animal?.identifier ?? '');
+    _weightController =
+        TextEditingController(text: widget.animal?.weight?.toString() ?? '');
+    _breedController = TextEditingController(text: widget.animal?.breed ?? '');
+    _notesController = TextEditingController(text: widget.animal?.notes ?? '');
 
-    if (widget.animal != null) {
-      _birthDate = widget.animal!.birthDate ?? DateTime.now();
-    }
+    _formController.initForm(widget.animal);
+
+    // Escuchar cambios en los campos
+    _identifierController.addListener(() {
+      _formController.updateField('identifier', _identifierController.text);
+    });
+    _weightController.addListener(() {
+      _formController.updateField('weight', _weightController.text);
+    });
+    _breedController.addListener(() {
+      _formController.updateField('breed', _breedController.text);
+    });
+    _notesController.addListener(() {
+      _formController.updateField('notes', _notesController.text);
+    });
   }
 
   @override
@@ -48,6 +64,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
     _weightController.dispose();
     _breedController.dispose();
     _notesController.dispose();
+    _formController.dispose();
     super.dispose();
   }
 
@@ -61,8 +78,13 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      _formController
+          .setError('Por favor corrige los errores en el formulario');
+      return;
+    }
 
+    _formController.setLoading(true);
     final animal = Animal(
       id: widget.animal?.id ?? '',
       identifier: _identifierController.text,
@@ -74,7 +96,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
       createdAt: widget.animal?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
       batchId: widget.preselectedBatchId ?? widget.animal?.batchId ?? '',
-      status: 'active',
+      status: widget.animal?.status ?? 'active',
       gender: _isMale ? 'male' : 'female',
       notes: _notesController.text.isNotEmpty ? _notesController.text : null,
     );
@@ -87,7 +109,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
           id: animal.id,
           identifier: animal.identifier,
           birthDate: animal.birthDate ?? DateTime.now(),
-          breed: animal.breed ?? '',
+          breed: animal.breed,
           weight: animal.weight,
           status: animal.status,
           type: animal.type,
@@ -97,7 +119,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
           batchId: animal.batchId,
           identifier: animal.identifier,
           birthDate: animal.birthDate ?? DateTime.now(),
-          breed: animal.breed ?? '',
+          breed: animal.breed,
           weight: animal.weight,
           status: animal.status,
           type: animal.type,
@@ -136,192 +158,236 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        constraints: const BoxConstraints(maxWidth: 500),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  widget.animal != null ? 'Editar Animal' : 'Nuevo Animal',
-                  style: theme.textTheme.titleLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-
-                // Tipo de animal
-                DropdownButtonFormField<AnimalType>(
-                  value: _selectedType,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo de animal',
-                    border: OutlineInputBorder(),
+      child: PopScope(
+        canPop: !_formController.isDirty,
+        onPopInvoked: (didPop) async {
+          if (didPop) return;
+          final shouldPop = await _formController.shouldPop(context);
+          if (shouldPop && mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    widget.animal != null ? 'Editar Animal' : 'Nuevo Animal',
+                    style: theme.textTheme.titleLarge,
+                    textAlign: TextAlign.center,
                   ),
-                  items: [
-                    AnimalType.piglet(),
-                    AnimalType.sow(),
-                    AnimalType.boar(),
-                    AnimalType.fattening(),
-                  ].map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(_getAnimalTypeLabel(type)),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedType = value;
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 24),
 
-                // Identificador
-                TextFormField(
-                  controller: _identifierController,
-                  decoration: const InputDecoration(
-                    labelText: 'Identificador/Arete',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'El identificador es requerido';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Peso
-                TextFormField(
-                  controller: _weightController,
-                  decoration: const InputDecoration(
-                    labelText: 'Peso inicial (kg)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'El peso es requerido';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'Ingrese un número válido';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Fecha de nacimiento
-                InkWell(
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: _birthDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                    );
-                    if (date != null) {
-                      setState(() {
-                        _birthDate = date;
-                      });
-                    }
-                  },
-                  child: InputDecorator(
+                  // Tipo de animal
+                  DropdownButtonFormField<AnimalType>(
+                    value: _selectedType,
                     decoration: const InputDecoration(
-                      labelText: 'Fecha de nacimiento',
+                      labelText: 'Tipo de animal',
                       border: OutlineInputBorder(),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${_birthDate.day}/${_birthDate.month}/${_birthDate.year}',
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
+                    items: [
+                      AnimalType.piglet(),
+                      AnimalType.sow(),
+                      AnimalType.boar(),
+                      AnimalType.fattening(),
+                    ].map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(_getAnimalTypeLabel(type)),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedType = value;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Campos específicos por tipo
+                  AnimalTypeFields(
+                    type: _getAnimalTypeLabel(_selectedType),
+                    animal: widget.animal,
+                    onFieldChanged: (field, value) {
+                      // Los valores se manejarán en _submit
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Identificador
+                  TextFormField(
+                    controller: _identifierController,
+                    decoration: const InputDecoration(
+                      labelText: 'Identificador/Arete',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'El identificador es requerido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Peso
+                  TextFormField(
+                    controller: _weightController,
+                    decoration: const InputDecoration(
+                      labelText: 'Peso inicial (kg)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'El peso es requerido';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Ingrese un número válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Fecha de nacimiento
+                  InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: _birthDate,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime.now(),
+                      );
+                      if (date != null) {
+                        setState(() {
+                          _birthDate = date;
+                        });
+                      }
+                    },
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Fecha de nacimiento',
+                        border: OutlineInputBorder(),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${_birthDate.day}/${_birthDate.month}/${_birthDate.year}',
+                          ),
+                          const Icon(Icons.calendar_today),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // Raza/Genética
-                TextFormField(
-                  controller: _breedController,
-                  decoration: const InputDecoration(
-                    labelText: 'Raza/Línea genética',
-                    border: OutlineInputBorder(),
+                  // Raza/Genética
+                  TextFormField(
+                    controller: _breedController,
+                    decoration: const InputDecoration(
+                      labelText: 'Raza/Línea genética',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'La raza es requerida';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'La raza es requerida';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // Género
-                Row(
-                  children: [
-                    const Text('Género:'),
-                    const SizedBox(width: 16),
-                    ChoiceChip(
-                      label: const Text('Macho'),
-                      selected: _isMale,
-                      onSelected: (selected) {
+                  // Género
+                  Row(
+                    children: [
+                      const Text('Género:'),
+                      const SizedBox(width: 16),
+                      ChoiceChip(
+                        label: const Text('Macho'),
+                        selected: _isMale,
+                        onSelected: (selected) {
+                          setState(() {
+                            _isMale = selected;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Hembra'),
+                        selected: !_isMale,
+                        onSelected: (selected) {
+                          setState(() {
+                            _isMale = !selected;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Notas
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: const InputDecoration(
+                      labelText: 'Notas (opcional)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Estado (solo para edición)
+                  if (widget.animal != null) ...[
+                    AnimalStatusChange(
+                      currentStatus: widget.animal!.status,
+                      onStatusChanged: (newStatus, notes) {
                         setState(() {
-                          _isMale = selected;
+                          if (notes != null && notes.isNotEmpty) {
+                            _notesController.text = notes;
+                          }
                         });
+                        // El nuevo estado se manejará en _submit
                       },
                     ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      label: const Text('Hembra'),
-                      selected: !_isMale,
-                      onSelected: (selected) {
-                        setState(() {
-                          _isMale = !selected;
-                        });
-                      },
-                    ),
+                    const SizedBox(height: 24),
                   ],
-                ),
-                const SizedBox(height: 16),
 
-                // Notas
-                TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Notas (opcional)',
-                    border: OutlineInputBorder(),
+                  // Feedback del formulario
+                  FormFeedback(
+                    isLoading: _formController.isLoading,
+                    errorMessage: _formController.errorMessage,
+                    onRetry: _submit,
                   ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
-                // Botones
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancelar'),
-                    ),
-                    const SizedBox(width: 16),
-                    FilledButton.icon(
-                      onPressed: _submit,
-                      icon: const Icon(Icons.save),
-                      label: const Text('Guardar'),
-                    ),
-                  ],
-                ),
-              ],
+                  // Botones
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancelar'),
+                      ),
+                      const SizedBox(width: 16),
+                      FilledButton.icon(
+                        onPressed: _formController.isLoading ? null : _submit,
+                        icon: const Icon(Icons.save),
+                        label: const Text('Guardar'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

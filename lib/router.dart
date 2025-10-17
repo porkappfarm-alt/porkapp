@@ -9,7 +9,6 @@ import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_animals_view.dart';
 import 'package:porkapp/features/animals/presentation/views/animal_detail_view.dart';
-import 'package:porkapp/features/animals/presentation/views/animals_main_view.dart';
 import 'package:porkapp/features/biometrics/presentation/biometrics_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
 import 'package:porkapp/shared/widgets/placeholder_screen.dart';
@@ -26,7 +25,6 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _dashboardNavigatorKey = GlobalKey<NavigatorState>();
 final _corralsNavigatorKey = GlobalKey<NavigatorState>();
 final _batchesNavigatorKey = GlobalKey<NavigatorState>();
-final _animalsNavigatorKey = GlobalKey<NavigatorState>();
 final _biometricsNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -149,9 +147,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                           // Detalle individual del animal
                           GoRoute(
                             path: ':animalId',
+                            name: 'animal-detail',
                             builder: (context, state) {
                               final animalId =
                                   state.pathParameters['animalId'] ?? '';
+                              print('Building AnimalDetailView for animalId: $animalId'); // Debug log
                               return AnimalDetailView(animalId: animalId);
                             },
                           ),
@@ -164,37 +164,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // 4. Animals Branch
-          StatefulShellBranch(
-            navigatorKey: _animalsNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/animals',
-                builder: (context, state) => const AnimalsMainView(),
-                routes: [
-                  GoRoute(
-                    path: ':batchId',
-                    builder: (context, state) {
-                      final batchId = state.pathParameters['batchId'] ?? '';
-                      return BatchAnimalsView(batchId: batchId);
-                    },
-                    routes: [
-                      GoRoute(
-                        path: ':animalId',
-                        builder: (context, state) {
-                          final animalId =
-                              state.pathParameters['animalId'] ?? '';
-                          return AnimalDetailView(animalId: animalId);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          // 5. Biometrics Branch
+          // 4. Biometrics Branch
           StatefulShellBranch(
             navigatorKey: _biometricsNavigatorKey,
             routes: [

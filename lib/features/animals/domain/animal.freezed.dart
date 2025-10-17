@@ -56,7 +56,38 @@ mixin _$Animal {
   String get gender => throw _privateConstructorUsedError;
   String get status =>
       throw _privateConstructorUsedError; // active, sold, deceased, removed
-  String? get notes => throw _privateConstructorUsedError;
+  String? get notes =>
+      throw _privateConstructorUsedError; // Campos específicos por tipo
+  @JsonKey(name: 'target_weight')
+  double? get targetWeight => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'estimated_sale_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get estimatedSaleDate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parity_number')
+  int? get parityNumber => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'last_farrowing_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get lastFarrowingDate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'total_born_alive')
+  int? get totalBornAlive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'service_count')
+  int? get serviceCount => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'last_service_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get lastServiceDate => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'weaning_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get weaningDate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'birth_weight')
+  double? get birthWeight => throw _privateConstructorUsedError;
 
   /// Serializes this Animal to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -102,7 +133,32 @@ abstract class $AnimalCopyWith<$Res> {
       DateTime? updatedAt,
       String gender,
       String status,
-      String? notes});
+      String? notes,
+      @JsonKey(name: 'target_weight') double? targetWeight,
+      @JsonKey(
+          name: 'estimated_sale_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? estimatedSaleDate,
+      @JsonKey(name: 'parity_number') int? parityNumber,
+      @JsonKey(
+          name: 'last_farrowing_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? lastFarrowingDate,
+      @JsonKey(name: 'total_born_alive') int? totalBornAlive,
+      @JsonKey(name: 'service_count') int? serviceCount,
+      @JsonKey(
+          name: 'last_service_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? lastServiceDate,
+      @JsonKey(
+          name: 'weaning_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? weaningDate,
+      @JsonKey(name: 'birth_weight') double? birthWeight});
 }
 
 /// @nodoc
@@ -134,6 +190,15 @@ class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
     Object? gender = null,
     Object? status = null,
     Object? notes = freezed,
+    Object? targetWeight = freezed,
+    Object? estimatedSaleDate = freezed,
+    Object? parityNumber = freezed,
+    Object? lastFarrowingDate = freezed,
+    Object? totalBornAlive = freezed,
+    Object? serviceCount = freezed,
+    Object? lastServiceDate = freezed,
+    Object? weaningDate = freezed,
+    Object? birthWeight = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -192,6 +257,42 @@ class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
+      targetWeight: freezed == targetWeight
+          ? _value.targetWeight
+          : targetWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      estimatedSaleDate: freezed == estimatedSaleDate
+          ? _value.estimatedSaleDate
+          : estimatedSaleDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      parityNumber: freezed == parityNumber
+          ? _value.parityNumber
+          : parityNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      lastFarrowingDate: freezed == lastFarrowingDate
+          ? _value.lastFarrowingDate
+          : lastFarrowingDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      totalBornAlive: freezed == totalBornAlive
+          ? _value.totalBornAlive
+          : totalBornAlive // ignore: cast_nullable_to_non_nullable
+              as int?,
+      serviceCount: freezed == serviceCount
+          ? _value.serviceCount
+          : serviceCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      lastServiceDate: freezed == lastServiceDate
+          ? _value.lastServiceDate
+          : lastServiceDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      weaningDate: freezed == weaningDate
+          ? _value.weaningDate
+          : weaningDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      birthWeight: freezed == birthWeight
+          ? _value.birthWeight
+          : birthWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
     ) as $Val);
   }
 }
@@ -233,7 +334,32 @@ abstract class _$$AnimalImplCopyWith<$Res> implements $AnimalCopyWith<$Res> {
       DateTime? updatedAt,
       String gender,
       String status,
-      String? notes});
+      String? notes,
+      @JsonKey(name: 'target_weight') double? targetWeight,
+      @JsonKey(
+          name: 'estimated_sale_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? estimatedSaleDate,
+      @JsonKey(name: 'parity_number') int? parityNumber,
+      @JsonKey(
+          name: 'last_farrowing_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? lastFarrowingDate,
+      @JsonKey(name: 'total_born_alive') int? totalBornAlive,
+      @JsonKey(name: 'service_count') int? serviceCount,
+      @JsonKey(
+          name: 'last_service_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? lastServiceDate,
+      @JsonKey(
+          name: 'weaning_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      DateTime? weaningDate,
+      @JsonKey(name: 'birth_weight') double? birthWeight});
 }
 
 /// @nodoc
@@ -263,6 +389,15 @@ class __$$AnimalImplCopyWithImpl<$Res>
     Object? gender = null,
     Object? status = null,
     Object? notes = freezed,
+    Object? targetWeight = freezed,
+    Object? estimatedSaleDate = freezed,
+    Object? parityNumber = freezed,
+    Object? lastFarrowingDate = freezed,
+    Object? totalBornAlive = freezed,
+    Object? serviceCount = freezed,
+    Object? lastServiceDate = freezed,
+    Object? weaningDate = freezed,
+    Object? birthWeight = freezed,
   }) {
     return _then(_$AnimalImpl(
       id: null == id
@@ -321,6 +456,42 @@ class __$$AnimalImplCopyWithImpl<$Res>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
+      targetWeight: freezed == targetWeight
+          ? _value.targetWeight
+          : targetWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      estimatedSaleDate: freezed == estimatedSaleDate
+          ? _value.estimatedSaleDate
+          : estimatedSaleDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      parityNumber: freezed == parityNumber
+          ? _value.parityNumber
+          : parityNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      lastFarrowingDate: freezed == lastFarrowingDate
+          ? _value.lastFarrowingDate
+          : lastFarrowingDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      totalBornAlive: freezed == totalBornAlive
+          ? _value.totalBornAlive
+          : totalBornAlive // ignore: cast_nullable_to_non_nullable
+              as int?,
+      serviceCount: freezed == serviceCount
+          ? _value.serviceCount
+          : serviceCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      lastServiceDate: freezed == lastServiceDate
+          ? _value.lastServiceDate
+          : lastServiceDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      weaningDate: freezed == weaningDate
+          ? _value.weaningDate
+          : weaningDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      birthWeight: freezed == birthWeight
+          ? _value.birthWeight
+          : birthWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -358,7 +529,32 @@ class _$AnimalImpl implements _Animal {
       this.updatedAt,
       this.gender = 'unknown',
       this.status = 'active',
-      this.notes});
+      this.notes,
+      @JsonKey(name: 'target_weight') this.targetWeight,
+      @JsonKey(
+          name: 'estimated_sale_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      this.estimatedSaleDate,
+      @JsonKey(name: 'parity_number') this.parityNumber,
+      @JsonKey(
+          name: 'last_farrowing_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      this.lastFarrowingDate,
+      @JsonKey(name: 'total_born_alive') this.totalBornAlive,
+      @JsonKey(name: 'service_count') this.serviceCount,
+      @JsonKey(
+          name: 'last_service_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      this.lastServiceDate,
+      @JsonKey(
+          name: 'weaning_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      this.weaningDate,
+      @JsonKey(name: 'birth_weight') this.birthWeight});
 
   factory _$AnimalImpl.fromJson(Map<String, dynamic> json) =>
       _$$AnimalImplFromJson(json);
@@ -417,10 +613,50 @@ class _$AnimalImpl implements _Animal {
 // active, sold, deceased, removed
   @override
   final String? notes;
+// Campos específicos por tipo
+  @override
+  @JsonKey(name: 'target_weight')
+  final double? targetWeight;
+  @override
+  @JsonKey(
+      name: 'estimated_sale_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  final DateTime? estimatedSaleDate;
+  @override
+  @JsonKey(name: 'parity_number')
+  final int? parityNumber;
+  @override
+  @JsonKey(
+      name: 'last_farrowing_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  final DateTime? lastFarrowingDate;
+  @override
+  @JsonKey(name: 'total_born_alive')
+  final int? totalBornAlive;
+  @override
+  @JsonKey(name: 'service_count')
+  final int? serviceCount;
+  @override
+  @JsonKey(
+      name: 'last_service_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  final DateTime? lastServiceDate;
+  @override
+  @JsonKey(
+      name: 'weaning_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  final DateTime? weaningDate;
+  @override
+  @JsonKey(name: 'birth_weight')
+  final double? birthWeight;
 
   @override
   String toString() {
-    return 'Animal(id: $id, batchId: $batchId, identifier: $identifier, birthDate: $birthDate, sex: $sex, weight: $weight, breed: $breed, type: $type, entryDate: $entryDate, createdAt: $createdAt, updatedAt: $updatedAt, gender: $gender, status: $status, notes: $notes)';
+    return 'Animal(id: $id, batchId: $batchId, identifier: $identifier, birthDate: $birthDate, sex: $sex, weight: $weight, breed: $breed, type: $type, entryDate: $entryDate, createdAt: $createdAt, updatedAt: $updatedAt, gender: $gender, status: $status, notes: $notes, targetWeight: $targetWeight, estimatedSaleDate: $estimatedSaleDate, parityNumber: $parityNumber, lastFarrowingDate: $lastFarrowingDate, totalBornAlive: $totalBornAlive, serviceCount: $serviceCount, lastServiceDate: $lastServiceDate, weaningDate: $weaningDate, birthWeight: $birthWeight)';
   }
 
   @override
@@ -446,27 +682,55 @@ class _$AnimalImpl implements _Animal {
                 other.updatedAt == updatedAt) &&
             (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.notes, notes) || other.notes == notes));
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.targetWeight, targetWeight) ||
+                other.targetWeight == targetWeight) &&
+            (identical(other.estimatedSaleDate, estimatedSaleDate) ||
+                other.estimatedSaleDate == estimatedSaleDate) &&
+            (identical(other.parityNumber, parityNumber) ||
+                other.parityNumber == parityNumber) &&
+            (identical(other.lastFarrowingDate, lastFarrowingDate) ||
+                other.lastFarrowingDate == lastFarrowingDate) &&
+            (identical(other.totalBornAlive, totalBornAlive) ||
+                other.totalBornAlive == totalBornAlive) &&
+            (identical(other.serviceCount, serviceCount) ||
+                other.serviceCount == serviceCount) &&
+            (identical(other.lastServiceDate, lastServiceDate) ||
+                other.lastServiceDate == lastServiceDate) &&
+            (identical(other.weaningDate, weaningDate) ||
+                other.weaningDate == weaningDate) &&
+            (identical(other.birthWeight, birthWeight) ||
+                other.birthWeight == birthWeight));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      batchId,
-      identifier,
-      birthDate,
-      sex,
-      weight,
-      breed,
-      type,
-      entryDate,
-      createdAt,
-      updatedAt,
-      gender,
-      status,
-      notes);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        batchId,
+        identifier,
+        birthDate,
+        sex,
+        weight,
+        breed,
+        type,
+        entryDate,
+        createdAt,
+        updatedAt,
+        gender,
+        status,
+        notes,
+        targetWeight,
+        estimatedSaleDate,
+        parityNumber,
+        lastFarrowingDate,
+        totalBornAlive,
+        serviceCount,
+        lastServiceDate,
+        weaningDate,
+        birthWeight
+      ]);
 
   /// Create a copy of Animal
   /// with the given fields replaced by the non-null parameter values.
@@ -515,7 +779,32 @@ abstract class _Animal implements Animal {
       final DateTime? updatedAt,
       final String gender,
       final String status,
-      final String? notes}) = _$AnimalImpl;
+      final String? notes,
+      @JsonKey(name: 'target_weight') final double? targetWeight,
+      @JsonKey(
+          name: 'estimated_sale_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      final DateTime? estimatedSaleDate,
+      @JsonKey(name: 'parity_number') final int? parityNumber,
+      @JsonKey(
+          name: 'last_farrowing_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      final DateTime? lastFarrowingDate,
+      @JsonKey(name: 'total_born_alive') final int? totalBornAlive,
+      @JsonKey(name: 'service_count') final int? serviceCount,
+      @JsonKey(
+          name: 'last_service_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      final DateTime? lastServiceDate,
+      @JsonKey(
+          name: 'weaning_date',
+          fromJson: _nullableDateFromString,
+          toJson: _nullableDateToString)
+      final DateTime? weaningDate,
+      @JsonKey(name: 'birth_weight') final double? birthWeight}) = _$AnimalImpl;
 
   factory _Animal.fromJson(Map<String, dynamic> json) = _$AnimalImpl.fromJson;
 
@@ -565,7 +854,46 @@ abstract class _Animal implements Animal {
   @override
   String get status; // active, sold, deceased, removed
   @override
-  String? get notes;
+  String? get notes; // Campos específicos por tipo
+  @override
+  @JsonKey(name: 'target_weight')
+  double? get targetWeight;
+  @override
+  @JsonKey(
+      name: 'estimated_sale_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get estimatedSaleDate;
+  @override
+  @JsonKey(name: 'parity_number')
+  int? get parityNumber;
+  @override
+  @JsonKey(
+      name: 'last_farrowing_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get lastFarrowingDate;
+  @override
+  @JsonKey(name: 'total_born_alive')
+  int? get totalBornAlive;
+  @override
+  @JsonKey(name: 'service_count')
+  int? get serviceCount;
+  @override
+  @JsonKey(
+      name: 'last_service_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get lastServiceDate;
+  @override
+  @JsonKey(
+      name: 'weaning_date',
+      fromJson: _nullableDateFromString,
+      toJson: _nullableDateToString)
+  DateTime? get weaningDate;
+  @override
+  @JsonKey(name: 'birth_weight')
+  double? get birthWeight;
 
   /// Create a copy of Animal
   /// with the given fields replaced by the non-null parameter values.

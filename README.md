@@ -1,16 +1,59 @@
-# porkapp_new
+# PorkApp
 
-A new Flutter project.
+Aplicación móvil para la gestión de granjas porcinas.
 
-## Getting Started
+## Estructura de Navegación
 
-This project is a starting point for a Flutter application.
+La aplicación utiliza una navegación basada en pestañas con las siguientes secciones principales:
 
-A few resources to get you started if this is your first Flutter project:
+1. **Dashboard**
+   - Vista general del sistema
+   - Accesos rápidos a funciones principales
+   - Resumen de métricas importantes
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2. **Corrales**
+   - Gestión de espacios físicos
+   - Distribución y capacidad
+   - Estado y mantenimiento
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3. **Lotes**
+   - Gestión de grupos de animales
+   - Vista detallada de cada lote
+   - Acceso a los animales del lote
+   - Control de producción
+
+4. **Biometría**
+   - Análisis y métricas
+   - Seguimiento de peso y salud
+   - Indicadores de rendimiento
+
+### Gestión de Animales
+
+Los animales se gestionan siempre en el contexto de un lote específico. Para acceder a los animales:
+
+1. Navegar a la sección de "Lotes"
+2. Seleccionar el lote deseado
+3. Acceder a la lista de animales del lote
+
+Rutas de acceso a animales:
+- `/batches` - Lista de lotes
+- `/batches/:batchId` - Detalle del lote
+- `/batches/:batchId/animals` - Animales del lote
+- `/batches/:batchId/animals/:animalId` - Detalle del animal
+
+## Desarrollo
+
+### Requisitos
+- Flutter SDK
+- Dart SDK
+- Supabase Account
+
+### Configuración
+1. Clonar el repositorio
+2. Ejecutar `flutter pub get`
+3. Configurar las variables de entorno
+4. Ejecutar la aplicación con `flutter run`
+
+## Licencia
+
+Este proyecto es propiedad de PorkApp Farm.

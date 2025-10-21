@@ -14,10 +14,14 @@ class AnimalsRepository {
   }
 
   Future<Animal> getAnimal(String id) async {
+    print('AnimalsRepository: Fetching animal with id: $id');
     final response =
         await supabase.from('animals').select().eq('id', id).single();
+    print('AnimalsRepository: Raw response: $response');
 
-    return Animal.fromJson(response);
+    final animal = Animal.fromJson(response);
+    print('AnimalsRepository: Parsed animal: ${animal.toString()}');
+    return animal;
   }
 
   Future<Animal> createAnimal({

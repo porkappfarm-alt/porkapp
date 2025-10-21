@@ -68,8 +68,10 @@ class _AnimalDetailViewState extends ConsumerState<AnimalDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('AnimalDetailView: Building with animalId: ${widget.animalId}');
     final theme = Theme.of(context);
     final animalAsync = ref.watch(animalDetailProvider(widget.animalId));
+    debugPrint('AnimalDetailView: Current state: $animalAsync');
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -155,15 +157,15 @@ class _AnimalDetailContent extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return Colors.green;
+        return const Color(0xFF1A8754); // Verde personalizado
       case 'sold':
-        return Colors.blue;
+        return const Color(0xFF0D6EFD); // Azul personalizado
       case 'deceased':
-        return Colors.red;
+        return const Color(0xFFDC3545); // Rojo personalizado
       case 'removed':
-        return Colors.orange;
+        return const Color(0xFFFD7E14); // Naranja personalizado
       default:
-        return Colors.grey;
+        return const Color(0xFF6C757D); // Gris personalizado
     }
   }
 
@@ -217,51 +219,90 @@ class _AnimalDetailContent extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       children: [
+        // Identificador y Estado
+        Hero(
+          tag: 'animal-${animal.id}',
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Text(
+                    animal.identifier,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildStatusBadge(context),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
         // Información básica
         Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 12),
                     Text(
                       'Información Básica',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    _buildStatusBadge(context),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildInfoRow(
                   context: context,
+                  icon: Icons.tag,
                   label: 'ID',
                   value: animal.identifier,
                 ),
                 _buildInfoRow(
                   context: context,
+                  icon: Icons.category,
                   label: 'Tipo',
                   value: animal.type,
                 ),
                 _buildInfoRow(
                   context: context,
+                  icon: Icons.pets,
                   label: 'Raza',
                   value: animal.breed,
                 ),
                 _buildInfoRow(
                   context: context,
+                  icon: Icons.calendar_today,
                   label: 'Fecha de nacimiento',
                   value: _formatDate(animal.birthDate),
                 ),
                 if (animal.weight != null)
                   _buildInfoRow(
                     context: context,
+                    icon: Icons.monitor_weight,
                     label: 'Peso inicial',
                     value: '${animal.weight} kg',
                   ),
@@ -269,55 +310,95 @@ class _AnimalDetailContent extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         // Historial
         Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Historial',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.history,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Historial',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildInfoRow(
                   context: context,
+                  icon: Icons.login,
                   label: 'Fecha de ingreso',
                   value: _formatDate(animal.entryDate),
                 ),
                 _buildInfoRow(
                   context: context,
+                  icon: Icons.offline_pin,
                   label: 'Estado',
-                  value: animal.status,
+                  value: _getStatusText(animal.status),
+                  valueColor: _getStatusColor(animal.status),
                 ),
               ],
             ),
           ),
         ),
         if (animal.notes != null && animal.notes!.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           // Notas
           Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Notas',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.note,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Notas',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    animal.notes!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.colorScheme.outlineVariant,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      animal.notes!,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ],
@@ -325,6 +406,7 @@ class _AnimalDetailContent extends StatelessWidget {
             ),
           ),
         ],
+        const SizedBox(height: 24),
       ],
     );
   }
@@ -333,24 +415,37 @@ class _AnimalDetailContent extends StatelessWidget {
     required BuildContext context,
     required String label,
     required String? value,
+    IconData? icon,
+    Color? valueColor,
   }) {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
+          if (icon != null) ...[
+            Icon(
+              icon,
+              size: 20,
+              color: theme.colorScheme.primary.withOpacity(0.7),
+            ),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
             ),
           ),
+          const SizedBox(width: 16),
           Text(
             value ?? 'No disponible',
             style: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.w500,
+              color: valueColor,
             ),
           ),
         ],

@@ -25,7 +25,7 @@ class Corral with _$Corral {
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'created_by') required String createdBy,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    @Default(0) int activeBatchCount,
+    @JsonKey(name: 'active_batch_count') @Default(0) int activeBatchCount,
     @Default(CorralStatus.disponible) CorralStatus status,
   }) = _Corral;
 

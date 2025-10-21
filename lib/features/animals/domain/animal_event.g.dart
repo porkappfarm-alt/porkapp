@@ -9,7 +9,7 @@ part of 'animal_event.dart';
 _$AnimalEventImpl _$$AnimalEventImplFromJson(Map<String, dynamic> json) =>
     _$AnimalEventImpl(
       id: json['id'] as String,
-      animalId: json['animalId'] as String,
+      animalId: json['animal_id'] as String,
       date: DateTime.parse(json['event_date'] as String),
       type: json['type'] as String,
       data: json['data'] as Map<String, dynamic>,
@@ -28,7 +28,7 @@ _$AnimalEventImpl _$$AnimalEventImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$AnimalEventImplToJson(_$AnimalEventImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'animalId': instance.animalId,
+      'animal_id': instance.animalId,
       'event_date': instance.date.toIso8601String(),
       'type': instance.type,
       'data': instance.data,

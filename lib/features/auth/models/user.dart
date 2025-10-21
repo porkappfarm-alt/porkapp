@@ -9,15 +9,9 @@ class User with _$User {
     required String id,
     required String email,
     String? username,
-    required DateTime createdAt,
-    DateTime? lastLogin,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'last_login') DateTime? lastLogin,
   }) = _User;
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson({
-    ...json,
-    'createdAt': json['created_at'],
-    'lastLogin': json['last_login'],
-  });
-
-  const User._();
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

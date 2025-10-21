@@ -9,42 +9,58 @@ class KPISection extends ConsumerWidget {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.2,
+      crossAxisCount: 3,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 0.85,
       children: const [
         KPICard(
           title: 'Corrales Activos',
-          icon: Icons.business,
-          value: '8',
-          trend: '+2',
+          icon: Icons.grid_view_rounded,
+          value: '2',
+          trend: '',
           trendIsPositive: true,
-          details: ['Ocupación: 85%', 'vs Mes anterior: +15%'],
+          details: [],
         ),
         KPICard(
-          title: 'Lotes en Producción',
-          icon: Icons.inventory_2,
-          value: '5',
-          trend: '2 próximos',
+          title: 'Ocupación',
+          icon: Icons.bar_chart_rounded,
+          value: '0.2%',
+          trend: '',
           trendIsPositive: true,
-          details: ['Estado: Normal', 'Finalización próxima: 2'],
+          details: [],
         ),
         KPICard(
-          title: 'Población Animal',
-          icon: Icons.pets,
-          value: '250',
-          trend: '+10',
+          title: 'Lotes Activos',
+          icon: Icons.group_rounded,
+          value: '2',
+          trend: '',
           trendIsPositive: true,
-          details: ['Altas hoy: 10', 'Bajas hoy: 0'],
+          details: [],
         ),
         KPICard(
-          title: 'Peso Promedio',
-          icon: Icons.monitor_weight,
-          value: '75.5 kg',
-          trend: '+2.3 kg',
+          title: 'Lotes por Terminar',
+          icon: Icons.warning_amber_rounded,
+          value: '2',
+          trend: '',
           trendIsPositive: true,
-          details: ['ADG: 0.85 kg/día', 'Tendencia: Positiva'],
+          details: [],
+        ),
+        KPICard(
+          title: 'Total Animales',
+          icon: Icons.pets_rounded,
+          value: '52',
+          trend: '',
+          trendIsPositive: true,
+          details: [],
+        ),
+        KPICard(
+          title: 'Entradas Hoy',
+          icon: Icons.add_circle_outline_rounded,
+          value: '0',
+          trend: '',
+          trendIsPositive: true,
+          details: [],
         ),
       ],
     );
@@ -101,70 +117,53 @@ class _KPICardState extends State<KPICard> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: _scaleAnimation,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6B0338).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
                     widget.icon,
-                    size: 24,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                widget.value,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    widget.trendIsPositive
-                        ? Icons.trending_up
-                        : Icons.trending_down,
-                    size: 16,
-                    color: widget.trendIsPositive ? Colors.green : Colors.red,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    widget.trend,
-                    style: TextStyle(
-                      color: widget.trendIsPositive ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              ...widget.details.map(
-                (detail) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    detail,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    size: 20,
+                    color: const Color(0xFF6B0338),
                   ),
                 ),
+                const SizedBox(height: 12),
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF6B6B6B),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            Text(
+              widget.value,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1F2937),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

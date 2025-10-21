@@ -35,18 +35,18 @@ _$AnimalFiltersImpl _$$AnimalFiltersImplFromJson(Map<String, dynamic> json) =>
           json['type'], const AnimalTypeConverter().fromJson),
       status: _$JsonConverterFromJson<String, AnimalStatus>(
           json['status'], const AnimalStatusConverter().fromJson),
-      dateFrom: json['dateFrom'] == null
+      dateFrom: json['date_from'] == null
           ? null
-          : DateTime.parse(json['dateFrom'] as String),
-      dateTo: json['dateTo'] == null
+          : DateTime.parse(json['date_from'] as String),
+      dateTo: json['date_to'] == null
           ? null
-          : DateTime.parse(json['dateTo'] as String),
-      batchId: json['batchId'] as String?,
-      corralId: json['corralId'] as String?,
-      minWeight: (json['minWeight'] as num?)?.toDouble(),
-      maxWeight: (json['maxWeight'] as num?)?.toDouble(),
-      isMale: json['isMale'] as bool?,
-      searchQuery: json['searchQuery'] as String?,
+          : DateTime.parse(json['date_to'] as String),
+      batchId: json['batch_id'] as String?,
+      corralId: json['corral_id'] as String?,
+      minWeight: (json['min_weight'] as num?)?.toDouble(),
+      maxWeight: (json['max_weight'] as num?)?.toDouble(),
+      isMale: json['is_male'] as bool?,
+      searchQuery: json['search_query'] as String?,
     );
 
 Map<String, dynamic> _$$AnimalFiltersImplToJson(_$AnimalFiltersImpl instance) =>
@@ -55,14 +55,14 @@ Map<String, dynamic> _$$AnimalFiltersImplToJson(_$AnimalFiltersImpl instance) =>
           instance.type, const AnimalTypeConverter().toJson),
       'status': _$JsonConverterToJson<String, AnimalStatus>(
           instance.status, const AnimalStatusConverter().toJson),
-      'dateFrom': instance.dateFrom?.toIso8601String(),
-      'dateTo': instance.dateTo?.toIso8601String(),
-      'batchId': instance.batchId,
-      'corralId': instance.corralId,
-      'minWeight': instance.minWeight,
-      'maxWeight': instance.maxWeight,
-      'isMale': instance.isMale,
-      'searchQuery': instance.searchQuery,
+      'date_from': instance.dateFrom?.toIso8601String(),
+      'date_to': instance.dateTo?.toIso8601String(),
+      'batch_id': instance.batchId,
+      'corral_id': instance.corralId,
+      'min_weight': instance.minWeight,
+      'max_weight': instance.maxWeight,
+      'is_male': instance.isMale,
+      'search_query': instance.searchQuery,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(

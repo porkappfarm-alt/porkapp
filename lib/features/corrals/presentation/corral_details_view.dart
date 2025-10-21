@@ -22,14 +22,20 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Corral ${corral['nombre'] ?? 'Sin nombre'}'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Detalle de Corral',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: 'Editar corral',
+            icon: const Icon(Icons.edit_outlined),
             onPressed: () {
-              // Navegar a la vista de edición
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -39,13 +45,32 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
                 ),
               ).then((wasUpdated) {
                 if (wasUpdated == true) {
-                  // Cerrar esta vista también para volver a la lista actualizada
                   Navigator.pop(context);
                 }
               });
             },
           ),
+          IconButton(
+            icon: Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                color: Color(0xFF6B0338),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.person_outline_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            onPressed: () {},
+          ),
+          const SizedBox(width: 8),
         ],
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -73,151 +98,254 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
   }
 
   Widget _buildStatusCard() {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(
-                'Estado',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  'assets/images/3800591.png',
+                  fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 8),
-              Row(
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(corral['estado']),
-                      shape: BoxShape.circle,
+                  Text(
+                    'Corral ${corral['nombre'] ?? 'Sin nombre'}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _getStatusText(corral['estado'] ?? 'Desconocido'),
-                    style: const TextStyle(fontSize: 16),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(corral['estado']),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      _getStatusText(corral['estado'] ?? 'Desconocido'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildDetailsCard() {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Detalles',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                  'Identificador', corral['nombre'] ?? 'Sin nombre'),
-              _buildDetailRow(
-                  'Capacidad', '${corral['capacidad'] ?? 0} animales'),
-              _buildDetailRow('Estado', corral['estado'] ?? 'No especificado'),
-              _buildDetailRow(
-                'Ocupación',
-                '${corral['ocupacion'] ?? 0} animales',
-              ),
-            ],
-          ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
         ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Información General',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF6B0338),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildDetailRow(
+            'Identificador',
+            corral['nombre'] ?? 'Sin nombre',
+            icon: Icons.tag_rounded,
+          ),
+          _buildDetailRow(
+            'Capacidad',
+            '${corral['capacidad'] ?? 0} animales',
+            icon: Icons.group_rounded,
+          ),
+          _buildDetailRow(
+            'Estado',
+            corral['estado'] ?? 'No especificado',
+            icon: Icons.info_outline_rounded,
+          ),
+          _buildDetailRow(
+            'Ocupación',
+            '${corral['ocupacion'] ?? 0} animales',
+            icon: Icons.pets_rounded,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildOccupancyCard() {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    final occupancy = corral['ocupacion'] as int? ?? 0;
+    final capacity = corral['capacidad'] as int? ?? 1;
+    final percentage = ((occupancy / capacity) * 100).round();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(
-                'Ocupación',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color:
+                      _getOccupancyColor(occupancy, capacity).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.area_chart_rounded,
+                  color: _getOccupancyColor(occupancy, capacity),
+                  size: 24,
                 ),
               ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                'Capacidad máxima',
-                '${corral['capacidad'] ?? 0} animales',
-              ),
-              _buildDetailRow(
-                'Ocupación actual',
-                '${corral['ocupacion'] ?? 0} animales',
-              ),
-              const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: ((corral['ocupacion'] as int? ?? 0) /
-                        (corral['capacidad'] as int? ?? 1))
-                    .clamp(0.0, 1.0),
-                backgroundColor: Colors.grey[200],
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  _getOccupancyColor(
-                    corral['ocupacion'] as int? ?? 0,
-                    corral['capacidad'] as int? ?? 1,
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Ocupación',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF6B0338),
+                    ),
                   ),
+                  Text(
+                    '$percentage% de capacidad utilizada',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: (occupancy / capacity).clamp(0.0, 1.0),
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(
+                _getOccupancyColor(occupancy, capacity),
+              ),
+              minHeight: 8,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$occupancy animales',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                'Máximo: $capacity',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value,
-      {bool isEditable = false, ValueChanged<String>? onChanged}) {
+  Widget _buildDetailRow(
+    String label,
+    String value, {
+    bool isEditable = false,
+    ValueChanged<String>? onChanged,
+    IconData? icon,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 5,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Colors.black87,
+          if (icon != null) ...[
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B0338).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              overflow: TextOverflow.ellipsis,
+              child: Icon(
+                icon,
+                color: const Color(0xFF6B0338),
+                size: 20,
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
+            const SizedBox(width: 12),
+          ],
           Expanded(
-            flex: 5,
-            child: isEditable
-                ? TextFormField(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (isEditable)
+                  TextFormField(
                     initialValue: value,
                     onChanged: onChanged,
                     decoration: const InputDecoration(
@@ -232,16 +360,17 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
-                    textAlign: TextAlign.right,
                   )
-                : Text(
+                else
+                  Text(
                     value,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
-                    textAlign: TextAlign.right,
                   ),
+              ],
+            ),
           ),
         ],
       ),
@@ -283,10 +412,10 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-    onPressed: () {
-      Navigator.pop(context);
-    },
-    child: const Text('Cancelar'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancelar'),
               ),
             ),
           ],
@@ -333,13 +462,15 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'normal':
-        return Colors.green;
+      case 'activo':
+        return const Color(0xFF1A8754);
       case 'mantenimiento':
-        return Colors.orange;
+        return const Color(0xFFF59E0B);
       case 'crítico':
-        return Colors.red;
+      case 'inactivo':
+        return const Color(0xFFDC2626);
       default:
-        return Colors.grey;
+        return const Color(0xFF6B7280);
     }
   }
 

@@ -13,10 +13,15 @@ class AnimalDetailNotifier extends FamilyAsyncNotifier<Animal, String> {
 
   @override
   Future<Animal> build(String animalId) async {
+    print('AnimalDetailProvider: Iniciando build para animalId: $animalId');
+    state = const AsyncValue.loading();
     _repository = ref.read(animalsRepositoryProvider);
 
     try {
+      print('AnimalDetailProvider: Intentando obtener datos del animal...');
       final animal = await _repository.getAnimal(animalId);
+      print(
+          'AnimalDetailProvider: Animal obtenido exitosamente: ${animal.toString()}');
       return animal;
     } catch (e, stack) {
       // Log del error para debugging

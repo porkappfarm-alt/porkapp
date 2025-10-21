@@ -14,19 +14,18 @@ class BatchesView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
-        title: const Text('Lotes'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // TODO: Implementar filtros
-            },
-            tooltip: 'Filtrar lotes',
+        title: Text(
+          'Gestión de Lotes',
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
           ),
-        ],
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -39,23 +38,51 @@ class BatchesView extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.folder_open,
-                          size: 64,
-                          color: theme.colorScheme.primary.withOpacity(0.5),
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.secondaryContainer,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.colorScheme.secondary
+                                    .withOpacity(0.2),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.inventory_2_rounded,
+                            size: 64,
+                            color: theme.colorScheme.onSecondaryContainer,
+                          ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         Text(
                           'No hay lotes creados',
-                          style: theme.textTheme.titleMedium?.copyWith(
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Crea un nuevo lote para comenzar',
+                          style: theme.textTheme.bodyLarge?.copyWith(
                             color: theme.colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        ElevatedButton.icon(
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
                           onPressed: () => _showCreateBatchDialog(context),
                           icon: const Icon(Icons.add),
                           label: const Text('Crear Lote'),
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -64,57 +91,145 @@ class BatchesView extends ConsumerWidget {
 
                 return CustomScrollView(
                   slivers: [
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: 16),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total: ${batches.length} ${batches.length == 1 ? 'lote' : 'lotes'}',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.7),
+                              ),
+                            ),
+                            FilledButton.tonalIcon(
+                              onPressed: () {
+                                // TODO: Implementar ordenamiento
+                              },
+                              icon: Icon(
+                                Icons.sort_rounded,
+                                color: theme.colorScheme.onSecondaryContainer,
+                              ),
+                              label: Text(
+                                'Ordenar',
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSecondaryContainer,
+                                ),
+                              ),
+                              style: FilledButton.styleFrom(
+                                backgroundColor:
+                                    theme.colorScheme.secondaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     SliverPadding(
-                      padding: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             final batch = batches[index];
-                            return BatchCard(
-                              batch: batch,
-                              onTap: () => context.push('/batches/${batch.id}'),
-                              onEdit: () => _onBatchEdit(context, batch),
-                              onDelete: () => _onBatchDelete(context, batch),
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Hero(
+                                tag: 'batch-${batch.id}',
+                                child: BatchCard(
+                                  batch: batch,
+                                  onTap: () =>
+                                      context.push('/batches/${batch.id}'),
+                                  onEdit: () => _onBatchEdit(context, batch),
+                                  onDelete: () =>
+                                      _onBatchDelete(context, batch),
+                                ),
+                              ),
                             );
                           },
                           childCount: batches.length,
                         ),
                       ),
                     ),
-                    // Espacio adicional al final de la lista
                     const SliverPadding(padding: EdgeInsets.only(bottom: 80)),
                   ],
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
+              loading: () => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: theme.colorScheme.error,
-                    ),
-                    const SizedBox(height: 16),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 24),
                     Text(
-                      'Error al cargar los lotes',
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      error.toString(),
-                      style: theme.textTheme.bodySmall,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        ref.invalidate(batchListProvider);
-                      },
-                      child: const Text('Reintentar'),
+                      'Cargando lotes...',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
                     ),
                   ],
+                ),
+              ),
+              error: (error, stack) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.errorContainer,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.error.withOpacity(0.2),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.error_outline_rounded,
+                          size: 48,
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Error al cargar los lotes',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: theme.colorScheme.error,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        error.toString(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: () => ref.invalidate(batchListProvider),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Reintentar'),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -123,33 +238,11 @@ class BatchesView extends ConsumerWidget {
         onPressed: () => _showCreateBatchDialog(context),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo Lote'),
+        elevation: 3,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
     );
-  }
-
-  void _onBatchTap(BuildContext context, Batch batch) {
-    context.go('/batches/${batch.id}');
-  }
-
-  int _calculateCrossAxisCount(double width) {
-    if (width > 1200) return 4; // Pantallas grandes
-    if (width > 900) return 3; // Tablets horizontales
-    if (width > 600) return 2; // Tablets verticales
-    return 1; // Móviles
-  }
-
-  double _calculateHorizontalPadding(double width) {
-    if (width > 1200) return 32;
-    if (width > 900) return 24;
-    if (width > 600) return 16;
-    return 8;
-  }
-
-  double _calculateChildAspectRatio(double width) {
-    if (width > 1200) return 1.2;
-    if (width > 900) return 1.1;
-    if (width > 600) return 1.0;
-    return 0.9;
   }
 
   void _onBatchEdit(BuildContext context, Batch batch) {
@@ -166,17 +259,18 @@ class BatchesView extends ConsumerWidget {
           'Esta acción no se puede deshacer.',
         ),
         actions: [
-          TextButton(
+          FilledButton.tonal(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
               // TODO: Implementar eliminación del lote
               Navigator.of(context).pop();
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             child: const Text('Eliminar'),
           ),

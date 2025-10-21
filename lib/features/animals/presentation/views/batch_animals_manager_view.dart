@@ -10,16 +10,18 @@ import 'package:porkapp/features/animals/presentation/views/animal_events_view.d
 import 'package:porkapp/features/animals/providers/animals_provider.dart';
 import 'package:porkapp/features/animals/data/animals_repository.dart';
 
-class BatchAnimalsView extends ConsumerStatefulWidget {
+class BatchAnimalsManagerView extends ConsumerStatefulWidget {
   final String batchId;
 
-  const BatchAnimalsView({super.key, required this.batchId});
+  const BatchAnimalsManagerView({super.key, required this.batchId});
 
   @override
-  ConsumerState<BatchAnimalsView> createState() => _BatchAnimalsViewState();
+  ConsumerState<BatchAnimalsManagerView> createState() =>
+      _BatchAnimalsManagerViewState();
 }
 
-class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
+class _BatchAnimalsManagerViewState
+    extends ConsumerState<BatchAnimalsManagerView> {
   String _searchQuery = '';
   String? _statusFilter;
   DateTimeRange? _dateFilter;
@@ -115,15 +117,15 @@ class _BatchAnimalsViewState extends ConsumerState<BatchAnimalsView> {
                         itemBuilder: (context, index) {
                           final animal = filteredAnimals[index];
                           return AnimalListItem(
-                              onTap: () => _showAnimalDetails(context, animal),
-                              animal: animal,
-                              onEdit: () =>
-                                  _showEditAnimalDialog(context, animal.id),
-                              onDelete: () =>
-                                  _confirmDeleteAnimal(context, animal),
-                              onAddEvent: () =>
-                                  _showAddEventDialog(context, animal),
-                            );
+                            onTap: () => _showAnimalDetails(context, animal),
+                            animal: animal,
+                            onEdit: () =>
+                                _showEditAnimalDialog(context, animal.id),
+                            onDelete: () =>
+                                _confirmDeleteAnimal(context, animal),
+                            onAddEvent: () =>
+                                _showAddEventDialog(context, animal),
+                          );
                         },
                       ),
                     );

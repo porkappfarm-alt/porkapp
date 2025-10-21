@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_form_dialog.dart';
 import 'package:porkapp/features/animals/providers/animals_provider.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
@@ -20,10 +19,37 @@ class BatchDetailView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Detalle de Lote'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          'Detalle de Lote',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
+        actions: [
+          IconButton(
+            icon: Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                color: Color(0xFF6B0338),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.person_outline_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            onPressed: () {},
+          ),
+        ],
         centerTitle: true,
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
@@ -95,71 +121,79 @@ class BatchDetailView extends ConsumerWidget {
                         padding: const EdgeInsets.all(16),
                         itemBuilder: (context, index) {
                           final animal = animals[index];
-                          return Card(
-                            child: InkWell(
-                              onTap: () => context.push(
-                                  '/batches/$batchId/animals/${animal.id}'),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
-                                      child: Text(
-                                        animal.identifier
-                                            .substring(0, 1)
-                                            .toUpperCase(),
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            animal.identifier,
-                                            style: theme.textTheme.titleMedium,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${animal.breed} - ${animal.weight != null ? "${animal.weight!.toStringAsFixed(1)} kg" : "Sin peso"}',
-                                            style: theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withOpacity(0.7),
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: animal.status == 'active'
-                                            ? Colors.green.withOpacity(0.1)
-                                            : Colors.red.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        animal.status,
-                                        style:
-                                            theme.textTheme.bodySmall?.copyWith(
-                                          color: animal.status == 'active'
-                                              ? Colors.green
-                                              : Colors.red,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                          return GestureDetector(
+                            onTap: () => context
+                                .push('/batches/$batchId/animals/${animal.id}'),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFE5E7EB),
                                 ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Image.asset(
+                                      'assets/images/3800591.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          animal.identifier,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${animal.breed} - ${animal.weight != null ? "${animal.weight!.toStringAsFixed(1)} kg" : "Sin peso"}',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: animal.status == 'active'
+                                          ? const Color(0xFF1A8754)
+                                          : const Color(0xFFDC2626),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      animal.status == 'active'
+                                          ? 'Activo'
+                                          : 'Inactivo',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -192,13 +226,6 @@ class BatchDetailView extends ConsumerWidget {
       builder: (context) => AnimalFormDialog(preselectedBatchId: batchId),
     );
   }
-
-  void _showEditAnimalDialog(BuildContext context, Animal animal) {
-    showDialog(
-      context: context,
-      builder: (context) => AnimalFormDialog(animal: animal),
-    );
-  }
 }
 
 class _BatchHeader extends StatelessWidget {
@@ -208,112 +235,59 @@ class _BatchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Text(batch.name, style: theme.textTheme.headlineSmall),
-                      const SizedBox(width: 8),
-                      _StatusChip(status: batch.status),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.monitor_weight),
-                  onPressed: () => context.go('/biometrics/${batch.id}'),
-                  tooltip: 'Ver Biometrías',
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
             Text(
-              'Fecha inicio: ${_formatDate(batch.createdAt)}',
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Cantidad inicial: ${batch.headcountStart} cerdos',
-              style: theme.textTheme.bodyMedium,
-            ),
-            if (batch.initialAvgWeight != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                'Peso inicial promedio: ${batch.initialAvgWeight!.toStringAsFixed(1)} kg',
-                style: theme.textTheme.bodyMedium,
+              batch.name,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-            if (batch.notes != null && batch.notes!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const Divider(),
-              const SizedBox(height: 8),
-              Text('Notas:', style: theme.textTheme.titleSmall),
-              const SizedBox(height: 4),
-              Text(batch.notes!, style: theme.textTheme.bodyMedium),
-            ],
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A8754),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Text(
+                'Activo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ],
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          'Fecha inicio: ${_formatDate(batch.createdAt)}',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Cantidad inicial: ${batch.headcountStart} cerdos',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+      ],
     );
   }
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final String status;
-
-  const _StatusChip({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: Text(_getStatusText(status)),
-      backgroundColor: _getStatusColor(status),
-      labelStyle: const TextStyle(color: Colors.white),
-    );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'activo':
-      case 'active':
-        return Colors.green;
-      case 'finalizado':
-      case 'finished':
-        return Colors.blue;
-      case 'cancelado':
-      case 'cancelled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getStatusText(String status) {
-    switch (status.toLowerCase()) {
-      case 'activo':
-      case 'active':
-        return 'Activo';
-      case 'finalizado':
-      case 'finished':
-        return 'Finalizado';
-      case 'cancelado':
-      case 'cancelled':
-        return 'Cancelado';
-      default:
-        return 'Desconocido';
-    }
   }
 }

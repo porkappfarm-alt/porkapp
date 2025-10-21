@@ -38,7 +38,19 @@ class CorralsRepository {
             ? DateTime.parse(json['updated_at'])
             : DateTime.now();
 
-        final activeBatchCount = json['active_batch_count']?[0]?['count'] ?? 0;
+        final dynamic rawCount = json['active_batch_count']?[0]?['count'];
+        final int activeBatchCount;
+        if (rawCount is int) {
+          activeBatchCount = rawCount;
+        } else if (rawCount is List) {
+          activeBatchCount =
+              rawCount.isNotEmpty ? (rawCount[0] as num).toInt() : 0;
+        } else if (rawCount is num) {
+          activeBatchCount = rawCount.toInt();
+        } else {
+          activeBatchCount = 0;
+        }
+
         final hasActiveBatches = activeBatchCount > 0;
 
         // Si el estado no es mantenimiento y hay lotes activos, asegurarse de que esté ocupado
@@ -48,15 +60,19 @@ class CorralsRepository {
                 ? CorralStatus.ocupado
                 : CorralStatus.disponible;
 
+        // Creamos un nuevo mapa sin los campos que no necesitamos
         final mappedJson = {
-          ...json,
-          'name': json['name'],
           'id': json['id'],
-          'activeBatchCount': activeBatchCount,
+          'name': json['name'],
+          'location': json['location'],
+          'capacity': json['capacity'],
+          'notes': json['notes'],
+          'image_url': json['image_url'],
+          'active_batch_count': activeBatchCount,
           'status': status.name,
-          'createdAt': createdAt.toIso8601String(),
-          'updatedAt': updatedAt.toIso8601String(),
-          'createdBy':
+          'created_at': createdAt.toIso8601String(),
+          'updated_at': updatedAt.toIso8601String(),
+          'created_by':
               json['created_by'] ?? supabase.auth.currentUser?.id ?? '',
         };
         print('Mapped JSON: $mappedJson');
@@ -102,8 +118,18 @@ class CorralsRepository {
           ? DateTime.parse(response['updated_at'])
           : DateTime.now();
 
-      final activeBatchCount =
-          response['active_batch_count']?[0]?['count'] ?? 0;
+      final dynamic rawCount = response['active_batch_count']?[0]?['count'];
+      final int activeBatchCount;
+      if (rawCount is int) {
+        activeBatchCount = rawCount;
+      } else if (rawCount is List) {
+        activeBatchCount =
+            rawCount.isNotEmpty ? (rawCount[0] as num).toInt() : 0;
+      } else if (rawCount is num) {
+        activeBatchCount = rawCount.toInt();
+      } else {
+        activeBatchCount = 0;
+      }
       final hasActiveBatches = activeBatchCount > 0;
 
       // Si el estado no es mantenimiento y hay lotes activos, asegurarse de que esté ocupado
@@ -113,15 +139,19 @@ class CorralsRepository {
               ? CorralStatus.ocupado
               : CorralStatus.disponible;
 
+      // Creamos un nuevo mapa sin los campos que no necesitamos
       final mappedJson = {
-        ...response,
-        'name': response['name'],
         'id': response['id'],
-        'activeBatchCount': activeBatchCount,
+        'name': response['name'],
+        'location': response['location'],
+        'capacity': response['capacity'],
+        'notes': response['notes'],
+        'image_url': response['image_url'],
+        'active_batch_count': activeBatchCount,
         'status': status.name,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-        'createdBy':
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'created_by':
             response['created_by'] ?? supabase.auth.currentUser?.id ?? '',
       };
 

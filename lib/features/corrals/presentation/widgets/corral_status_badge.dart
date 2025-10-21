@@ -11,6 +11,7 @@ class CorralStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Color backgroundColor;
     Color textColor;
     IconData icon;
@@ -18,19 +19,19 @@ class CorralStatusBadge extends StatelessWidget {
 
     switch (status) {
       case CorralStatus.disponible:
-        backgroundColor = Colors.green.shade100;
-        textColor = Colors.green.shade700;
-        icon = Icons.check_circle;
+        backgroundColor = theme.colorScheme.primaryContainer;
+        textColor = theme.colorScheme.onPrimaryContainer;
+        icon = Icons.check_circle_rounded;
         text = 'Disponible';
       case CorralStatus.ocupado:
-        backgroundColor = Colors.red.shade100;
-        textColor = Colors.red.shade700;
-        icon = Icons.block;
+        backgroundColor = theme.colorScheme.errorContainer;
+        textColor = theme.colorScheme.onErrorContainer;
+        icon = Icons.block_rounded;
         text = 'Ocupado';
       case CorralStatus.mantenimiento:
-        backgroundColor = Colors.orange.shade100;
-        textColor = Colors.orange.shade700;
-        icon = Icons.warning;
+        backgroundColor = theme.colorScheme.secondaryContainer;
+        textColor = theme.colorScheme.onSecondaryContainer;
+        icon = Icons.warning_rounded;
         text = 'Mantenimiento';
     }
 

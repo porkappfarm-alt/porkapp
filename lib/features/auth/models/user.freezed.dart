@@ -23,7 +23,9 @@ mixin _$User {
   String get id => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String? get username => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_login')
   DateTime? get lastLogin => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
@@ -44,8 +46,8 @@ abstract class $UserCopyWith<$Res> {
       {String id,
       String email,
       String? username,
-      DateTime createdAt,
-      DateTime? lastLogin});
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'last_login') DateTime? lastLogin});
 }
 
 /// @nodoc
@@ -105,8 +107,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       {String id,
       String email,
       String? username,
-      DateTime createdAt,
-      DateTime? lastLogin});
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'last_login') DateTime? lastLogin});
 }
 
 /// @nodoc
@@ -154,14 +156,13 @@ class __$$UserImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserImpl extends _User {
+class _$UserImpl implements _User {
   const _$UserImpl(
       {required this.id,
       required this.email,
       this.username,
-      required this.createdAt,
-      this.lastLogin})
-      : super._();
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'last_login') this.lastLogin});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -173,8 +174,10 @@ class _$UserImpl extends _User {
   @override
   final String? username;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
+  @JsonKey(name: 'last_login')
   final DateTime? lastLogin;
 
   @override
@@ -218,14 +221,13 @@ class _$UserImpl extends _User {
   }
 }
 
-abstract class _User extends User {
+abstract class _User implements User {
   const factory _User(
       {required final String id,
       required final String email,
       final String? username,
-      required final DateTime createdAt,
-      final DateTime? lastLogin}) = _$UserImpl;
-  const _User._() : super._();
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'last_login') final DateTime? lastLogin}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -236,8 +238,10 @@ abstract class _User extends User {
   @override
   String? get username;
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
+  @JsonKey(name: 'last_login')
   DateTime? get lastLogin;
 
   /// Create a copy of User

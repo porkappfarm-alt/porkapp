@@ -148,10 +148,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                           GoRoute(
                             path: ':animalId',
                             name: 'animal-detail',
+                            parentNavigatorKey: _rootNavigatorKey,
                             builder: (context, state) {
                               final animalId =
                                   state.pathParameters['animalId'] ?? '';
-                              print('Building AnimalDetailView for animalId: $animalId'); // Debug log
+                              print(
+                                  'Building AnimalDetailView for animalId: $animalId'); // Debug log
                               return AnimalDetailView(animalId: animalId);
                             },
                           ),

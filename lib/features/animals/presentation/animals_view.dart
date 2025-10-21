@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:porkapp/features/animals/presentation/views/batch_animals_view.dart';
+import 'package:porkapp/features/animals/presentation/views/batch_animals_manager_view.dart';
 import 'package:porkapp/shared/widgets/main_bottom_navigation_bar.dart';
 
 class AnimalsView extends ConsumerWidget {
@@ -28,7 +28,7 @@ class AnimalsView extends ConsumerWidget {
         centerTitle: true,
         backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
       ),
-      body: BatchAnimalsView(batchId: batchId),
+      body: BatchAnimalsManagerView(batchId: batchId),
       bottomNavigationBar: const MainBottomNavigationBar(currentIndex: 2),
     );
   }

@@ -189,21 +189,26 @@ class CorralCard extends ConsumerWidget {
     required this.onTap,
   });
 
-  Color _getOccupancyColor(double percentage) {
-    if (percentage >= 90) return Colors.red;
-    if (percentage >= 75) return Colors.orange;
-    return Colors.green;
+  Color _getOccupancyColor(BuildContext context, num percentage) {
+    final theme = Theme.of(context);
+    if (percentage >= 90) return theme.colorScheme.error;
+    if (percentage >= 75) return theme.colorScheme.secondary;
+    return theme.colorScheme.primary;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final ocupacionPorcentaje = corral.capacity != null && corral.capacity! > 0
-        ? (corral.activeBatchCount / corral.capacity! * 100)
+        ? (corral.activeBatchCount.toDouble() /
+            corral.capacity!.toDouble() *
+            100)
         : 0.0;
 
     return Card(
       elevation: 2,
       clipBehavior: Clip.antiAlias,
+      surfaceTintColor: theme.colorScheme.surfaceTint,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -216,11 +221,11 @@ class CorralCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               decoration: BoxDecoration(
-                color: _getOccupancyColor(ocupacionPorcentaje).withOpacity(0.1),
+                color: _getOccupancyColor(context, ocupacionPorcentaje)
+                    .withOpacity(0.1),
                 border: Border(
                   bottom: BorderSide(
-                    color: _getOccupancyColor(ocupacionPorcentaje)
-                        .withOpacity(0.2),
+                    color: theme.colorScheme.outlineVariant.withOpacity(0.2),
                     width: 1,
                   ),
                 ),
@@ -285,37 +290,73 @@ class CorralCard extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${corral.activeBatchCount}/${corral.capacity ?? "∞"}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: _getOccupancyColor(ocupacionPorcentaje),
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: _getOccupancyColor(
+                                        context, ocupacionPorcentaje),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     // Barra de progreso
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: ocupacionPorcentaje / 100,
-                        backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          _getOccupancyColor(ocupacionPorcentaje),
-                        ),
-                        minHeight: 8,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color:
+                            theme.colorScheme.surfaceVariant.withOpacity(0.3),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    // Porcentaje
-                    Text(
-                      '${ocupacionPorcentaje.toStringAsFixed(1)}% ocupado',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _getOccupancyColor(ocupacionPorcentaje),
-                            fontWeight: FontWeight.w500,
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Ocupación',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '${ocupacionPorcentaje.toStringAsFixed(1)}%',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: _getOccupancyColor(
+                                        context, ocupacionPorcentaje),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: LinearProgressIndicator(
+                              value: ocupacionPorcentaje / 100,
+                              backgroundColor: theme.colorScheme.surface,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                _getOccupancyColor(
+                                    context, ocupacionPorcentaje),
+                              ),
+                              minHeight: 10,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

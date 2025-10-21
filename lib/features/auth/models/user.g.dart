@@ -10,10 +10,10 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       id: json['id'] as String,
       email: json['email'] as String,
       username: json['username'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      lastLogin: json['lastLogin'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      lastLogin: json['last_login'] == null
           ? null
-          : DateTime.parse(json['lastLogin'] as String),
+          : DateTime.parse(json['last_login'] as String),
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
@@ -21,6 +21,6 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'id': instance.id,
       'email': instance.email,
       'username': instance.username,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'lastLogin': instance.lastLogin?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'last_login': instance.lastLogin?.toIso8601String(),
     };

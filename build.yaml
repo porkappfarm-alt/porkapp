@@ -1,0 +1,24 @@
+targets:
+  $default:
+    builders:
+      freezed|freezed:
+        enabled: true
+        generate_for:
+          include:
+            - lib/features/animals/domain/**.dart
+            - lib/features/batches/domain/**.dart
+            - lib/features/biometrics/domain/**.dart
+            - lib/features/corrals/domain/**.dart
+            - lib/features/auth/models/**.dart
+      json_serializable|json_serializable:
+        enabled: true
+        generate_for:
+          include:
+            - lib/features/animals/domain/**.dart
+            - lib/features/batches/domain/**.dart
+            - lib/features/biometrics/domain/**.dart
+            - lib/features/corrals/domain/**.dart
+            - lib/features/auth/models/**.dart
+        options:
+          explicit_to_json: true
+          field_rename: snake

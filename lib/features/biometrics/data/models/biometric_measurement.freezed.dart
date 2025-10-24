@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'animal_measurement.dart';
+part of 'biometric_measurement.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,52 +14,79 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-AnimalMeasurement _$AnimalMeasurementFromJson(Map<String, dynamic> json) {
-  return _AnimalMeasurement.fromJson(json);
+BiometricMeasurement _$BiometricMeasurementFromJson(Map<String, dynamic> json) {
+  return _BiometricMeasurement.fromJson(json);
 }
 
 /// @nodoc
-mixin _$AnimalMeasurement {
+mixin _$BiometricMeasurement {
+  /// Identificador único de la medición
   String get id => throw _privateConstructorUsedError;
+
+  /// ID de la medición de lote a la que pertenece
+  @JsonKey(name: 'biometric_id')
   String get batchMeasurementId => throw _privateConstructorUsedError;
+
+  /// ID del animal medido
+  @JsonKey(name: 'animal_id')
   String get animalId => throw _privateConstructorUsedError;
+
+  /// Peso actual en kilogramos
   double get weight => throw _privateConstructorUsedError;
+
+  /// Peso anterior en kilogramos
+  @JsonKey(name: 'previous_weight')
   double? get previousWeight => throw _privateConstructorUsedError;
+
+  /// Ganancia de peso desde la última medición
+  @JsonKey(name: 'weight_gain')
   double? get weightGain => throw _privateConstructorUsedError;
+
+  /// Días transcurridos desde la última medición
+  @JsonKey(name: 'days_since_last')
   int? get daysSinceLast => throw _privateConstructorUsedError;
-  double? get adg => throw _privateConstructorUsedError;
+
+  /// Ganancia diaria promedio (kg/día)
+  @JsonKey(name: 'adg')
+  double? get averageDailyGain => throw _privateConstructorUsedError;
+
+  /// Notas u observaciones sobre la medición
   String? get notes => throw _privateConstructorUsedError;
+
+  /// Fecha y hora de la medición
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $AnimalMeasurementCopyWith<AnimalMeasurement> get copyWith =>
+  $BiometricMeasurementCopyWith<BiometricMeasurement> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $AnimalMeasurementCopyWith<$Res> {
-  factory $AnimalMeasurementCopyWith(
-          AnimalMeasurement value, $Res Function(AnimalMeasurement) then) =
-      _$AnimalMeasurementCopyWithImpl<$Res, AnimalMeasurement>;
+abstract class $BiometricMeasurementCopyWith<$Res> {
+  factory $BiometricMeasurementCopyWith(BiometricMeasurement value,
+          $Res Function(BiometricMeasurement) then) =
+      _$BiometricMeasurementCopyWithImpl<$Res, BiometricMeasurement>;
   @useResult
   $Res call(
       {String id,
-      String batchMeasurementId,
-      String animalId,
+      @JsonKey(name: 'biometric_id') String batchMeasurementId,
+      @JsonKey(name: 'animal_id') String animalId,
       double weight,
-      double? previousWeight,
-      double? weightGain,
-      int? daysSinceLast,
-      double? adg,
+      @JsonKey(name: 'previous_weight') double? previousWeight,
+      @JsonKey(name: 'weight_gain') double? weightGain,
+      @JsonKey(name: 'days_since_last') int? daysSinceLast,
+      @JsonKey(name: 'adg') double? averageDailyGain,
       String? notes,
-      DateTime createdAt});
+      @JsonKey(name: 'created_at') DateTime createdAt});
 }
 
 /// @nodoc
-class _$AnimalMeasurementCopyWithImpl<$Res, $Val extends AnimalMeasurement>
-    implements $AnimalMeasurementCopyWith<$Res> {
-  _$AnimalMeasurementCopyWithImpl(this._value, this._then);
+class _$BiometricMeasurementCopyWithImpl<$Res,
+        $Val extends BiometricMeasurement>
+    implements $BiometricMeasurementCopyWith<$Res> {
+  _$BiometricMeasurementCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -76,7 +103,7 @@ class _$AnimalMeasurementCopyWithImpl<$Res, $Val extends AnimalMeasurement>
     Object? previousWeight = freezed,
     Object? weightGain = freezed,
     Object? daysSinceLast = freezed,
-    Object? adg = freezed,
+    Object? averageDailyGain = freezed,
     Object? notes = freezed,
     Object? createdAt = null,
   }) {
@@ -109,9 +136,9 @@ class _$AnimalMeasurementCopyWithImpl<$Res, $Val extends AnimalMeasurement>
           ? _value.daysSinceLast
           : daysSinceLast // ignore: cast_nullable_to_non_nullable
               as int?,
-      adg: freezed == adg
-          ? _value.adg
-          : adg // ignore: cast_nullable_to_non_nullable
+      averageDailyGain: freezed == averageDailyGain
+          ? _value.averageDailyGain
+          : averageDailyGain // ignore: cast_nullable_to_non_nullable
               as double?,
       notes: freezed == notes
           ? _value.notes
@@ -126,32 +153,32 @@ class _$AnimalMeasurementCopyWithImpl<$Res, $Val extends AnimalMeasurement>
 }
 
 /// @nodoc
-abstract class _$$AnimalMeasurementImplCopyWith<$Res>
-    implements $AnimalMeasurementCopyWith<$Res> {
-  factory _$$AnimalMeasurementImplCopyWith(_$AnimalMeasurementImpl value,
-          $Res Function(_$AnimalMeasurementImpl) then) =
-      __$$AnimalMeasurementImplCopyWithImpl<$Res>;
+abstract class _$$BiometricMeasurementImplCopyWith<$Res>
+    implements $BiometricMeasurementCopyWith<$Res> {
+  factory _$$BiometricMeasurementImplCopyWith(_$BiometricMeasurementImpl value,
+          $Res Function(_$BiometricMeasurementImpl) then) =
+      __$$BiometricMeasurementImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
       {String id,
-      String batchMeasurementId,
-      String animalId,
+      @JsonKey(name: 'biometric_id') String batchMeasurementId,
+      @JsonKey(name: 'animal_id') String animalId,
       double weight,
-      double? previousWeight,
-      double? weightGain,
-      int? daysSinceLast,
-      double? adg,
+      @JsonKey(name: 'previous_weight') double? previousWeight,
+      @JsonKey(name: 'weight_gain') double? weightGain,
+      @JsonKey(name: 'days_since_last') int? daysSinceLast,
+      @JsonKey(name: 'adg') double? averageDailyGain,
       String? notes,
-      DateTime createdAt});
+      @JsonKey(name: 'created_at') DateTime createdAt});
 }
 
 /// @nodoc
-class __$$AnimalMeasurementImplCopyWithImpl<$Res>
-    extends _$AnimalMeasurementCopyWithImpl<$Res, _$AnimalMeasurementImpl>
-    implements _$$AnimalMeasurementImplCopyWith<$Res> {
-  __$$AnimalMeasurementImplCopyWithImpl(_$AnimalMeasurementImpl _value,
-      $Res Function(_$AnimalMeasurementImpl) _then)
+class __$$BiometricMeasurementImplCopyWithImpl<$Res>
+    extends _$BiometricMeasurementCopyWithImpl<$Res, _$BiometricMeasurementImpl>
+    implements _$$BiometricMeasurementImplCopyWith<$Res> {
+  __$$BiometricMeasurementImplCopyWithImpl(_$BiometricMeasurementImpl _value,
+      $Res Function(_$BiometricMeasurementImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -164,11 +191,11 @@ class __$$AnimalMeasurementImplCopyWithImpl<$Res>
     Object? previousWeight = freezed,
     Object? weightGain = freezed,
     Object? daysSinceLast = freezed,
-    Object? adg = freezed,
+    Object? averageDailyGain = freezed,
     Object? notes = freezed,
     Object? createdAt = null,
   }) {
-    return _then(_$AnimalMeasurementImpl(
+    return _then(_$BiometricMeasurementImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -197,9 +224,9 @@ class __$$AnimalMeasurementImplCopyWithImpl<$Res>
           ? _value.daysSinceLast
           : daysSinceLast // ignore: cast_nullable_to_non_nullable
               as int?,
-      adg: freezed == adg
-          ? _value.adg
-          : adg // ignore: cast_nullable_to_non_nullable
+      averageDailyGain: freezed == averageDailyGain
+          ? _value.averageDailyGain
+          : averageDailyGain // ignore: cast_nullable_to_non_nullable
               as double?,
       notes: freezed == notes
           ? _value.notes
@@ -215,54 +242,84 @@ class __$$AnimalMeasurementImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$AnimalMeasurementImpl extends _AnimalMeasurement {
-  const _$AnimalMeasurementImpl(
+class _$BiometricMeasurementImpl implements _BiometricMeasurement {
+  const _$BiometricMeasurementImpl(
       {required this.id,
-      required this.batchMeasurementId,
-      required this.animalId,
+      @JsonKey(name: 'biometric_id') required this.batchMeasurementId,
+      @JsonKey(name: 'animal_id') required this.animalId,
       required this.weight,
-      this.previousWeight,
-      this.weightGain,
-      this.daysSinceLast,
-      this.adg,
+      @JsonKey(name: 'previous_weight') this.previousWeight,
+      @JsonKey(name: 'weight_gain') this.weightGain,
+      @JsonKey(name: 'days_since_last') this.daysSinceLast,
+      @JsonKey(name: 'adg') this.averageDailyGain,
       this.notes,
-      required this.createdAt})
-      : super._();
+      @JsonKey(name: 'created_at') required this.createdAt})
+      : assert(weight > 0, 'El peso debe ser mayor a 0'),
+        assert(
+            averageDailyGain == null ||
+                (averageDailyGain >= 0 && averageDailyGain <= 2),
+            'La ganancia diaria debe estar entre 0 y 2 kg/día');
 
-  factory _$AnimalMeasurementImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AnimalMeasurementImplFromJson(json);
+  factory _$BiometricMeasurementImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BiometricMeasurementImplFromJson(json);
 
+  /// Identificador único de la medición
   @override
   final String id;
+
+  /// ID de la medición de lote a la que pertenece
   @override
+  @JsonKey(name: 'biometric_id')
   final String batchMeasurementId;
+
+  /// ID del animal medido
   @override
+  @JsonKey(name: 'animal_id')
   final String animalId;
+
+  /// Peso actual en kilogramos
   @override
   final double weight;
+
+  /// Peso anterior en kilogramos
   @override
+  @JsonKey(name: 'previous_weight')
   final double? previousWeight;
+
+  /// Ganancia de peso desde la última medición
   @override
+  @JsonKey(name: 'weight_gain')
   final double? weightGain;
+
+  /// Días transcurridos desde la última medición
   @override
+  @JsonKey(name: 'days_since_last')
   final int? daysSinceLast;
+
+  /// Ganancia diaria promedio (kg/día)
   @override
-  final double? adg;
+  @JsonKey(name: 'adg')
+  final double? averageDailyGain;
+
+  /// Notas u observaciones sobre la medición
   @override
   final String? notes;
+
+  /// Fecha y hora de la medición
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'AnimalMeasurement(id: $id, batchMeasurementId: $batchMeasurementId, animalId: $animalId, weight: $weight, previousWeight: $previousWeight, weightGain: $weightGain, daysSinceLast: $daysSinceLast, adg: $adg, notes: $notes, createdAt: $createdAt)';
+    return 'BiometricMeasurement(id: $id, batchMeasurementId: $batchMeasurementId, animalId: $animalId, weight: $weight, previousWeight: $previousWeight, weightGain: $weightGain, daysSinceLast: $daysSinceLast, averageDailyGain: $averageDailyGain, notes: $notes, createdAt: $createdAt)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AnimalMeasurementImpl &&
+            other is _$BiometricMeasurementImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.batchMeasurementId, batchMeasurementId) ||
                 other.batchMeasurementId == batchMeasurementId) &&
@@ -275,7 +332,8 @@ class _$AnimalMeasurementImpl extends _AnimalMeasurement {
                 other.weightGain == weightGain) &&
             (identical(other.daysSinceLast, daysSinceLast) ||
                 other.daysSinceLast == daysSinceLast) &&
-            (identical(other.adg, adg) || other.adg == adg) &&
+            (identical(other.averageDailyGain, averageDailyGain) ||
+                other.averageDailyGain == averageDailyGain) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
@@ -283,63 +341,101 @@ class _$AnimalMeasurementImpl extends _AnimalMeasurement {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, batchMeasurementId, animalId,
-      weight, previousWeight, weightGain, daysSinceLast, adg, notes, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      batchMeasurementId,
+      animalId,
+      weight,
+      previousWeight,
+      weightGain,
+      daysSinceLast,
+      averageDailyGain,
+      notes,
+      createdAt);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$AnimalMeasurementImplCopyWith<_$AnimalMeasurementImpl> get copyWith =>
-      __$$AnimalMeasurementImplCopyWithImpl<_$AnimalMeasurementImpl>(
-          this, _$identity);
+  _$$BiometricMeasurementImplCopyWith<_$BiometricMeasurementImpl>
+      get copyWith =>
+          __$$BiometricMeasurementImplCopyWithImpl<_$BiometricMeasurementImpl>(
+              this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AnimalMeasurementImplToJson(
+    return _$$BiometricMeasurementImplToJson(
       this,
     );
   }
 }
 
-abstract class _AnimalMeasurement extends AnimalMeasurement {
-  const factory _AnimalMeasurement(
+abstract class _BiometricMeasurement implements BiometricMeasurement {
+  const factory _BiometricMeasurement(
       {required final String id,
-      required final String batchMeasurementId,
-      required final String animalId,
+      @JsonKey(name: 'biometric_id') required final String batchMeasurementId,
+      @JsonKey(name: 'animal_id') required final String animalId,
       required final double weight,
-      final double? previousWeight,
-      final double? weightGain,
-      final int? daysSinceLast,
-      final double? adg,
+      @JsonKey(name: 'previous_weight') final double? previousWeight,
+      @JsonKey(name: 'weight_gain') final double? weightGain,
+      @JsonKey(name: 'days_since_last') final int? daysSinceLast,
+      @JsonKey(name: 'adg') final double? averageDailyGain,
       final String? notes,
-      required final DateTime createdAt}) = _$AnimalMeasurementImpl;
-  const _AnimalMeasurement._() : super._();
+      @JsonKey(name: 'created_at')
+      required final DateTime createdAt}) = _$BiometricMeasurementImpl;
 
-  factory _AnimalMeasurement.fromJson(Map<String, dynamic> json) =
-      _$AnimalMeasurementImpl.fromJson;
+  factory _BiometricMeasurement.fromJson(Map<String, dynamic> json) =
+      _$BiometricMeasurementImpl.fromJson;
 
   @override
+
+  /// Identificador único de la medición
   String get id;
   @override
+
+  /// ID de la medición de lote a la que pertenece
+  @JsonKey(name: 'biometric_id')
   String get batchMeasurementId;
   @override
+
+  /// ID del animal medido
+  @JsonKey(name: 'animal_id')
   String get animalId;
   @override
+
+  /// Peso actual en kilogramos
   double get weight;
   @override
+
+  /// Peso anterior en kilogramos
+  @JsonKey(name: 'previous_weight')
   double? get previousWeight;
   @override
+
+  /// Ganancia de peso desde la última medición
+  @JsonKey(name: 'weight_gain')
   double? get weightGain;
   @override
+
+  /// Días transcurridos desde la última medición
+  @JsonKey(name: 'days_since_last')
   int? get daysSinceLast;
   @override
-  double? get adg;
+
+  /// Ganancia diaria promedio (kg/día)
+  @JsonKey(name: 'adg')
+  double? get averageDailyGain;
   @override
+
+  /// Notas u observaciones sobre la medición
   String? get notes;
   @override
+
+  /// Fecha y hora de la medición
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
   @JsonKey(ignore: true)
-  _$$AnimalMeasurementImplCopyWith<_$AnimalMeasurementImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  _$$BiometricMeasurementImplCopyWith<_$BiometricMeasurementImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }

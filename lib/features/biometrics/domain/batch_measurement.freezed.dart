@@ -31,13 +31,12 @@ mixin _$BatchMeasurement {
   DateTime get updatedAt => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   String? get batchName => throw _privateConstructorUsedError;
+  String? get measurementName => throw _privateConstructorUsedError;
+  List<AnimalMeasurement> get measurements =>
+      throw _privateConstructorUsedError;
 
-  /// Serializes this BatchMeasurement to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BatchMeasurement
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BatchMeasurementCopyWith<BatchMeasurement> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -59,7 +58,9 @@ abstract class $BatchMeasurementCopyWith<$Res> {
       DateTime createdAt,
       DateTime updatedAt,
       String status,
-      String? batchName});
+      String? batchName,
+      String? measurementName,
+      List<AnimalMeasurement> measurements});
 }
 
 /// @nodoc
@@ -72,8 +73,6 @@ class _$BatchMeasurementCopyWithImpl<$Res, $Val extends BatchMeasurement>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BatchMeasurement
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -88,6 +87,8 @@ class _$BatchMeasurementCopyWithImpl<$Res, $Val extends BatchMeasurement>
     Object? updatedAt = null,
     Object? status = null,
     Object? batchName = freezed,
+    Object? measurementName = freezed,
+    Object? measurements = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -134,6 +135,14 @@ class _$BatchMeasurementCopyWithImpl<$Res, $Val extends BatchMeasurement>
           ? _value.batchName
           : batchName // ignore: cast_nullable_to_non_nullable
               as String?,
+      measurementName: freezed == measurementName
+          ? _value.measurementName
+          : measurementName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      measurements: null == measurements
+          ? _value.measurements
+          : measurements // ignore: cast_nullable_to_non_nullable
+              as List<AnimalMeasurement>,
     ) as $Val);
   }
 }
@@ -157,7 +166,9 @@ abstract class _$$BatchMeasurementImplCopyWith<$Res>
       DateTime createdAt,
       DateTime updatedAt,
       String status,
-      String? batchName});
+      String? batchName,
+      String? measurementName,
+      List<AnimalMeasurement> measurements});
 }
 
 /// @nodoc
@@ -168,8 +179,6 @@ class __$$BatchMeasurementImplCopyWithImpl<$Res>
       $Res Function(_$BatchMeasurementImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BatchMeasurement
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -184,6 +193,8 @@ class __$$BatchMeasurementImplCopyWithImpl<$Res>
     Object? updatedAt = null,
     Object? status = null,
     Object? batchName = freezed,
+    Object? measurementName = freezed,
+    Object? measurements = null,
   }) {
     return _then(_$BatchMeasurementImpl(
       id: null == id
@@ -230,13 +241,21 @@ class __$$BatchMeasurementImplCopyWithImpl<$Res>
           ? _value.batchName
           : batchName // ignore: cast_nullable_to_non_nullable
               as String?,
+      measurementName: freezed == measurementName
+          ? _value.measurementName
+          : measurementName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      measurements: null == measurements
+          ? _value._measurements
+          : measurements // ignore: cast_nullable_to_non_nullable
+              as List<AnimalMeasurement>,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$BatchMeasurementImpl implements _BatchMeasurement {
+class _$BatchMeasurementImpl extends _BatchMeasurement {
   const _$BatchMeasurementImpl(
       {required this.id,
       required this.batchId,
@@ -248,7 +267,11 @@ class _$BatchMeasurementImpl implements _BatchMeasurement {
       required this.createdAt,
       required this.updatedAt,
       this.status = 'active',
-      this.batchName});
+      this.batchName,
+      this.measurementName,
+      final List<AnimalMeasurement> measurements = const []})
+      : _measurements = measurements,
+        super._();
 
   factory _$BatchMeasurementImpl.fromJson(Map<String, dynamic> json) =>
       _$$BatchMeasurementImplFromJson(json);
@@ -276,10 +299,20 @@ class _$BatchMeasurementImpl implements _BatchMeasurement {
   final String status;
   @override
   final String? batchName;
+  @override
+  final String? measurementName;
+  final List<AnimalMeasurement> _measurements;
+  @override
+  @JsonKey()
+  List<AnimalMeasurement> get measurements {
+    if (_measurements is EqualUnmodifiableListView) return _measurements;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_measurements);
+  }
 
   @override
   String toString() {
-    return 'BatchMeasurement(id: $id, batchId: $batchId, measurementDate: $measurementDate, averageWeight: $averageWeight, animalCount: $animalCount, notes: $notes, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, status: $status, batchName: $batchName)';
+    return 'BatchMeasurement(id: $id, batchId: $batchId, measurementDate: $measurementDate, averageWeight: $averageWeight, animalCount: $animalCount, notes: $notes, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, status: $status, batchName: $batchName, measurementName: $measurementName, measurements: $measurements)';
   }
 
   @override
@@ -304,10 +337,14 @@ class _$BatchMeasurementImpl implements _BatchMeasurement {
                 other.updatedAt == updatedAt) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.batchName, batchName) ||
-                other.batchName == batchName));
+                other.batchName == batchName) &&
+            (identical(other.measurementName, measurementName) ||
+                other.measurementName == measurementName) &&
+            const DeepCollectionEquality()
+                .equals(other._measurements, _measurements));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -321,11 +358,11 @@ class _$BatchMeasurementImpl implements _BatchMeasurement {
       createdAt,
       updatedAt,
       status,
-      batchName);
+      batchName,
+      measurementName,
+      const DeepCollectionEquality().hash(_measurements));
 
-  /// Create a copy of BatchMeasurement
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BatchMeasurementImplCopyWith<_$BatchMeasurementImpl> get copyWith =>
@@ -340,7 +377,7 @@ class _$BatchMeasurementImpl implements _BatchMeasurement {
   }
 }
 
-abstract class _BatchMeasurement implements BatchMeasurement {
+abstract class _BatchMeasurement extends BatchMeasurement {
   const factory _BatchMeasurement(
       {required final String id,
       required final String batchId,
@@ -352,7 +389,10 @@ abstract class _BatchMeasurement implements BatchMeasurement {
       required final DateTime createdAt,
       required final DateTime updatedAt,
       final String status,
-      final String? batchName}) = _$BatchMeasurementImpl;
+      final String? batchName,
+      final String? measurementName,
+      final List<AnimalMeasurement> measurements}) = _$BatchMeasurementImpl;
+  const _BatchMeasurement._() : super._();
 
   factory _BatchMeasurement.fromJson(Map<String, dynamic> json) =
       _$BatchMeasurementImpl.fromJson;
@@ -379,11 +419,12 @@ abstract class _BatchMeasurement implements BatchMeasurement {
   String get status;
   @override
   String? get batchName;
-
-  /// Create a copy of BatchMeasurement
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get measurementName;
+  @override
+  List<AnimalMeasurement> get measurements;
+  @override
+  @JsonKey(ignore: true)
   _$$BatchMeasurementImplCopyWith<_$BatchMeasurementImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

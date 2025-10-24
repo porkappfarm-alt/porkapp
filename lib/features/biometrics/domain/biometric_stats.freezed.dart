@@ -27,12 +27,8 @@ mixin _$BiometricStats {
       throw _privateConstructorUsedError;
   List<WeightPoint> get weightTimeline => throw _privateConstructorUsedError;
 
-  /// Serializes this BiometricStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BiometricStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BiometricStatsCopyWith<BiometricStats> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -61,8 +57,6 @@ class _$BiometricStatsCopyWithImpl<$Res, $Val extends BiometricStats>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BiometricStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -121,8 +115,6 @@ class __$$BiometricStatsImplCopyWithImpl<$Res>
       _$BiometricStatsImpl _value, $Res Function(_$BiometricStatsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BiometricStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -215,7 +207,7 @@ class _$BiometricStatsImpl implements _BiometricStats {
                 .equals(other._weightTimeline, _weightTimeline));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -225,9 +217,7 @@ class _$BiometricStatsImpl implements _BiometricStats {
       const DeepCollectionEquality().hash(_mortalityByCause),
       const DeepCollectionEquality().hash(_weightTimeline));
 
-  /// Create a copy of BiometricStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BiometricStatsImplCopyWith<_$BiometricStatsImpl> get copyWith =>
@@ -263,11 +253,8 @@ abstract class _BiometricStats implements BiometricStats {
   List<MortalityByCause> get mortalityByCause;
   @override
   List<WeightPoint> get weightTimeline;
-
-  /// Create a copy of BiometricStats
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BiometricStatsImplCopyWith<_$BiometricStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -281,12 +268,8 @@ mixin _$MortalityByCause {
   String get cause => throw _privateConstructorUsedError;
   int get count => throw _privateConstructorUsedError;
 
-  /// Serializes this MortalityByCause to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of MortalityByCause
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $MortalityByCauseCopyWith<MortalityByCause> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -310,8 +293,6 @@ class _$MortalityByCauseCopyWithImpl<$Res, $Val extends MortalityByCause>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of MortalityByCause
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -350,8 +331,6 @@ class __$$MortalityByCauseImplCopyWithImpl<$Res>
       $Res Function(_$MortalityByCauseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of MortalityByCause
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -398,13 +377,11 @@ class _$MortalityByCauseImpl implements _MortalityByCause {
             (identical(other.count, count) || other.count == count));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, cause, count);
 
-  /// Create a copy of MortalityByCause
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$MortalityByCauseImplCopyWith<_$MortalityByCauseImpl> get copyWith =>
@@ -431,11 +408,8 @@ abstract class _MortalityByCause implements MortalityByCause {
   String get cause;
   @override
   int get count;
-
-  /// Create a copy of MortalityByCause
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$MortalityByCauseImplCopyWith<_$MortalityByCauseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -449,12 +423,8 @@ mixin _$WeightPoint {
   DateTime get date => throw _privateConstructorUsedError;
   double get avgWeight => throw _privateConstructorUsedError;
 
-  /// Serializes this WeightPoint to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of WeightPoint
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $WeightPointCopyWith<WeightPoint> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -478,8 +448,6 @@ class _$WeightPointCopyWithImpl<$Res, $Val extends WeightPoint>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of WeightPoint
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -518,8 +486,6 @@ class __$$WeightPointImplCopyWithImpl<$Res>
       _$WeightPointImpl _value, $Res Function(_$WeightPointImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of WeightPoint
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -567,13 +533,11 @@ class _$WeightPointImpl implements _WeightPoint {
                 other.avgWeight == avgWeight));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, date, avgWeight);
 
-  /// Create a copy of WeightPoint
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$WeightPointImplCopyWith<_$WeightPointImpl> get copyWith =>
@@ -599,11 +563,8 @@ abstract class _WeightPoint implements WeightPoint {
   DateTime get date;
   @override
   double get avgWeight;
-
-  /// Create a copy of WeightPoint
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$WeightPointImplCopyWith<_$WeightPointImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

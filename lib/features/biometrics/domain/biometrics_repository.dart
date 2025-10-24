@@ -1,10 +1,27 @@
 import '../data/biometrics_data_source.dart';
 import '../domain/models/biometric_stats.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../domain/batch_measurement.dart';
+
+final biometricsRepositoryProvider = Provider<BiometricsRepository>((ref) {
+  final dataSource = ref.watch(biometricsDataSourceProvider);
+  return BiometricsRepository(dataSource);
+});
+
 class BiometricsRepository {
   final BiometricsDataSource _dataSource;
 
   BiometricsRepository(this._dataSource);
+
+  Future<List<BatchMeasurement>> getBatchMeasurements({String? batchId}) async {
+    final measurements = await _dataSource.getPesajesByBatch(batchId ?? '');
+    return measurements.map((m) => BatchMeasurement.fromJson(m)).toList();
+  }
+
+  Future<void> saveBatchMeasurement(BatchMeasurement measurement) async {
+    await _dataSource.savePesaje(measurement.toJson());
+  }
 
   Future<BiometricStats> getBatchBiometrics(String batchId) async {
     final pesajes = await _dataSource.getPesajesByBatch(batchId);

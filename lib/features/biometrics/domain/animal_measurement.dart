@@ -1,10 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../data/local/biometric_local_models.dart';
 
 part 'animal_measurement.freezed.dart';
 part 'animal_measurement.g.dart';
 
 @freezed
 class AnimalMeasurement with _$AnimalMeasurement {
+  const AnimalMeasurement._(); // Añadimos este constructor privado
+
   const factory AnimalMeasurement({
     required String id,
     required String batchMeasurementId,
@@ -20,4 +23,21 @@ class AnimalMeasurement with _$AnimalMeasurement {
 
   factory AnimalMeasurement.fromJson(Map<String, dynamic> json) =>
       _$AnimalMeasurementFromJson(json);
+}
+
+extension AnimalMeasurementLocalExtension on AnimalMeasurement {
+  LocalAnimalMeasurement toLocal() {
+    final local = LocalAnimalMeasurement()
+      ..remoteId = id
+      ..animalId = animalId
+      ..weight = weight
+      ..previousWeight = previousWeight
+      ..weightGain = weightGain
+      ..daysSinceLast = daysSinceLast
+      ..adg = adg
+      ..notes = notes
+      ..createdAt = createdAt
+      ..syncStatus = SyncStatus.pending;
+    return local;
+  }
 }

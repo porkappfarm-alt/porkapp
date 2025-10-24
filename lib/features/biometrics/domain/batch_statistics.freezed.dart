@@ -27,12 +27,8 @@ mixin _$BatchStatistics {
   double get weightStdDev => throw _privateConstructorUsedError;
   double get uniformityPercent => throw _privateConstructorUsedError;
 
-  /// Serializes this BatchStatistics to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BatchStatistics
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BatchStatisticsCopyWith<BatchStatistics> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -62,8 +58,6 @@ class _$BatchStatisticsCopyWithImpl<$Res, $Val extends BatchStatistics>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BatchStatistics
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -128,8 +122,6 @@ class __$$BatchStatisticsImplCopyWithImpl<$Res>
       _$BatchStatisticsImpl _value, $Res Function(_$BatchStatisticsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BatchStatistics
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -219,14 +211,12 @@ class _$BatchStatisticsImpl implements _BatchStatistics {
                 other.uniformityPercent == uniformityPercent));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, avgWeight, avgAdg, minWeight,
       maxWeight, weightStdDev, uniformityPercent);
 
-  /// Create a copy of BatchStatistics
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BatchStatisticsImplCopyWith<_$BatchStatisticsImpl> get copyWith =>
@@ -265,11 +255,8 @@ abstract class _BatchStatistics implements BatchStatistics {
   double get weightStdDev;
   @override
   double get uniformityPercent;
-
-  /// Create a copy of BatchStatistics
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BatchStatisticsImplCopyWith<_$BatchStatisticsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

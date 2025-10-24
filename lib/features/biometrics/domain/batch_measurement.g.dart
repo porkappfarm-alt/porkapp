@@ -20,6 +20,12 @@ _$BatchMeasurementImpl _$$BatchMeasurementImplFromJson(
       updatedAt: DateTime.parse(json['updated_at'] as String),
       status: json['status'] as String? ?? 'active',
       batchName: json['batch_name'] as String?,
+      measurementName: json['measurement_name'] as String?,
+      measurements: (json['measurements'] as List<dynamic>?)
+              ?.map(
+                  (e) => AnimalMeasurement.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$BatchMeasurementImplToJson(
@@ -36,4 +42,6 @@ Map<String, dynamic> _$$BatchMeasurementImplToJson(
       'updated_at': instance.updatedAt.toIso8601String(),
       'status': instance.status,
       'batch_name': instance.batchName,
+      'measurement_name': instance.measurementName,
+      'measurements': instance.measurements.map((e) => e.toJson()).toList(),
     };

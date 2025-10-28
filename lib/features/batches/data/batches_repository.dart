@@ -20,7 +20,6 @@ class BatchesRepository {
   }
 
   Future<Batch> createBatch({
-    required String name,
     required String corralId,
     required DateTime createdAt,
     required int headcountStart,
@@ -35,7 +34,7 @@ class BatchesRepository {
     final response = await supabase
         .from('batches')
         .insert({
-          'name': name,
+          // 'name' se genera automáticamente en la base de datos
           'corral_id': corralId,
           'created_at': createdAt.toIso8601String(),
           'headcount_start': headcountStart,

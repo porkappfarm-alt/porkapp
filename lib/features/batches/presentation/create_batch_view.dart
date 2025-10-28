@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/presentation/batches_controller.dart';
-import 'package:porkapp/features/corrals/domain/corral.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_controller.dart';
 
 class CreateBatchView extends ConsumerStatefulWidget {
@@ -17,7 +16,6 @@ class CreateBatchView extends ConsumerStatefulWidget {
 
 class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _headcountController = TextEditingController();
   final _weightController = TextEditingController();
   final _notesController = TextEditingController();
@@ -33,7 +31,6 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
     _selectedDate = isEditing ? widget.batch!.createdAt : DateTime.now();
     if (isEditing) {
       _selectedCorralId = widget.batch!.corralId;
-      _nameController.text = widget.batch!.name;
       _headcountController.text = widget.batch!.headcountStart.toString();
       _weightController.text = widget.batch!.initialAvgWeight?.toString() ?? '';
       _notesController.text = widget.batch!.notes ?? '';
@@ -42,7 +39,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _headcountController.dispose();
     _headcountController.dispose();
     _weightController.dispose();
     _notesController.dispose();
@@ -83,7 +80,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
       if (isEditing) {
         await ref.read(batchesControllerProvider.notifier).updateBatch(
               id: widget.batch!.id,
-              name: _nameController.text,
+              name: widget.batch!.name, // No se puede cambiar el nombre
               corralId: _selectedCorralId!,
               createdAt: _selectedDate,
               headcountStart: int.parse(_headcountController.text),
@@ -95,7 +92,6 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
             );
       } else {
         await ref.read(batchesControllerProvider.notifier).createBatch(
-              name: _nameController.text,
               corralId: _selectedCorralId!,
               createdAt: _selectedDate,
               headcountStart: int.parse(_headcountController.text),
@@ -191,17 +187,55 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                         Center(child: Text('Error: $error')),
                   ),
                   const SizedBox(height: 16),
-                  // Name field
-                  _buildField(
-                    controller: _nameController,
-                    label: 'Nombre',
-                    placeholder: 'ej. Lote Verano 2024',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese un nombre';
-                      }
-                      return null;
-                    },
+                  // Auto-generated name info
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Nombre del Lote',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              isEditing ? Icons.label : Icons.auto_awesome,
+                              color: theme.colorScheme.primary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                isEditing
+                                    ? widget.batch!.name
+                                    : '🔢 Se generará automáticamente (LXXXX)',
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: isEditing
+                                      ? theme.colorScheme.onSurface
+                                      : theme.colorScheme.onSurface
+                                          .withOpacity(0.7),
+                                  fontWeight: isEditing
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   // Date field

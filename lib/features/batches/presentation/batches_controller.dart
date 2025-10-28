@@ -25,17 +25,13 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
   }
 
   Future<void> createBatch({
-    required String name,
     required String corralId,
     required DateTime createdAt,
     required int headcountStart,
     double? initialAvgWeight,
     String? notes,
   }) async {
-    await ref
-        .read(batchesRepositoryProvider)
-        .createBatch(
-          name: name,
+    await ref.read(batchesRepositoryProvider).createBatch(
           corralId: corralId,
           createdAt: createdAt,
           headcountStart: headcountStart,
@@ -54,9 +50,7 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
     double? initialAvgWeight,
     String? notes,
   }) async {
-    await ref
-        .read(batchesRepositoryProvider)
-        .updateBatch(
+    await ref.read(batchesRepositoryProvider).updateBatch(
           id: id,
           name: name,
           corralId: corralId,
@@ -81,6 +75,6 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
 
 final batchesControllerProvider =
     StateNotifierProvider<BatchesController, AsyncValue<List<Batch>>>(
-      (ref) => BatchesController(ref),
-      dependencies: [batchesRepositoryProvider],
-    );
+  (ref) => BatchesController(ref),
+  dependencies: [batchesRepositoryProvider],
+);

@@ -21,37 +21,86 @@ class BiometricHistoryView extends ConsumerWidget {
     final biometricsAsync = ref.watch(simpleBiometricProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: const Text('Historial de Biometrías').withSemantics(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: const Color(0xFF5D4037),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          'Historial de Mediciones',
+          style: TextStyle(
+            color: const Color(0xFF5D4037),
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ).withSemantics(
           label: 'Historial de mediciones biométricas',
         ),
+        centerTitle: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: BiometricHelp(
-                    title: 'Filtros',
-                    content:
-                        'Aplica filtros para encontrar registros específicos',
-                    child: const Text('Filtros de Búsqueda'),
-                  ),
-                  content: const BiometricFilters(),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cerrar'),
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  ],
+                    title: BiometricHelp(
+                      title: 'Filtros',
+                      content:
+                          'Aplica filtros para encontrar registros específicos',
+                      child: Text(
+                        'Filtros de Búsqueda',
+                        style: TextStyle(
+                          color: const Color(0xFF5D4037),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    content: const BiometricFilters(),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cerrar',
+                          style: TextStyle(
+                            color: const Color(0xFF4CAF50),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.tune,
+                size: 18,
+                color: const Color(0xFF4CAF50),
+              ),
+              label: Text(
+                'Ver evolución',
+                style: TextStyle(
+                  color: const Color(0xFFF07281),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
                 ),
-              );
-            },
-            tooltip: 'Filtrar registros',
-          ).withSemantics(
-            label: 'Filtrar',
-            hint: 'Abre el diálogo de filtros',
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+            ).withSemantics(
+              label: 'Ver evolución',
+              hint: 'Abre el gráfico de evolución',
+            ),
           ),
         ],
       ),
@@ -62,29 +111,93 @@ class BiometricHistoryView extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.line_weight, size: 48),
-                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF07281).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.timeline,
+                      size: 64,
+                      color: const Color(0xFFF07281).withOpacity(0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Text(
-                    'No hay registros de biometrías',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    'No hay mediciones registradas',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF5D4037),
+                    ),
                   ).withSemantics(
                     label: 'Sin registros',
                     hint: 'No se encontraron registros de biometrías',
                   ),
                   const SizedBox(height: 8),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Función en desarrollo'),
+                  Text(
+                    'Comienza registrando la primera medición',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFFF5A6E),
+                          Color(0xFFFF7F8F),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFF5A6E).withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Nueva medición'),
-                  ).withSemantics(
-                    label: 'Agregar medición',
-                    hint: 'Crear un nuevo registro de biometría',
+                      ],
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Función en desarrollo'),
+                            backgroundColor: const Color(0xFF4CAF50),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      label: Text(
+                        'Nueva Biometría',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ).withSemantics(
+                      label: 'Agregar medición',
+                      hint: 'Crear un nuevo registro de biometría',
+                    ),
                   ),
                 ],
               ),

@@ -14,18 +14,20 @@ class BatchesView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Gestión de Lotes',
           style: TextStyle(
-            color: theme.colorScheme.onSurface,
+            color: Color(0xFF5D4037),
             fontWeight: FontWeight.w600,
+            fontSize: 18,
           ),
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -41,46 +43,71 @@ class BatchesView extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.secondaryContainer,
+                            color: const Color(0xFFF07281).withOpacity(0.1),
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.secondary
-                                    .withOpacity(0.2),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
                           ),
                           child: Icon(
                             Icons.inventory_2_rounded,
                             size: 64,
-                            color: theme.colorScheme.onSecondaryContainer,
+                            color: const Color(0xFFF07281).withOpacity(0.5),
                           ),
                         ),
                         const SizedBox(height: 24),
                         Text(
                           'No hay lotes creados',
-                          style: theme.textTheme.titleLarge?.copyWith(
+                          style: TextStyle(
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: const Color(0xFF5D4037),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'Crea un nuevo lote para comenzar',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        FilledButton.icon(
-                          onPressed: () => _showCreateBatchDialog(context),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Crear Lote'),
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
+                        const SizedBox(height: 32),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFFF5A6E),
+                                Color(0xFFFF7F8F),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton.icon(
+                            onPressed: () => _showCreateBatchDialog(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            icon: const Icon(Icons.add, color: Colors.white),
+                            label: const Text(
+                              'Crear Lote',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                         ),
@@ -103,28 +130,35 @@ class BatchesView extends ConsumerWidget {
                           children: [
                             Text(
                               'Total: ${batches.length} ${batches.length == 1 ? 'lote' : 'lotes'}',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withOpacity(0.7),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF5D4037),
                               ),
                             ),
-                            FilledButton.tonalIcon(
+                            ElevatedButton.icon(
                               onPressed: () {
                                 // TODO: Implementar ordenamiento
                               },
-                              icon: Icon(
-                                Icons.sort_rounded,
-                                color: theme.colorScheme.onSecondaryContainer,
-                              ),
-                              label: Text(
-                                'Ordenar',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSecondaryContainer,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4CAF50),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              style: FilledButton.styleFrom(
-                                backgroundColor:
-                                    theme.colorScheme.secondaryContainer,
+                              icon: const Icon(Icons.sort_rounded, size: 18),
+                              label: const Text(
+                                'Ordenar',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                           ],
@@ -234,13 +268,40 @@ class BatchesView extends ConsumerWidget {
               ),
             ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateBatchDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Nuevo Lote'),
-        elevation: 3,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFFF5A6E),
+                Color(0xFFFF7F8F),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: FloatingActionButton.extended(
+            onPressed: () => _showCreateBatchDialog(context),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text(
+              'Nuevo Lote',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -4,17 +4,7 @@ import 'package:porkapp/supabase/supabase.dart';
 
 class CorralsRepository {
   Map<String, dynamic> _processCorralJson(Map<String, dynamic> json) {
-    final dynamic rawCount = json['active_batch_count']?[0]?['count'];
-    final int activeBatchCount;
-    if (rawCount is int) {
-      activeBatchCount = rawCount;
-    } else if (rawCount is List) {
-      activeBatchCount = rawCount.isNotEmpty ? (rawCount[0] as num).toInt() : 0;
-    } else if (rawCount is num) {
-      activeBatchCount = rawCount.toInt();
-    } else {
-      activeBatchCount = 0;
-    }
+    final activeBatchCount = json['active_batch_count'] as int? ?? 0;
 
     final hasActiveBatches = activeBatchCount > 0;
     final status = json['status'] == 'mantenimiento'
@@ -37,7 +27,7 @@ class CorralsRepository {
       'location': json['location'],
       'capacity': json['capacity'],
       'notes': json['notes'],
-      'image_url': json['image_url'],
+      'image_url': json['image_url'] ?? '',
       'active_batch_count': activeBatchCount,
       'status': status.name,
       'created_at': createdAt.toIso8601String(),
@@ -48,11 +38,8 @@ class CorralsRepository {
 
   Future<List<Corral>> getCorrals() async {
     // Obtener los corrales con su estado actual y conteo de lotes activos
-    final response = await supabase.from('corrals').select('''
-          *,
-          active_batch_count:batches!inner(count).eq(status, 'active'),
-          active_batches:batches!inner(id).eq(status, 'active')
-        ''').order('name');
+    final response =
+        await supabase.from('corral_batch_counts').select().order('name');
 
     print('Raw response: $response');
 
@@ -78,11 +65,11 @@ class CorralsRepository {
 
   Future<Corral> getCorral(String id) async {
     try {
-      final response = await supabase.from('corrals').select('''
-          *,
-          active_batch_count:batches!inner(count).eq(status, 'active'),
-          active_batches:batches!inner(id).eq(status, 'active')
-        ''').eq('id', id).single();
+      final response = await supabase
+          .from('corral_batch_counts')
+          .select()
+          .eq('id', id)
+          .single();
 
       print('Raw response for single corral: $response');
 
@@ -106,16 +93,18 @@ class CorralsRepository {
           ? DateTime.parse(response['updated_at'])
           : DateTime.now();
 
-      final dynamic rawCount = response['active_batch_count']?[0]?['count'];
-      final int activeBatchCount;
-      if (rawCount is int) {
-        activeBatchCount = rawCount;
-      } else if (rawCount is List) {
-        activeBatchCount =
-            rawCount.isNotEmpty ? (rawCount[0] as num).toInt() : 0;
-      } else if (rawCount is num) {
-        activeBatchCount = rawCount.toInt();
-      } else {
+      int activeBatchCount = 0;
+
+      try {
+        final rawCount = response['active_batch_count'];
+        if (rawCount != null && rawCount is List && rawCount.isNotEmpty) {
+          final count = rawCount[0]['count'];
+          if (count != null) {
+            activeBatchCount = int.parse(count.toString());
+          }
+        }
+      } catch (e) {
+        print('Error processing active_batch_count: $e');
         activeBatchCount = 0;
       }
       final hasActiveBatches = activeBatchCount > 0;
@@ -171,6 +160,8 @@ class CorralsRepository {
       'notes': notes,
       'image_url': imageUrl,
       'created_by': userId,
+      'status': CorralStatus.disponible
+          .name, // Aseguramos que siempre tenga un estado por defecto
     }).select('''
           *,
           active_batch_count:batches!inner(count).eq(status, 'active')
@@ -205,6 +196,13 @@ class CorralsRepository {
           'El estado "ocupado" se maneja automáticamente basado en los lotes activos');
     }
 
+    // Obtener el estado actual del corral si no se proporciona uno nuevo
+    CorralStatus currentStatus = status ?? CorralStatus.disponible;
+    if (status == null) {
+      final currentCorral = await getCorral(id);
+      currentStatus = currentCorral.status;
+    }
+
     final response = await supabase
         .from('corrals')
         .update({
@@ -213,7 +211,8 @@ class CorralsRepository {
           'capacity': capacity,
           'notes': notes,
           'image_url': imageUrl,
-          'status': status?.name,
+          'status':
+              currentStatus.name, // Aseguramos que siempre tenga un estado
           'updated_by': userId,
         })
         .eq('id', id)

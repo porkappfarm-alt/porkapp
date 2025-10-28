@@ -19,18 +19,18 @@ class CorralStatusBadge extends StatelessWidget {
 
     switch (status) {
       case CorralStatus.disponible:
-        backgroundColor = theme.colorScheme.primaryContainer;
-        textColor = theme.colorScheme.onPrimaryContainer;
+        backgroundColor = const Color(0xFF4CAF50); // Verde
+        textColor = Colors.white;
         icon = Icons.check_circle_rounded;
         text = 'Disponible';
       case CorralStatus.ocupado:
-        backgroundColor = theme.colorScheme.errorContainer;
-        textColor = theme.colorScheme.onErrorContainer;
+        backgroundColor = const Color(0xFFE57373); // Rojo suave
+        textColor = Colors.white;
         icon = Icons.block_rounded;
         text = 'Ocupado';
       case CorralStatus.mantenimiento:
-        backgroundColor = theme.colorScheme.secondaryContainer;
-        textColor = theme.colorScheme.onSecondaryContainer;
+        backgroundColor = const Color(0xFFFFB74D); // Naranja
+        textColor = Colors.white;
         icon = Icons.warning_rounded;
         text = 'Mantenimiento';
     }

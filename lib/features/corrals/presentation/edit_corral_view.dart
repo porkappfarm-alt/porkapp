@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:porkapp/features/corrals/providers/corral_edit_provider.dart';
+import 'package:porkapp/features/corrals/providers/corral_edit_provider_new.dart';
 
 class EditCorralView extends ConsumerStatefulWidget {
   final Map<String, dynamic> corral;
@@ -25,13 +25,25 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.corral['nombre']);
-    _locationController =
-        TextEditingController(text: widget.corral['ubicacion'] ?? '');
-    _capacityController = TextEditingController(
-        text: widget.corral['capacidad']?.toString() ?? '');
-    _notesController =
-        TextEditingController(text: widget.corral['notas'] ?? '');
+    // Asegurarnos de que los valores sean del tipo correcto
+    String name = (widget.corral['name'] ?? '').toString();
+    String location = (widget.corral['location'] ?? '').toString();
+    String notes = (widget.corral['notes'] ?? '').toString();
+
+    // Manejar capacity específicamente ya que debe ser un número
+    String capacity = '';
+    if (widget.corral['capacity'] != null) {
+      try {
+        capacity = widget.corral['capacity'].toString();
+      } catch (e) {
+        print('Error convirtiendo capacity: $e');
+      }
+    }
+
+    _nameController = TextEditingController(text: name);
+    _locationController = TextEditingController(text: location);
+    _capacityController = TextEditingController(text: capacity);
+    _notesController = TextEditingController(text: notes);
 
     _nameController.addListener(_onFieldChanged);
     _locationController.addListener(_onFieldChanged);
@@ -129,11 +141,26 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
               ),
               keyboardType: TextInputType.number,
               validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  final number = int.tryParse(value);
-                  if (number == null || number < 0) {
-                    return 'Ingrese un número válido';
+                if (value == null || value.isEmpty) {
+                  return null; // La capacidad es opcional
+                }
+
+                // Remover espacios y verificar que solo contenga números
+                value = value.trim();
+                if (!RegExp(r'^\d+$').hasMatch(value)) {
+                  return 'Ingrese solo números';
+                }
+
+                try {
+                  final number = int.parse(value);
+                  if (number < 0) {
+                    return 'La capacidad no puede ser negativa';
                   }
+                  if (number > 1000) {
+                    return 'La capacidad parece muy alta';
+                  }
+                } catch (e) {
+                  return 'Número no válido';
                 }
                 return null;
               },
@@ -191,19 +218,38 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final capacity = _capacityController.text.isNotEmpty
-        ? int.tryParse(_capacityController.text)
-        : null;
+    try {
+      int? capacity;
+      if (_capacityController.text.isNotEmpty) {
+        capacity = int.parse(_capacityController.text.trim());
+      }
 
-    await ref.read(corralEditProvider.notifier).updateCorral(
-          id: widget.corral['id'],
-          name: _nameController.text,
-          location: _locationController.text.isEmpty
-              ? null
-              : _locationController.text,
-          capacity: capacity,
-          notes: _notesController.text.isEmpty ? null : _notesController.text,
+      String id = widget.corral['id']?.toString() ?? '';
+      if (id.isEmpty) {
+        throw Exception('ID del corral no válido');
+      }
+
+      await ref.read(corralEditProvider.notifier).updateCorral(
+            id: id,
+            name: _nameController.text.trim(),
+            location: _locationController.text.trim().isEmpty
+                ? null
+                : _locationController.text.trim(),
+            capacity: capacity,
+            notes: _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
+          );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
         );
+      }
+    }
   }
 
   Future<void> _confirmDelete() async {
@@ -212,7 +258,7 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
       builder: (context) => AlertDialog(
         title: const Text('Confirmar eliminación'),
         content: Text(
-            '¿Está seguro que desea eliminar el corral "${widget.corral['nombre']}"?'),
+            '¿Está seguro que desea eliminar el corral "${widget.corral['name']}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

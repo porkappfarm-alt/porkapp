@@ -13,10 +13,13 @@ class BottomNavBar extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: navigationShell.currentIndex,
-        onTap: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
-        ),
+        onTap: (index) {
+          if (index == navigationShell.currentIndex) {
+            // Si ya estamos en la pestaña actual, no hacemos nada
+            return;
+          }
+          navigationShell.goBranch(index);
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),

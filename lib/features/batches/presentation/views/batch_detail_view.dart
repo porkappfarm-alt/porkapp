@@ -19,15 +19,20 @@ class BatchDetailView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
+          color: const Color(0xFF5D4037),
           onPressed: () => context.pop(),
         ),
         title: const Text(
           'Detalle de Lote',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF5D4037),
+            fontSize: 18,
+          ),
         ),
         actions: [
           IconButton(
@@ -35,7 +40,7 @@ class BatchDetailView extends ConsumerWidget {
               width: 32,
               height: 32,
               decoration: const BoxDecoration(
-                color: Color(0xFF6B0338),
+                color: Color(0xFFF07281),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -49,6 +54,7 @@ class BatchDetailView extends ConsumerWidget {
         ],
         centerTitle: true,
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
       body: Column(
@@ -127,10 +133,18 @@ class BatchDetailView extends ConsumerWidget {
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: const Color(0xFFE5E7EB),
+                                  color: const Color(0xFFF07281).withOpacity(0.15),
+                                  width: 1,
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.03),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 children: [
@@ -156,7 +170,8 @@ class BatchDetailView extends ConsumerWidget {
                                           animal.identifier,
                                           style: const TextStyle(
                                             fontSize: 16,
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF5D4037),
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -177,8 +192,8 @@ class BatchDetailView extends ConsumerWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       color: animal.status == 'active'
-                                          ? const Color(0xFF1A8754)
-                                          : const Color(0xFFDC2626),
+                                          ? const Color(0xFF4CAF50)
+                                          : const Color(0xFFE57373),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Text(
@@ -187,7 +202,8 @@ class BatchDetailView extends ConsumerWidget {
                                           : 'Inactivo',
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 14,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
@@ -210,10 +226,40 @@ class BatchDetailView extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddAnimalDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Agregar Animal'),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFFF5A6E),
+                Color(0xFFFF7F8F),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: FloatingActionButton.extended(
+            onPressed: () => _showAddAnimalDialog(context),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text(
+              'Agregar Animal',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -233,59 +279,165 @@ class _BatchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              batch.name,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A8754),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Text(
-                'Activo',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFF07281).withOpacity(0.15),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  batch.name,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5D4037),
+                  ),
                 ),
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CAF50),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4CAF50).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'Activo',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Fecha inicio: ${_formatDate(batch.createdAt)}',
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _InfoItem(
+                    icon: Icons.calendar_today_rounded,
+                    label: 'Fecha inicio',
+                    value: _formatDate(batch.createdAt),
+                    iconColor: const Color(0xFFF07281),
+                  ),
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Colors.grey[300],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _InfoItem(
+                    icon: Icons.pets_rounded,
+                    label: 'Cantidad inicial',
+                    value: '${batch.headcountStart} cerdos',
+                    iconColor: const Color(0xFF4CAF50),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Cantidad inicial: ${batch.headcountStart} cerdos',
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+}
+
+class _InfoItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color iconColor;
+
+  const _InfoItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: iconColor,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF5D4037),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

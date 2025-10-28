@@ -37,6 +37,80 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/login',
     debugLogDiagnostics: true,
     navigatorKey: _rootNavigatorKey,
+    errorBuilder: (context, state) {
+      _printRouteInfo('Navigation error: ${state.error}');
+      return SafeArea(
+        child: Scaffold(
+          backgroundColor: const Color(0xFFFFF0F0),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE57373).withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 64,
+                          color: Color(0xFFE57373),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error de navegación',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: const Color(0xFF5D4037),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => context.go('/dashboard'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFE57373),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Volver al Dashboard',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
     redirect: (context, state) {
       _printRouteInfo('Current auth state: $authState');
       _printRouteInfo('Current path: ${state.uri.path}');
@@ -171,12 +245,20 @@ final routerProvider = Provider<GoRouter>((ref) {
 
           // 4. Biometrics Branch
           StatefulShellBranch(
+            initialLocation: '/biometrics',
             navigatorKey: _biometricsNavigatorKey,
             routes: [
               GoRoute(
                 path: '/biometrics',
-                builder: (context, state) => const SimpleBiometricView(),
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: SimpleBiometricView(),
+                ),
                 routes: [
+                  GoRoute(
+                    path: 'history',
+                    builder: (context, state) => const BiometricHistoryView(),
+                  ),
+                  // Nested routes for batch-specific biometrics
                   GoRoute(
                     path: 'batch/:batchId',
                     parentNavigatorKey: _rootNavigatorKey,

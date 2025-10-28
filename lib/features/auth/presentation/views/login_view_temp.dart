@@ -38,8 +38,8 @@ class _LoginViewState extends ConsumerState<LoginView>
 
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-        );
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
 
     _animationController.forward();
   }
@@ -89,12 +89,11 @@ class _LoginViewState extends ConsumerState<LoginView>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final horizontalPadding = size.width > 600
-        ? (size.width - 600) / 2
-        : AppSpacing.md;
+    final horizontalPadding =
+        size.width > 600 ? (size.width - 600) / 2 : AppSpacing.md;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundPrimary,
+      backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -105,49 +104,96 @@ class _LoginViewState extends ConsumerState<LoginView>
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: Card(
-                    elevation: 0,
+                    elevation: 8,
+                    shadowColor: Colors.black.withOpacity(0.1),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                      borderRadius: BorderRadius.circular(28),
                     ),
-                    color: AppColors.surfacePrimary,
+                    color: Colors.white,
                     child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      padding: const EdgeInsets.all(32),
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 400),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // Logo
                             Container(
-                              width: 120,
-                              height: 120,
+                              width: 96,
+                              height: 96,
                               decoration: BoxDecoration(
-                                color: AppColors.backgroundSecondary,
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFEC407A),
+                                    Color(0xFFE91E63),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                                 shape: BoxShape.circle,
-                                boxShadow: AppElevation.sm,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFEC407A)
+                                        .withOpacity(0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
                               ),
                               child: const Center(
                                 child: Icon(
                                   Icons.pets,
-                                  size: 64,
-                                  color: AppColors.coral,
+                                  size: 56,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.xl),
+                            const SizedBox(height: 24),
 
                             // Título
-                            Text('Bienvenido', style: AppTextStyles.h1),
-                            const SizedBox(height: AppSpacing.sm),
-
                             Text(
-                              'Ingresa tus credenciales para continuar',
-                              style: AppTextStyles.body1.copyWith(
-                                color: AppColors.textSecondary,
+                              'PorkApp',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF5D4037),
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: AppSpacing.xl),
+                            const SizedBox(height: 4),
+
+                            Text(
+                              'Criadero San Andrés',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF4CAF50),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 32),
+
+                            Text(
+                              'Bienvenido de nuevo',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF5D4037),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+
+                            Text(
+                              'Ingresa tus credenciales para continuar',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 32),
 
                             // Formulario
                             Form(
@@ -155,17 +201,67 @@ class _LoginViewState extends ConsumerState<LoginView>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
+                                  // Email label
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Correo electrónico',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF5D4037),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+
+                                  // Email field
                                   TextFormField(
                                     controller: _emailController,
                                     keyboardType: TextInputType.emailAddress,
-                                    style: AppTextStyles.body1,
-                                    decoration:
-                                        AppInputDecorations.defaultInput(
-                                          labelText: 'Correo electrónico',
-                                          prefixIcon: const Icon(
-                                            Icons.email_outlined,
-                                          ),
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.grey[800],
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: 'tu@email.com',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                      ),
+                                      prefixIcon: Icon(
+                                        Icons.email_outlined,
+                                        color: Colors.grey[400],
+                                        size: 20,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 2,
                                         ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF4CAF50),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      filled: true,
+                                      fillColor: const Color(0xFFFAFAFA),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
+                                      ),
+                                    ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Por favor ingresa tu correo';
@@ -176,22 +272,47 @@ class _LoginViewState extends ConsumerState<LoginView>
                                       return null;
                                     },
                                   ),
-                                  const SizedBox(height: AppSpacing.md),
+                                  const SizedBox(height: 20),
 
+                                  // Password label
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Contraseña',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF5D4037),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+
+                                  // Password field
                                   TextFormField(
                                     controller: _passwordController,
                                     obscureText: _obscurePassword,
-                                    style: AppTextStyles.body1,
-                                    decoration: AppInputDecorations.defaultInput(
-                                      labelText: 'Contraseña',
-                                      prefixIcon: const Icon(
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.grey[800],
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: '••••••••',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                      ),
+                                      prefixIcon: Icon(
                                         Icons.lock_outline,
+                                        color: Colors.grey[400],
+                                        size: 20,
                                       ),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscurePassword
                                               ? Icons.visibility_outlined
                                               : Icons.visibility_off_outlined,
+                                          color: Colors.grey[400],
+                                          size: 20,
                                         ),
                                         onPressed: () {
                                           setState(() {
@@ -199,6 +320,34 @@ class _LoginViewState extends ConsumerState<LoginView>
                                                 !_obscurePassword;
                                           });
                                         },
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF4CAF50),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      filled: true,
+                                      fillColor: const Color(0xFFFAFAFA),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
                                       ),
                                     ),
                                     validator: (value) {
@@ -211,44 +360,114 @@ class _LoginViewState extends ConsumerState<LoginView>
                                       return null;
                                     },
                                   ),
-                                  const SizedBox(height: AppSpacing.xl),
+                                  const SizedBox(height: 28),
 
+                                  // Login button
                                   SizedBox(
-                                    height: 48,
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 300,
-                                      ),
-                                      curve: Curves.easeInOut,
-                                      transform: Matrix4.identity()
-                                        ..scale(_isLoading ? 0.95 : 1.0),
-                                      child: ElevatedButton(
-                                        onPressed: _isLoading
-                                            ? null
-                                            : _onSubmit,
-                                        style: AppButtonStyles.primaryButton,
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          child: _isLoading
-                                              ? const SizedBox(
-                                                  width: 24,
-                                                  height: 24,
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                          Color
-                                                        >(AppColors.white),
-                                                  ),
-                                                )
-                                              : Text(
-                                                  'Entrar',
-                                                  style: AppTextStyles.button,
-                                                ),
+                                    height: 56,
+                                    child: ElevatedButton(
+                                      onPressed: _isLoading ? null : _onSubmit,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFFEC407A),
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
                                         ),
                                       ),
+                                      child: _isLoading
+                                          ? const SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                        Color>(
+                                                  Colors.white,
+                                                ),
+                                              ),
+                                            )
+                                          : Text(
+                                              'Entrar',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Footer links
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.help_outline,
+                                        size: 16,
+                                        color: Colors.grey[600],
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '¿Necesitas ayuda?',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        child: Text(
+                                          '|',
+                                          style: TextStyle(
+                                            color: Colors.grey[300],
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {},
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          minimumSize: Size.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: Text(
+                                          'Registrarse',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: const Color(0xFF4CAF50),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Footer note
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 24),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        top: BorderSide(
+                                          color: Colors.grey[200]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Gestión integral para tu criadero porcino',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[400],
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ],
@@ -263,6 +482,18 @@ class _LoginViewState extends ConsumerState<LoginView>
               ),
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        color: const Color(0xFFF5F5F5),
+        child: Text(
+          'Criadero San Andrés © 2025',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[500],
+          ),
+          textAlign: TextAlign.center,
         ),
       ),
     );

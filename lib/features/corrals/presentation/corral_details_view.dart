@@ -22,19 +22,25 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
+          color: const Color(0xFF5D4037),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Detalle de Corral',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: Color(0xFF5D4037),
+          ),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
+            color: const Color(0xFF4CAF50),
             onPressed: () {
               Navigator.push(
                 context,
@@ -55,7 +61,7 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
               width: 32,
               height: 32,
               decoration: const BoxDecoration(
-                color: Color(0xFF6B0338),
+                color: Color(0xFFF07281),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -70,6 +76,7 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
         ],
         centerTitle: true,
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
       body: SafeArea(
@@ -126,35 +133,49 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Corral ${corral['nombre'] ?? 'Sin nombre'}',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(corral['estado']),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      _getStatusText(corral['estado'] ?? 'Desconocido'),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Corral ${corral['nombre'] ?? 'Sin nombre'}',
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5D4037),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(corral['estado']),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getStatusColor(corral['estado']).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        _getStatusText(corral['estado'] ?? 'Desconocido'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

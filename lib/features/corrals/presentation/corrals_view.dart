@@ -15,20 +15,40 @@ class CorralsView extends ConsumerWidget {
     final corralsAsyncValue = ref.watch(corralsProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
         title: ref.watch(corralsProvider).when(
               data: (corrals) => Text(
                 'Corrales (${corrals.length})',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: Color(0xFF5D4037),
+                ),
               ),
-              loading: () => const Text('Cargando...'),
-              error: (error, stack) => const Text('Error'),
+              loading: () => const Text(
+                'Cargando...',
+                style: TextStyle(
+                  color: Color(0xFF5D4037),
+                  fontSize: 18,
+                ),
+              ),
+              error: (error, stack) => const Text(
+                'Error',
+                style: TextStyle(
+                  color: Color(0xFF5D4037),
+                  fontSize: 18,
+                ),
+              ),
             ),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
+            color: const Color(0xFF4CAF50),
             onPressed: () {
               // TODO: Implementar filtros
             },
@@ -36,6 +56,7 @@ class CorralsView extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.add),
+            color: const Color(0xFFF07281),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -56,38 +77,105 @@ class CorralsView extends ConsumerWidget {
                 data: (corrals) {
                   if (corrals.isEmpty) {
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.fence,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No hay corrales disponibles',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  color: Colors.grey[600],
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFF07281)
+                                        .withOpacity(0.2),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset(
+                                  'imagenes/corrales-de-animales.png',
+                                  fit: BoxFit.cover,
                                 ),
-                          ),
-                          const SizedBox(height: 8),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CreateCorralView(),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            Text(
+                              'No hay corrales disponibles',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF5D4037),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Crea un nuevo corral para comenzar\na gestionar tus instalaciones',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey[600],
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 40),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFF5A6E),
+                                    Color(0xFFFF7F8F),
+                                  ],
                                 ),
-                              );
-                            },
-                            icon: const Icon(Icons.add),
-                            label: const Text('Crear corral'),
-                          ),
-                        ],
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFF5A6E)
+                                        .withOpacity(0.4),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CreateCorralView(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                icon:
+                                    const Icon(Icons.add, color: Colors.white),
+                                label: const Text(
+                                  'Crear corral',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
@@ -164,16 +252,46 @@ class CorralsView extends ConsumerWidget {
               ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const CreateCorralView(),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFFF5A6E),
+                Color(0xFFFF7F8F),
+              ],
             ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Nuevo Corral'),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CreateCorralView(),
+                ),
+              );
+            },
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text(
+              'Nuevo Corral',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -190,15 +308,14 @@ class CorralCard extends ConsumerWidget {
   });
 
   Color _getOccupancyColor(BuildContext context, num percentage) {
-    final theme = Theme.of(context);
-    if (percentage >= 90) return theme.colorScheme.error;
-    if (percentage >= 75) return theme.colorScheme.secondary;
-    return theme.colorScheme.primary;
+    if (percentage >= 90) return const Color(0xFFE57373); // Rojo suave
+    if (percentage >= 75) return const Color(0xFFFFB74D); // Naranja
+    if (percentage >= 50) return const Color(0xFFFFF176); // Amarillo
+    return const Color(0xFF4CAF50); // Verde
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final ocupacionPorcentaje = corral.capacity != null && corral.capacity! > 0
         ? (corral.activeBatchCount.toDouble() /
             corral.capacity!.toDouble() *
@@ -206,11 +323,15 @@ class CorralCard extends ConsumerWidget {
         : 0.0;
 
     return Card(
-      elevation: 2,
+      elevation: 0,
       clipBehavior: Clip.antiAlias,
-      surfaceTintColor: theme.colorScheme.surfaceTint,
+      color: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: const Color(0xFFF07281).withOpacity(0.15),
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -219,13 +340,13 @@ class CorralCard extends ConsumerWidget {
           children: [
             // Encabezado con color de fondo basado en ocupación
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
                 color: _getOccupancyColor(context, ocupacionPorcentaje)
-                    .withOpacity(0.1),
+                    .withOpacity(0.08),
                 border: Border(
                   bottom: BorderSide(
-                    color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+                    color: Colors.grey[200]!,
                     width: 1,
                   ),
                 ),
@@ -239,9 +360,11 @@ class CorralCard extends ConsumerWidget {
                     flex: 2, // Da más espacio al nombre
                     child: Text(
                       corral.name,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5D4037),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -281,21 +404,22 @@ class CorralCard extends ConsumerWidget {
                         Flexible(
                           child: Text(
                             'Ocupación',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[700],
+                            ),
                           ),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${corral.activeBatchCount}/${corral.capacity ?? "∞"}',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: _getOccupancyColor(
-                                        context, ocupacionPorcentaje),
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _getOccupancyColor(
+                                context, ocupacionPorcentaje),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -303,9 +427,8 @@ class CorralCard extends ConsumerWidget {
                     // Barra de progreso
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color:
-                            theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        color: const Color(0xFFFAFAFA),
                       ),
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -317,26 +440,30 @@ class CorralCard extends ConsumerWidget {
                             children: [
                               Text(
                                 'Ocupación',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                                  horizontal: 10,
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: theme.colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: _getOccupancyColor(
+                                          context, ocupacionPorcentaje)
+                                      .withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
                                   '${ocupacionPorcentaje.toStringAsFixed(1)}%',
-                                  style: theme.textTheme.bodySmall?.copyWith(
+                                  style: TextStyle(
+                                    fontSize: 12,
                                     color: _getOccupancyColor(
                                         context, ocupacionPorcentaje),
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -344,15 +471,15 @@ class CorralCard extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(8),
                             child: LinearProgressIndicator(
                               value: ocupacionPorcentaje / 100,
-                              backgroundColor: theme.colorScheme.surface,
+                              backgroundColor: Colors.grey[200],
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 _getOccupancyColor(
                                     context, ocupacionPorcentaje),
                               ),
-                              minHeight: 10,
+                              minHeight: 8,
                             ),
                           ),
                         ],

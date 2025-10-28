@@ -51,12 +51,12 @@ class _BatchBiometricDetailViewState
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2D3250).withOpacity(0.1),
+                    color: const Color(0xFFF07281).withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
                     Icons.scale_outlined,
-                    color: Color(0xFF2D3250),
+                    color: Color(0xFFF07281),
                     size: 20,
                   ),
                 ),
@@ -68,7 +68,7 @@ class _BatchBiometricDetailViewState
                       Text(
                         date,
                         style: const TextStyle(
-                          color: Color(0xFF2D3250),
+                          color: Color(0xFF5D4037),
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
@@ -94,7 +94,7 @@ class _BatchBiometricDetailViewState
                         Text(
                           weight.toStringAsFixed(1),
                           style: const TextStyle(
-                            color: Color(0xFF2D3250),
+                            color: Color(0xFF5D4037),
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -117,7 +117,7 @@ class _BatchBiometricDetailViewState
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF4D6D).withOpacity(0.1),
+                        color: const Color(0xFF4CAF50).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -126,13 +126,13 @@ class _BatchBiometricDetailViewState
                           Icon(
                             Icons.pets,
                             size: 12,
-                            color: const Color(0xFFFF4D6D).withOpacity(0.8),
+                            color: const Color(0xFF4CAF50),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '$animalCount',
                             style: TextStyle(
-                              color: const Color(0xFFFF4D6D).withOpacity(0.8),
+                              color: const Color(0xFF4CAF50),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -155,10 +155,16 @@ class _BatchBiometricDetailViewState
     final biometricsAsync = ref.watch(batchBiometricsProvider(widget.batchId));
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        leading: BackButton(),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: const Color(0xFF5D4037),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: Consumer(
           builder: (context, ref, child) {
             final batch = ref.watch(batchProvider(widget.batchId));
@@ -166,12 +172,25 @@ class _BatchBiometricDetailViewState
               data: (batch) => Text(
                 batch.name,
                 style: const TextStyle(
-                  color: Color(0xFF2D3250),
-                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5D4037),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
                 ),
               ),
-              loading: () => const Text('Cargando...'),
-              error: (_, __) => Text('Lote ${widget.batchId}'),
+              loading: () => Text(
+                'Cargando...',
+                style: TextStyle(
+                  color: const Color(0xFF5D4037),
+                  fontSize: 18,
+                ),
+              ),
+              error: (_, __) => Text(
+                'Lote ${widget.batchId}',
+                style: TextStyle(
+                  color: const Color(0xFF5D4037),
+                  fontSize: 18,
+                ),
+              ),
             );
           },
         ),
@@ -269,7 +288,7 @@ class _BatchBiometricDetailViewState
                                         .textTheme
                                         .headlineLarge
                                         ?.copyWith(
-                                          color: const Color(0xFF2D3250),
+                                          color: const Color(0xFF5D4037),
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -293,7 +312,7 @@ class _BatchBiometricDetailViewState
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2D3250).withOpacity(0.1),
+                              color: const Color(0xFF4CAF50).withOpacity(0.15),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -301,13 +320,13 @@ class _BatchBiometricDetailViewState
                                 const Icon(
                                   Icons.pets,
                                   size: 16,
-                                  color: Color(0xFF2D3250),
+                                  color: Color(0xFF4CAF50),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${biometrics.first.animalCount} animales',
                                   style: const TextStyle(
-                                    color: Color(0xFF2D3250),
+                                    color: Color(0xFF4CAF50),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -325,20 +344,29 @@ class _BatchBiometricDetailViewState
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Historial de Mediciones',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: const Color(0xFF2D3250),
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Expanded(
+                      child: Text(
+                        'Historial de Mediciones',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: const Color(0xFF5D4037),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: () {},
-                      icon: const Icon(Icons.trending_up),
-                      label: const Text('Ver evolución'),
+                      icon: const Icon(Icons.trending_up, size: 16),
+                      label: const Text(
+                        'Ver evolución',
+                        style: TextStyle(fontSize: 13),
+                      ),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFFF4D6D),
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        foregroundColor: const Color(0xFFF07281),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
                   ],
@@ -350,17 +378,33 @@ class _BatchBiometricDetailViewState
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.scale_outlined,
-                              size: 64,
-                              color: Colors.grey[400],
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF07281).withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.timeline,
+                                size: 64,
+                                color: const Color(0xFFF07281).withOpacity(0.5),
+                              ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
                             Text(
                               'No hay mediciones registradas',
                               style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF5D4037),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Comienza registrando la primera medición',
+                              style: TextStyle(
+                                fontSize: 14,
                                 color: Colors.grey[600],
-                                fontSize: 16,
                               ),
                             ),
                           ],
@@ -390,19 +434,37 @@ class _BatchBiometricDetailViewState
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 16),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            context.push('/biometrics/batch/${widget.batchId}/new');
-          },
-          icon: const Icon(Icons.add, color: Colors.white),
-          backgroundColor: const Color(0xFFFF4D6D),
-          elevation: 4,
-          label: const Text(
-            'Nueva Biometría',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFFF5A6E),
+                Color(0xFFFF7F8F),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              context.push('/biometrics/batch/${widget.batchId}/new');
+            },
+            icon: const Icon(Icons.add, color: Colors.white),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            label: const Text(
+              'Nueva Biometría',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
             ),
           ),
         ),

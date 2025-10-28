@@ -24,7 +24,7 @@ class BatchCard extends StatelessWidget {
     return Card(
       elevation: 2,
       color: const Color(0xFFFFFFFF), // Blanco
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.zero, // Removido el margen ya que está en el SliverPadding
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
@@ -94,17 +94,21 @@ class BatchCard extends StatelessWidget {
                   // Información del lote
                   Row(
                     children: [
-                      _InfoItem(
-                        icon: Icons.calendar_today,
-                        label: 'Inicio',
-                        value: _formatDate(batch.createdAt),
+                      Expanded(
+                        child: _InfoItem(
+                          icon: Icons.calendar_today,
+                          label: 'Inicio',
+                          value: _formatDate(batch.createdAt),
+                        ),
                       ),
-                      const SizedBox(width: 24),
-                      _InfoItem(
-                        icon: Icons.group,
-                        label: 'Animales',
-                        value:
-                            '${batch.animals.length}/${batch.headcountStart}',
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoItem(
+                          icon: Icons.group,
+                          label: 'Animales',
+                          value:
+                              '${batch.animals.length}/${batch.headcountStart}',
+                        ),
                       ),
                     ],
                   ),
@@ -276,18 +280,19 @@ class _InfoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFFCD8D4).withOpacity(0.3), // Rosa cerdito
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: const Color(0xFFFFFFFF), // Blanco
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: const Color(0xFFE94C5D).withOpacity(0.3), // Coral
                 width: 1,
@@ -295,28 +300,35 @@ class _InfoItem extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              size: 16,
+              size: 14,
               color: const Color(0xFFE94C5D), // Coral
             ),
           ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+          const SizedBox(width: 6),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 11,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                value,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: theme.colorScheme.onSurface,
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 13,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

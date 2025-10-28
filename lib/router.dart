@@ -190,7 +190,22 @@ final routerProvider = Provider<GoRouter>((ref) {
                         parentNavigatorKey: _rootNavigatorKey,
                         builder: (context, state) {
                           final batchId = state.pathParameters['batchId'] ?? '';
-                          return NewBiometricView(initialBatchId: batchId);
+                          return NewBiometricView(
+                            initialBatchId: batchId,
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        path: ':biometricId/weights',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) {
+                          final batchId = state.pathParameters['batchId'] ?? '';
+                          final biometricId =
+                              state.pathParameters['biometricId'] ?? '';
+                          return NewBiometricView(
+                            initialBatchId: batchId,
+                            biometricId: biometricId,
+                          );
                         },
                       ),
                       GoRoute(

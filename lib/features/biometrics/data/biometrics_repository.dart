@@ -63,18 +63,8 @@ class BiometricsRepository {
   Future<BatchMeasurement> createBatchMeasurement(
       BatchMeasurement measurement) async {
     try {
-      // Verificar si el lote existe
-      final batchExists = await _supabase
-          .from('batches')
-          .select('id')
-          .eq('id', measurement.batchId)
-          .single();
-
-      if (batchExists == null) {
-        throw Exception('El lote no existe');
-      }
-
-      // Intentar crear la medición
+      // Intentar crear la medición directamente
+      // Si el lote no existe, la foreign key constraint lanzará un error
       final response = await _supabase
           .from(_batchMeasurementsTable)
           .insert(measurement.toJson())
@@ -156,6 +146,30 @@ class BiometricsRepository {
     await _supabase
         .from(_batchMeasurementsTable)
         .update({'status': status}).eq('id', id);
+  }
+
+  Future<BatchMeasurement> updateBatchMeasurement({
+    required String id,
+    double? averageWeight,
+    int? animalCount,
+    String? notes,
+    String? status,
+  }) async {
+    final updateData = <String, dynamic>{};
+    if (averageWeight != null) updateData['average_weight'] = averageWeight;
+    if (animalCount != null) updateData['animal_count'] = animalCount;
+    if (notes != null) updateData['notes'] = notes;
+    if (status != null) updateData['status'] = status;
+    updateData['updated_at'] = DateTime.now().toIso8601String();
+
+    final response = await _supabase
+        .from(_batchMeasurementsTable)
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+    return BatchMeasurement.fromJson(response);
   }
 
   Future<void> deleteBatchMeasurement(String id) async {

@@ -12,22 +12,65 @@ class BiometricsDataSource {
   BiometricsDataSource(this._client);
 
   Future<List<Map<String, dynamic>>> getPesajesByBatch(String batchId) async {
-    final query = _client
-        .from('batch_biometrics')
-        .select('*, batches(name)')
-        .eq('status', 'active');
+    try {
+      print('🔍 BiometricsDataSource: Fetching data for batch: $batchId');
 
-    if (batchId.isNotEmpty) {
-      query.eq('batch_id', batchId);
-    }
+      final query = _client
+          .from('batch_biometrics')
+          .select('*, batches(name)')
+          .inFilter(
+              'status', ['active', 'pending']); // Incluir pending y active
 
-    final response = await query.order('measurement_date', ascending: false);
+      if (batchId.isNotEmpty) {
+        query.eq('batch_id', batchId);
+      }
 
-    // Transform the response to match the expected format
-    return List<Map<String, dynamic>>.from(response.map((row) => {
+      print('🔍 BiometricsDataSource: Executing query...');
+      final response = await query.order('measurement_date', ascending: false);
+
+      print(
+          '🔍 BiometricsDataSource: Response received: ${response.length} records');
+      print(
+          '🔍 BiometricsDataSource: First record: ${response.isNotEmpty ? response.first : "empty"}');
+
+      // Transform the response to match the expected format
+      final transformed = List<Map<String, dynamic>>.from(response.map((row) {
+        print('🔍 BiometricsDataSource: Processing row with id: ${row['id']}');
+        print(
+            '🔍 BiometricsDataSource: batches field type: ${row['batches']?.runtimeType}');
+        print('🔍 BiometricsDataSource: batches value: ${row['batches']}');
+
+        // Extraer el nombre del batch de forma segura
+        String? batchName;
+        if (row['batches'] != null) {
+          if (row['batches'] is List && (row['batches'] as List).isNotEmpty) {
+            batchName = (row['batches'] as List).first['name'];
+            print(
+                '🔍 BiometricsDataSource: Extracted batchName from List: $batchName');
+          } else if (row['batches'] is Map) {
+            batchName = row['batches']['name'];
+            print(
+                '🔍 BiometricsDataSource: Extracted batchName from Map: $batchName');
+          }
+        }
+
+        final result = {
           ...row,
-          'batchName': row['batches']['name'],
-        }));
+          'batchName': batchName ?? 'Sin nombre',
+        };
+
+        print('🔍 BiometricsDataSource: Transformed row: $result');
+        return result;
+      }));
+
+      print(
+          '✅ BiometricsDataSource: Successfully transformed ${transformed.length} records');
+      return transformed;
+    } catch (e, stackTrace) {
+      print('❌ BiometricsDataSource ERROR: $e');
+      print('❌ StackTrace: $stackTrace');
+      rethrow;
+    }
   }
 
   Future<void> savePesaje(Map<String, dynamic> data) async {

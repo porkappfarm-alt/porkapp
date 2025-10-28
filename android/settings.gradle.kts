@@ -24,3 +24,5 @@ plugins {
 }
 
 include(":app")
+include(":isar_flutter_libs")
+project(":isar_flutter_libs").projectDir = file("isar_flutter_libs")

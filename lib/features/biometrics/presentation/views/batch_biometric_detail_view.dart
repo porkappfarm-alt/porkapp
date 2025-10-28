@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/batch_biometrics_provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/batch_biometrics_provider.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../widgets/date_picker_dialog.dart';
 
 class BatchBiometricDetailView extends ConsumerStatefulWidget {
   final String batchId;
@@ -28,123 +30,172 @@ class _BatchBiometricDetailViewState
     required double weight,
     required int animalCount,
     required String note,
+    String? status,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
+    final isPending = status == 'pending';
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: isPending
+              ? Border.all(color: Colors.orange.shade300, width: 2)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (isPending)
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2D3250).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.orange.shade200),
                   ),
-                  child: const Icon(
-                    Icons.scale_outlined,
-                    color: Color(0xFF2D3250),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      Icon(Icons.pending_actions,
+                          size: 16, color: Colors.orange.shade700),
+                      const SizedBox(width: 6),
                       Text(
-                        date,
-                        style: const TextStyle(
-                          color: Color(0xFF2D3250),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        note,
+                        'Pendiente de medición',
                         style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
+                          color: Colors.orange.shade700,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isPending
+                          ? Colors.orange.withOpacity(0.1)
+                          : const Color(0xFF2D3250).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      isPending ? Icons.edit : Icons.scale_outlined,
+                      color: isPending
+                          ? Colors.orange.shade700
+                          : const Color(0xFF2D3250),
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          weight.toStringAsFixed(1),
+                          date,
                           style: const TextStyle(
                             color: Color(0xFF2D3250),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: 2),
+                        const SizedBox(height: 4),
                         Text(
-                          'kg',
+                          note,
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (!isPending)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              weight.toStringAsFixed(1),
+                              style: const TextStyle(
+                                color: Color(0xFF2D3250),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              'kg',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF4D6D).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.pets,
+                                size: 12,
+                                color: const Color(0xFFFF4D6D).withOpacity(0.8),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$animalCount',
+                                style: TextStyle(
+                                  color:
+                                      const Color(0xFFFF4D6D).withOpacity(0.8),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF4D6D).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.pets,
-                            size: 12,
-                            color: const Color(0xFFFF4D6D).withOpacity(0.8),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$animalCount',
-                            style: TextStyle(
-                              color: const Color(0xFFFF4D6D).withOpacity(0.8),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                  if (isPending)
+                    Icon(Icons.chevron_right, color: Colors.orange.shade700),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -325,20 +376,23 @@ class _BatchBiometricDetailViewState
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Historial de Mediciones',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: const Color(0xFF2D3250),
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Flexible(
+                      child: Text(
+                        'Historial de Mediciones',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: const Color(0xFF2D3250),
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: () {},
-                      icon: const Icon(Icons.trending_up),
+                      icon: const Icon(Icons.trending_up, size: 18),
                       label: const Text('Ver evolución'),
                       style: TextButton.styleFrom(
                         foregroundColor: const Color(0xFFFF4D6D),
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
                     ),
                   ],
@@ -373,6 +427,8 @@ class _BatchBiometricDetailViewState
                             const Divider(height: 32),
                         itemBuilder: (context, index) {
                           final measurement = biometrics[index];
+                          final isPending = measurement.status == 'pending';
+
                           return _buildMeasurementTile(
                             date: _formatDate(measurement.measurementDate),
                             weight: measurement.averageWeight,
@@ -380,6 +436,10 @@ class _BatchBiometricDetailViewState
                             note: measurement.notes ??
                                 measurement.measurementName ??
                                 'Pesaje',
+                            status: measurement.status,
+                            onTap: isPending
+                                ? () => _showWeightInputModal(measurement.id)
+                                : null,
                           );
                         },
                       ),
@@ -391,9 +451,7 @@ class _BatchBiometricDetailViewState
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: FloatingActionButton.extended(
-          onPressed: () {
-            context.push('/biometrics/batch/${widget.batchId}/new');
-          },
+          onPressed: () => _showDatePickerAndNavigate(context),
           icon: const Icon(Icons.add, color: Colors.white),
           backgroundColor: const Color(0xFFFF4D6D),
           elevation: 4,
@@ -408,5 +466,81 @@ class _BatchBiometricDetailViewState
         ),
       ),
     );
+  }
+
+  Future<void> _showDatePickerAndNavigate(BuildContext context) async {
+    // Mostrar el bottom sheet modal para seleccionar la fecha
+    final selectedDate = await showModalBottomSheet<DateTime>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const BiometricDatePickerDialog(),
+    );
+
+    if (selectedDate == null || !context.mounted) return;
+
+    // Mostrar indicador de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Crear el registro de biometría en estado "pending"
+      await Supabase.instance.client
+          .from('batch_biometrics')
+          .insert({
+            'batch_id': widget.batchId,
+            'measurement_date': selectedDate.toIso8601String(),
+            'animals_measured': 0,
+            'avg_weight': 0.0,
+            'min_weight': 0.0,
+            'max_weight': 0.0,
+            'weight_std_dev': 0.0,
+            'avg_adg': 0.0,
+            'mortality_count': 0,
+            'mortality_causes': {},
+            'status': 'pending',
+            'notes': 'Pendiente de medición',
+          })
+          .select()
+          .single();
+
+      if (context.mounted) {
+        // Cerrar el indicador de carga
+        Navigator.of(context).pop();
+
+        // Refrescar el listado
+        ref.invalidate(batchBiometricsProvider(widget.batchId));
+
+        // Mostrar mensaje de éxito
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Biometría creada exitosamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // Cerrar el indicador de carga
+        Navigator.of(context).pop();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al crear la biometría: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showWeightInputModal(String biometricId) {
+    // Navegar a la vista de ingreso de pesos
+    context.push('/biometrics/batch/${widget.batchId}/$biometricId/weights');
   }
 }

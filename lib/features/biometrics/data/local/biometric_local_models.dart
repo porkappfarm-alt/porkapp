@@ -6,12 +6,9 @@ part 'biometric_local_models.g.dart';
 enum SyncStatus { synced, pending, error }
 
 @Collection()
-@Name('BatchMeasurement')
 class LocalBatchMeasurement {
   Id id = Isar.autoIncrement;
-
-  @Index(unique: true)
-  String? remoteId; // Nullable porque puede no estar sincronizado aún
+  String? remoteId;
 
   @Index(type: IndexType.hash)
   late String batchId;
@@ -26,26 +23,18 @@ class LocalBatchMeasurement {
 
   @Enumerated(EnumType.name)
   late SyncStatus syncStatus;
-
   late String status;
-
-  @Backlink(to: 'batchMeasurement')
-  final animalMeasurements = IsarLinks<LocalAnimalMeasurement>();
 }
 
 @Collection()
-@Name('AnimalMeasurement')
 class LocalAnimalMeasurement {
   Id id = Isar.autoIncrement;
-
-  @Index(unique: true)
-  String? remoteId; // Nullable porque puede no estar sincronizado aún
+  String? remoteId;
 
   @Index(type: IndexType.hash)
   late String animalId;
 
-  final batchMeasurement = IsarLink<LocalBatchMeasurement>();
-
+  late String batchMeasurementId;
   late double weight;
   double? previousWeight;
   double? weightGain;

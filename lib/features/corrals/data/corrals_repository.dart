@@ -3,6 +3,49 @@ import 'package:porkapp/features/corrals/domain/corral.dart';
 import 'package:porkapp/supabase/supabase.dart';
 
 class CorralsRepository {
+  Map<String, dynamic> _processCorralJson(Map<String, dynamic> json) {
+    final dynamic rawCount = json['active_batch_count']?[0]?['count'];
+    final int activeBatchCount;
+    if (rawCount is int) {
+      activeBatchCount = rawCount;
+    } else if (rawCount is List) {
+      activeBatchCount = rawCount.isNotEmpty ? (rawCount[0] as num).toInt() : 0;
+    } else if (rawCount is num) {
+      activeBatchCount = rawCount.toInt();
+    } else {
+      activeBatchCount = 0;
+    }
+
+    final hasActiveBatches = activeBatchCount > 0;
+    final status = json['status'] == 'mantenimiento'
+        ? CorralStatus.mantenimiento
+        : hasActiveBatches
+            ? CorralStatus.ocupado
+            : CorralStatus.disponible;
+
+    final createdAt = json['created_at'] != null
+        ? DateTime.parse(json['created_at'])
+        : DateTime.now();
+
+    final updatedAt = json['updated_at'] != null
+        ? DateTime.parse(json['updated_at'])
+        : DateTime.now();
+
+    return {
+      'id': json['id'],
+      'name': json['name'] ?? 'Corral sin nombre',
+      'location': json['location'],
+      'capacity': json['capacity'],
+      'notes': json['notes'],
+      'image_url': json['image_url'],
+      'active_batch_count': activeBatchCount,
+      'status': status.name,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'created_by': json['created_by'] ?? supabase.auth.currentUser?.id ?? '',
+    };
+  }
+
   Future<List<Corral>> getCorrals() async {
     // Obtener los corrales con su estado actual y conteo de lotes activos
     final response = await supabase.from('corrals').select('''
@@ -19,62 +62,7 @@ class CorralsRepository {
       final corrals = response.map<Corral>((json) {
         print('Processing corral: $json');
 
-        // Asegurémonos de que los campos requeridos estén presentes
-        if (json['name'] == null) {
-          print('Warning: name is null for corral ${json['id']}');
-          json['name'] = 'Corral sin nombre';
-        }
-
-        if (json['id'] == null) {
-          print('Warning: id is null for corral');
-          json['id'] = DateTime.now().millisecondsSinceEpoch.toString();
-        }
-
-        final createdAt = json['created_at'] != null
-            ? DateTime.parse(json['created_at'])
-            : DateTime.now();
-
-        final updatedAt = json['updated_at'] != null
-            ? DateTime.parse(json['updated_at'])
-            : DateTime.now();
-
-        final dynamic rawCount = json['active_batch_count']?[0]?['count'];
-        final int activeBatchCount;
-        if (rawCount is int) {
-          activeBatchCount = rawCount;
-        } else if (rawCount is List) {
-          activeBatchCount =
-              rawCount.isNotEmpty ? (rawCount[0] as num).toInt() : 0;
-        } else if (rawCount is num) {
-          activeBatchCount = rawCount.toInt();
-        } else {
-          activeBatchCount = 0;
-        }
-
-        final hasActiveBatches = activeBatchCount > 0;
-
-        // Si el estado no es mantenimiento y hay lotes activos, asegurarse de que esté ocupado
-        final status = json['status'] == 'mantenimiento'
-            ? CorralStatus.mantenimiento
-            : hasActiveBatches
-                ? CorralStatus.ocupado
-                : CorralStatus.disponible;
-
-        // Creamos un nuevo mapa sin los campos que no necesitamos
-        final mappedJson = {
-          'id': json['id'],
-          'name': json['name'],
-          'location': json['location'],
-          'capacity': json['capacity'],
-          'notes': json['notes'],
-          'image_url': json['image_url'],
-          'active_batch_count': activeBatchCount,
-          'status': status.name,
-          'created_at': createdAt.toIso8601String(),
-          'updated_at': updatedAt.toIso8601String(),
-          'created_by':
-              json['created_by'] ?? supabase.auth.currentUser?.id ?? '',
-        };
+        final mappedJson = _processCorralJson(json);
         print('Mapped JSON: $mappedJson');
         return Corral.fromJson(mappedJson);
       }).toList();

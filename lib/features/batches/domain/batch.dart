@@ -7,7 +7,17 @@ part 'batch.g.dart';
 
 List<Animal> _animalsFromJson(List<dynamic>? json) {
   if (json == null) return [];
-  return json.map((x) => Animal.fromJson(x as Map<String, dynamic>)).toList();
+  return json
+      .map((x) {
+        try {
+          return Animal.fromJson(x as Map<String, dynamic>);
+        } catch (e) {
+          print('Error al convertir animal: $e');
+          return null;
+        }
+      })
+      .whereType<Animal>()
+      .toList();
 }
 
 List<Map<String, dynamic>> _animalsToJson(List<Animal> animals) {
@@ -27,6 +37,7 @@ class Batch with _$Batch {
     String? notes,
     @JsonKey(name: 'image_url') String? imageUrl,
     @JsonKey(
+      name: 'animals',
       fromJson: _animalsFromJson,
       toJson: _animalsToJson,
     )

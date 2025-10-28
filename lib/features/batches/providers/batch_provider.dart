@@ -8,25 +8,20 @@ final batchProvider = FutureProvider.family<Batch, String>(
   (ref, batchId) async {
     try {
       // Obtener el lote con sus animales en una sola consulta
-      final batchData =
-          await ref.read(supabaseClientProvider).from('batches').select('''
-            *,
-            animals(
-              id,
-              batch_id,
-              identifier,
-              birth_date,
-              weight_at_entry,
-              status,
-              created_at,
-              updated_at,
-              notes,
-              entry_date,
-              breed,
-              animal_type,
-              sex
-            )
-          ''').eq('id', batchId).single();
+      // Primero obtenemos los datos del lote
+      final batchData = await ref
+          .read(supabaseClientProvider)
+          .from('batches')
+          .select('*')
+          .eq('id', batchId)
+          .single();
+
+      // Luego obtenemos los animales relacionados
+      final animalsData = await ref
+          .read(supabaseClientProvider)
+          .from('animals')
+          .select()
+          .eq('batch_id', batchId);
 
       try {
         // Verificar que los datos del lote estén completos
@@ -37,7 +32,7 @@ final batchProvider = FutureProvider.family<Batch, String>(
         print('Procesando datos del lote ID: $batchId');
         print('Datos recibidos: $batchData');
 
-        final animalsList = (batchData['animals'] as List?)
+        final animalsList = (animalsData as List?)
                 ?.map((animal) {
                   if (animal == null) {
                     print('Animal nulo encontrado');
@@ -103,8 +98,9 @@ final batchProvider = FutureProvider.family<Batch, String>(
         final batchDataCopy = Map<String, dynamic>.from(batchData)
           ..remove('animals');
 
-        // Crear el batch con los datos validados
-        return Batch.fromJson(batchDataCopy).copyWith(animals: animalsList);
+        // Incluir los animales en los datos del lote antes de crear el objeto
+        batchDataCopy['animals'] = animalsList;
+        return Batch.fromJson(batchDataCopy);
       } catch (e) {
         print('Error al mapear los datos del lote: $e');
         throw Exception(

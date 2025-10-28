@@ -22,7 +22,10 @@ Future<void> initializeSupabase() async {
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
       debug: true, // Enable debug mode
-      authOptions: FlutterAuthClientOptions(authFlowType: AuthFlowType.pkce),
+      authOptions: FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+        autoRefreshToken: true,
+      ),
     );
     print('Supabase initialized successfully');
 

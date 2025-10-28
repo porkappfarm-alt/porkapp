@@ -11,10 +11,9 @@ final biometricsRepositoryProvider = Provider<BiometricsRepository>((ref) {
 
 class BiometricsRepository {
   final SupabaseClient _supabase;
-  static const String _batchMeasurementsTable = 'biometrics.batch_measurements';
-  static const String _animalMeasurementsTable =
-      'biometrics.animal_measurements';
-  static const String _measurementsView = 'biometrics.measurements_view';
+  static const String _batchMeasurementsTable = 'batch_biometrics';
+  static const String _animalMeasurementsTable = 'biometric_measurements';
+  static const String _measurementsView = 'measurements_view';
 
   BiometricsRepository(this._supabase);
 
@@ -63,12 +62,35 @@ class BiometricsRepository {
 
   Future<BatchMeasurement> createBatchMeasurement(
       BatchMeasurement measurement) async {
-    final response = await _supabase
-        .from(_batchMeasurementsTable)
-        .insert(measurement.toJson())
-        .select()
-        .single();
-    return BatchMeasurement.fromJson(response);
+    try {
+      // Verificar si el lote existe
+      final batchExists = await _supabase
+          .from('batches')
+          .select('id')
+          .eq('id', measurement.batchId)
+          .single();
+
+      if (batchExists == null) {
+        throw Exception('El lote no existe');
+      }
+
+      // Intentar crear la medición
+      final response = await _supabase
+          .from(_batchMeasurementsTable)
+          .insert(measurement.toJson())
+          .select()
+          .single();
+
+      return BatchMeasurement.fromJson(response);
+    } catch (e) {
+      if (e.toString().contains('duplicate key')) {
+        throw Exception('Ya existe una medición para este lote en esta fecha');
+      } else if (e.toString().contains('foreign key')) {
+        throw Exception('El lote especificado no existe');
+      } else {
+        throw Exception('Error al crear la medición: ${e.toString()}');
+      }
+    }
   }
 
   Future<List<BatchMeasurement>> getBatchMeasurements(String batchId) async {
@@ -82,12 +104,27 @@ class BiometricsRepository {
 
   Future<AnimalMeasurement> createAnimalMeasurement(
       AnimalMeasurement measurement) async {
-    final response = await _supabase
-        .from(_animalMeasurementsTable)
-        .insert(measurement.toJson())
-        .select()
-        .single();
-    return AnimalMeasurement.fromJson(response);
+    try {
+      final measurementData = measurement.toJson();
+      measurementData['measurement_date'] = DateTime(
+        measurement.createdAt.year,
+        measurement.createdAt.month,
+        measurement.createdAt.day,
+      ).toIso8601String();
+
+      final response = await _supabase
+          .from(_animalMeasurementsTable)
+          .insert(measurementData)
+          .select()
+          .single();
+      return AnimalMeasurement.fromJson(response);
+    } catch (e) {
+      if (e.toString().contains('animal_measurements_unique_per_day')) {
+        throw Exception(
+            'Ya existe una medición para este animal en esta fecha');
+      }
+      throw Exception('Error al guardar la medición: ${e.toString()}');
+    }
   }
 
   Future<List<AnimalMeasurement>> getAnimalMeasurements(

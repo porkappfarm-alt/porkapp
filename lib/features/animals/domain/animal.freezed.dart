@@ -64,12 +64,8 @@ mixin _$Animal {
   @JsonKey(name: 'service_count')
   int? get serviceCount => throw _privateConstructorUsedError;
 
-  /// Serializes this Animal to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of Animal
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AnimalCopyWith<Animal> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -124,8 +120,6 @@ class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Animal
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -271,8 +265,6 @@ class __$$AnimalImplCopyWithImpl<$Res>
       _$AnimalImpl _value, $Res Function(_$AnimalImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Animal
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -509,7 +501,7 @@ class _$AnimalImpl implements _Animal {
                 other.serviceCount == serviceCount));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -531,9 +523,7 @@ class _$AnimalImpl implements _Animal {
       parityNumber,
       serviceCount);
 
-  /// Create a copy of Animal
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalImplCopyWith<_$AnimalImpl> get copyWith =>
@@ -591,8 +581,8 @@ abstract class _Animal implements Animal {
   @JsonKey(name: 'batch_id')
   String get batchId;
   @override
-  String get identifier; // ID interno o número de arete
-  @override
+  String get identifier;
+  @override // ID interno o número de arete
   @JsonKey(
       name: 'birth_date',
       fromJson: _nullableDateFromString,
@@ -602,19 +592,19 @@ abstract class _Animal implements Animal {
   String? get sex;
   @override
   @JsonKey(name: 'weight_at_entry')
-  double? get weight; // Peso inicial
-  @override
+  double? get weight;
+  @override // Peso inicial
   String get breed;
   @override
   @JsonKey(name: 'animal_type')
-  String get type; // Tipo de animal (ej: cerdo de engorde, reproductor, etc)
-  @override
+  String get type;
+  @override // Tipo de animal (ej: cerdo de engorde, reproductor, etc)
   @JsonKey(
       name: 'entry_date',
       fromJson: _nullableDateFromString,
       toJson: _nullableDateToString)
-  DateTime? get entryDate; // Fecha de ingreso al lote
-  @override
+  DateTime? get entryDate;
+  @override // Fecha de ingreso al lote
   @JsonKey(
       name: 'created_at',
       fromJson: _nullableDateFromString,
@@ -629,8 +619,8 @@ abstract class _Animal implements Animal {
   @override
   String get gender;
   @override
-  String get status; // active, sold, deceased, removed
-  @override
+  String get status;
+  @override // active, sold, deceased, removed
   String? get notes;
   @override
   @JsonKey(name: 'target_weight')
@@ -641,11 +631,8 @@ abstract class _Animal implements Animal {
   @override
   @JsonKey(name: 'service_count')
   int? get serviceCount;
-
-  /// Create a copy of Animal
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AnimalImplCopyWith<_$AnimalImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

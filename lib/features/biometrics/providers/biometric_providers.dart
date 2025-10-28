@@ -3,6 +3,7 @@ import '../domain/batch_measurement.dart';
 import '../domain/animal_measurement.dart';
 import '../data/biometrics_repository.dart';
 import '../data/local/biometric_sync_service.dart';
+import '../data/local/biometric_local_models.dart';
 
 /// Provider para obtener todas las biometrías
 final allBiometricsProvider =
@@ -60,8 +61,7 @@ class NewBiometricState {
 
 /// Provider para manejar el estado del formulario de nueva biometría
 final newBiometricProvider =
-    StateNotifierProvider.autoDispose<NewBiometricNotifier, NewBiometricState>(
-        (ref) {
+    StateNotifierProvider<NewBiometricNotifier, NewBiometricState>((ref) {
   final repository = ref.watch(biometricsRepositoryProvider);
   final syncService = ref.watch(biometricSyncServiceProvider);
   return NewBiometricNotifier(repository, syncService);
@@ -73,6 +73,90 @@ class NewBiometricNotifier extends StateNotifier<NewBiometricState> {
 
   NewBiometricNotifier(this._repository, this._syncService)
       : super(const NewBiometricState());
+
+  Future<bool> saveAnimalMeasurement({
+    required String batchId,
+    required AnimalMeasurement measurement,
+  }) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // Intentar guardar online
+      try {
+        BatchMeasurement? existingMeasurement;
+        if (state.measurement == null) {
+          final batchMeasurement = BatchMeasurement(
+            id: '',
+            batchId: batchId,
+            measurementDate: DateTime.now(),
+            averageWeight: measurement.weight,
+            animalCount: 1,
+            notes: '',
+            createdBy: 'current_user',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            status: 'active',
+          );
+
+          existingMeasurement =
+              await _repository.createBatchMeasurement(batchMeasurement);
+          state = state.copyWith(measurement: existingMeasurement);
+        }
+
+        await _repository.createAnimalMeasurement(
+          measurement.copyWith(
+            batchMeasurementId:
+                state.measurement?.id ?? existingMeasurement!.id,
+          ),
+        );
+
+        state = state.copyWith(isLoading: false);
+        return true;
+      } catch (e) {
+        // Si falla el guardado online, intentar guardar offline
+        try {
+          if (state.measurement == null) {
+            final batchMeasurement = BatchMeasurement(
+              id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+              batchId: batchId,
+              measurementDate: DateTime.now(),
+              averageWeight: measurement.weight,
+              animalCount: 1,
+              notes: '',
+              createdBy: 'current_user',
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+              status: 'active',
+            );
+
+            await _syncService.saveBatchMeasurement(batchMeasurement.toLocal());
+            state = state.copyWith(measurement: batchMeasurement);
+          }
+
+          final localMeasurement = measurement.toLocal()
+            ..remoteId =
+                null // Forzar que no tenga remoteId para evitar conflictos
+            ..syncStatus = SyncStatus.pending;
+
+          await _syncService.saveAnimalMeasurement(localMeasurement);
+
+          state = state.copyWith(
+            isLoading: false,
+            error: 'Guardado offline. Se sincronizará cuando haya conexión.',
+          );
+          return true;
+        } catch (e) {
+          throw Exception('Error al guardar localmente: ${e.toString()}');
+        }
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+      return false;
+    }
+  }
 
   Future<bool> saveBiometric({
     required String batchId,
@@ -144,7 +228,6 @@ class NewBiometricNotifier extends StateNotifier<NewBiometricState> {
 /// Provider para obtener los lotes activos
 final activeBatchesProvider =
     FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final repository = ref.watch(biometricsRepositoryProvider);
   // TODO: Implementar obtención de lotes activos
   return [];
 });

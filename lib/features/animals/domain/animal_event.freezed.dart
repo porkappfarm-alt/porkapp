@@ -41,12 +41,8 @@ mixin _$AnimalEvent {
   String? get batchId => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
 
-  /// Serializes this AnimalEvent to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AnimalEventCopyWith<AnimalEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -83,8 +79,6 @@ class _$AnimalEventCopyWithImpl<$Res, $Val extends AnimalEvent>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -191,8 +185,6 @@ class __$$AnimalEventImplCopyWithImpl<$Res>
       _$AnimalEventImpl _value, $Res Function(_$AnimalEventImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -360,7 +352,7 @@ class _$AnimalEventImpl implements _AnimalEvent {
                 other.description == description));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -378,9 +370,7 @@ class _$AnimalEventImpl implements _AnimalEvent {
       batchId,
       description);
 
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalEventImplCopyWith<_$AnimalEventImpl> get copyWith =>
@@ -421,8 +411,8 @@ abstract class _AnimalEvent implements AnimalEvent {
   @JsonKey(name: 'event_date')
   DateTime get date;
   @override
-  String get type; // weighing, treatment, mortality, etc.
-  @override
+  String get type;
+  @override // weighing, treatment, mortality, etc.
   Map<String, dynamic> get data;
   @override
   String? get notes;
@@ -445,11 +435,8 @@ abstract class _AnimalEvent implements AnimalEvent {
   String? get batchId;
   @override
   String? get description;
-
-  /// Create a copy of AnimalEvent
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AnimalEventImplCopyWith<_$AnimalEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

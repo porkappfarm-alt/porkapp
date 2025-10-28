@@ -34,15 +34,11 @@ mixin _$Batch {
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'image_url')
   String? get imageUrl => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+  @JsonKey(name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
   List<Animal> get animals => throw _privateConstructorUsedError;
 
-  /// Serializes this Batch to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $BatchCopyWith<Batch> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -61,7 +57,8 @@ abstract class $BatchCopyWith<$Res> {
       String status,
       String? notes,
       @JsonKey(name: 'image_url') String? imageUrl,
-      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      @JsonKey(
+          name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
       List<Animal> animals});
 }
 
@@ -75,8 +72,6 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -153,7 +148,8 @@ abstract class _$$BatchImplCopyWith<$Res> implements $BatchCopyWith<$Res> {
       String status,
       String? notes,
       @JsonKey(name: 'image_url') String? imageUrl,
-      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      @JsonKey(
+          name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
       List<Animal> animals});
 }
 
@@ -165,8 +161,6 @@ class __$$BatchImplCopyWithImpl<$Res>
       _$BatchImpl _value, $Res Function(_$BatchImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -239,7 +233,8 @@ class _$BatchImpl implements _Batch {
       this.status = 'active',
       this.notes,
       @JsonKey(name: 'image_url') this.imageUrl,
-      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      @JsonKey(
+          name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
       final List<Animal> animals = const []})
       : _animals = animals;
 
@@ -272,7 +267,7 @@ class _$BatchImpl implements _Batch {
   final String? imageUrl;
   final List<Animal> _animals;
   @override
-  @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+  @JsonKey(name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
   List<Animal> get animals {
     if (_animals is EqualUnmodifiableListView) return _animals;
     // ignore: implicit_dynamic_type
@@ -306,7 +301,7 @@ class _$BatchImpl implements _Batch {
             const DeepCollectionEquality().equals(other._animals, _animals));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -321,9 +316,7 @@ class _$BatchImpl implements _Batch {
       imageUrl,
       const DeepCollectionEquality().hash(_animals));
 
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$BatchImplCopyWith<_$BatchImpl> get copyWith =>
@@ -348,7 +341,8 @@ abstract class _Batch implements Batch {
       final String status,
       final String? notes,
       @JsonKey(name: 'image_url') final String? imageUrl,
-      @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+      @JsonKey(
+          name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
       final List<Animal> animals}) = _$BatchImpl;
 
   factory _Batch.fromJson(Map<String, dynamic> json) = _$BatchImpl.fromJson;
@@ -377,13 +371,10 @@ abstract class _Batch implements Batch {
   @JsonKey(name: 'image_url')
   String? get imageUrl;
   @override
-  @JsonKey(fromJson: _animalsFromJson, toJson: _animalsToJson)
+  @JsonKey(name: 'animals', fromJson: _animalsFromJson, toJson: _animalsToJson)
   List<Animal> get animals;
-
-  /// Create a copy of Batch
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$BatchImplCopyWith<_$BatchImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

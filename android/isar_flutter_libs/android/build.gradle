@@ -1,0 +1,28 @@
+plugins {
+    id('com.android.library')
+}
+
+group 'dev.isar.isar_flutter_libs'
+version '1.0'
+
+android {
+    namespace 'dev.isar.isar_flutter_libs'
+    compileSdkVersion 34
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation "androidx.startup:startup-runtime:1.1.1"
+}

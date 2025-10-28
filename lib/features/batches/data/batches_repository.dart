@@ -13,11 +13,8 @@ class BatchesRepository {
   }
 
   Future<Batch> getBatch(String id) async {
-    final response = await supabase
-        .from('batches')
-        .select()
-        .eq('id', id)
-        .single();
+    final response =
+        await supabase.from('batches').select().eq('id', id).single();
 
     return Batch.fromJson(response);
   }

@@ -45,7 +45,8 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
     _notesController = TextEditingController(text: widget.animal?.notes);
     _birthDate = widget.animal?.birthDate ?? DateTime.now();
     _status = (widget.animal?.status as AnimalStatus?) ?? AnimalStatus.active;
-    _type = (widget.animal?.type as filters.AnimalType?) ?? const filters.AnimalType.fattening();
+    _type = (widget.animal?.type as filters.AnimalType?) ??
+        const filters.AnimalType.fattening();
   }
 
   @override
@@ -69,7 +70,10 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
       if (widget.animal != null) {
         // Validar transición de estado
         if (widget.animal!.status != _status) {
-          AnimalStateMachine.validateTransition(widget.animal!.status, _status);
+          final currentStatus = AnimalStatus.values.firstWhere(
+            (s) => s.name == widget.animal!.status,
+          );
+          AnimalStateMachine.validateTransition(currentStatus, _status);
         }
       }
 
@@ -80,8 +84,8 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
         birthDate: _birthDate,
         weight: double.tryParse(_weightController.text),
         breed: _breedController.text,
-        type: _type,
-        status: _status,
+        type: _type.toString(),
+        status: _status.name,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         entryDate: widget.animal?.entryDate ?? DateTime.now(),
         createdAt: widget.animal?.createdAt ?? DateTime.now(),
@@ -98,7 +102,7 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
           breed: animal.breed,
           type: animal.type.toString(),
           weight: animal.weight,
-          status: _status.toString(),
+          status: _status.name,
         );
       } else {
         await repository.createAnimal(

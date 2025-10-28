@@ -23,8 +23,18 @@
 	 "mcpAceternityui": {
       "command": "npx",
       "args": ["aceternityui-mcp"]
+    },
+	
+	  "icons8mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp.icons8.com/mcp/"
+      ]
     }
+
 		
+	
 	},
 	"inputs": []
 }

@@ -9,9 +9,12 @@ import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_animals_view.dart';
 import 'package:porkapp/features/animals/presentation/views/animal_detail_view.dart';
-import 'package:porkapp/features/biometrics/presentation/biometrics_view.dart';
+import 'package:porkapp/features/biometrics/presentation/views/simple_biometric_view.dart';
+import 'package:porkapp/features/biometrics/presentation/views/biometric_history_view.dart';
+import 'package:porkapp/features/biometrics/presentation/views/batch_biometric_detail_view.dart';
+import 'package:porkapp/features/biometrics/presentation/views/new_biometric_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
-import 'package:porkapp/shared/widgets/placeholder_screen.dart';
+
 import 'package:porkapp/features/batches/providers/batch_provider.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 
@@ -172,43 +175,47 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/biometrics',
-                pageBuilder: (context, state) {
-                  return CustomTransitionPage(
-                    key: state.pageKey,
-                    child: const PlaceholderScreen(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
-                  );
-                },
+                builder: (context, state) => const SimpleBiometricView(),
                 routes: [
                   GoRoute(
-                    path: ':batchId',
-                    pageBuilder: (context, state) {
+                    path: 'batch/:batchId',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
                       final batchId = state.pathParameters['batchId'] ?? '';
-                      return CustomTransitionPage(
-                        key: state.pageKey,
-                        child: BiometricsView(batchId: batchId),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          return SlideTransition(
-                            position: animation.drive(
-                              Tween(
-                                begin: const Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).chain(CurveTween(curve: Curves.easeInOut)),
-                            ),
-                            child: child,
-                          );
-                        },
-                      );
+                      return BatchBiometricDetailView(batchId: batchId);
                     },
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) {
+                          final batchId = state.pathParameters['batchId'] ?? '';
+                          return NewBiometricView(initialBatchId: batchId);
+                        },
+                      ),
+                      GoRoute(
+                        path: 'evolution',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) {
+                          final batchId = state.pathParameters['batchId'] ?? '';
+                          return BatchBiometricDetailView(batchId: batchId);
+                        },
+                      ),
+                      GoRoute(
+                        path: 'detail/:measurementId',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) {
+                          final batchId = state.pathParameters['batchId'] ?? '';
+                          return BatchBiometricDetailView(batchId: batchId);
+                        },
+                      ),
+                    ],
                   ),
                 ],
+              ),
+              GoRoute(
+                path: '/biometrics/history',
+                builder: (context, state) => const BiometricHistoryView(),
               ),
             ],
           ),

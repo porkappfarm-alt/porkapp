@@ -8,6 +8,7 @@ targets:
             - lib/features/animals/domain/**.dart
             - lib/features/batches/domain/**.dart
             - lib/features/biometrics/domain/**.dart
+            - lib/features/biometrics/data/models/**.dart
             - lib/features/corrals/domain/**.dart
             - lib/features/auth/models/**.dart
       json_serializable|json_serializable:
@@ -17,6 +18,7 @@ targets:
             - lib/features/animals/domain/**.dart
             - lib/features/batches/domain/**.dart
             - lib/features/biometrics/domain/**.dart
+            - lib/features/biometrics/data/models/**.dart
             - lib/features/corrals/domain/**.dart
             - lib/features/auth/models/**.dart
         options:

@@ -70,13 +70,11 @@ class BatchDetailView extends ConsumerWidget {
 
           // Lista de animales del lote
           Expanded(
-            child: ref.watch(single_batch.batchProvider(batchId)).when(
-                  data: (batch) {
-                    print('Batch recibido: ${batch.toString()}'); // Debug log
+            child: ref.watch(batchAnimalsProvider(batchId)).when(
+                  data: (animals) {
                     print(
-                        'Cantidad de animales: ${batch.animals.length}'); // Debug log
+                        'Cantidad de animales: ${animals.length}'); // Debug log
 
-                    final animals = batch.animals;
                     if (animals.isEmpty) {
                       print(
                           'No se encontraron animales en el lote'); // Debug log

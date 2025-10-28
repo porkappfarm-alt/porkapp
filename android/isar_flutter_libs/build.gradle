@@ -1,0 +1,19 @@
+group 'dev.isar.isar_flutter_libs'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace "dev.isar.isar_flutter_libs"   // ✅ Esta línea arregla el error del namespace
+    compileSdkVersion 34                     // ✅ Usa una versión moderna y soportada
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.6.0'
+}

@@ -32,15 +32,12 @@ mixin _$Corral {
   String get createdBy => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'active_batch_count')
   int get activeBatchCount => throw _privateConstructorUsedError;
   CorralStatus get status => throw _privateConstructorUsedError;
 
-  /// Serializes this Corral to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CorralCopyWith<Corral> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -59,7 +56,7 @@ abstract class $CorralCopyWith<$Res> {
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'created_by') String createdBy,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
-      int activeBatchCount,
+      @JsonKey(name: 'active_batch_count') int activeBatchCount,
       CorralStatus status});
 }
 
@@ -73,8 +70,6 @@ class _$CorralCopyWithImpl<$Res, $Val extends Corral>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -156,7 +151,7 @@ abstract class _$$CorralImplCopyWith<$Res> implements $CorralCopyWith<$Res> {
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'created_by') String createdBy,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
-      int activeBatchCount,
+      @JsonKey(name: 'active_batch_count') int activeBatchCount,
       CorralStatus status});
 }
 
@@ -168,8 +163,6 @@ class __$$CorralImplCopyWithImpl<$Res>
       _$CorralImpl _value, $Res Function(_$CorralImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -247,7 +240,7 @@ class _$CorralImpl implements _Corral {
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'created_by') required this.createdBy,
       @JsonKey(name: 'updated_at') required this.updatedAt,
-      this.activeBatchCount = 0,
+      @JsonKey(name: 'active_batch_count') this.activeBatchCount = 0,
       this.status = CorralStatus.disponible});
 
   factory _$CorralImpl.fromJson(Map<String, dynamic> json) =>
@@ -275,7 +268,7 @@ class _$CorralImpl implements _Corral {
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   @override
-  @JsonKey()
+  @JsonKey(name: 'active_batch_count')
   final int activeBatchCount;
   @override
   @JsonKey()
@@ -311,7 +304,7 @@ class _$CorralImpl implements _Corral {
             (identical(other.status, status) || other.status == status));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -327,9 +320,7 @@ class _$CorralImpl implements _Corral {
       activeBatchCount,
       status);
 
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>
@@ -354,7 +345,7 @@ abstract class _Corral implements Corral {
       @JsonKey(name: 'created_at') required final DateTime createdAt,
       @JsonKey(name: 'created_by') required final String createdBy,
       @JsonKey(name: 'updated_at') required final DateTime updatedAt,
-      final int activeBatchCount,
+      @JsonKey(name: 'active_batch_count') final int activeBatchCount,
       final CorralStatus status}) = _$CorralImpl;
 
   factory _Corral.fromJson(Map<String, dynamic> json) = _$CorralImpl.fromJson;
@@ -381,14 +372,12 @@ abstract class _Corral implements Corral {
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
   @override
+  @JsonKey(name: 'active_batch_count')
   int get activeBatchCount;
   @override
   CorralStatus get status;
-
-  /// Create a copy of Corral
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

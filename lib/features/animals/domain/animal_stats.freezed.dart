@@ -39,12 +39,8 @@ mixin _$AnimalStats {
       throw _privateConstructorUsedError; // kg alimento / kg ganancia
   double? get dailyFeedIntake => throw _privateConstructorUsedError;
 
-  /// Serializes this AnimalStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AnimalStatsCopyWith<AnimalStats> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -79,8 +75,6 @@ class _$AnimalStatsCopyWithImpl<$Res, $Val extends AnimalStats>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -175,8 +169,6 @@ class __$$AnimalStatsImplCopyWithImpl<$Res>
       _$AnimalStatsImpl _value, $Res Function(_$AnimalStatsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -325,7 +317,7 @@ class _$AnimalStatsImpl implements _AnimalStats {
                 other.dailyFeedIntake == dailyFeedIntake));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -341,9 +333,7 @@ class _$AnimalStatsImpl implements _AnimalStats {
       feedConversionRatio,
       dailyFeedIntake);
 
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AnimalStatsImplCopyWith<_$AnimalStatsImpl> get copyWith =>
@@ -374,36 +364,32 @@ abstract class _AnimalStats implements AnimalStats {
   factory _AnimalStats.fromJson(Map<String, dynamic> json) =
       _$AnimalStatsImpl.fromJson;
 
-// Ganancia de peso
-  @override
+  @override // Ganancia de peso
   double get currentWeight;
   @override
   double get initialWeight;
   @override
-  double? get lastWeightGain; // kg/día desde última medición
-  @override
-  double get avgWeightGain; // kg/día promedio total
+  double? get lastWeightGain;
+  @override // kg/día desde última medición
+  double get avgWeightGain;
+  @override // kg/día promedio total
 // Edad
-  @override
   DateTime get birthDate;
   @override
-  int get ageInDays; // Mortalidad (si aplica al lote)
-  @override
+  int get ageInDays;
+  @override // Mortalidad (si aplica al lote)
   int? get initialCount;
   @override
   int? get currentCount;
   @override
-  double? get mortalityRate; // Porcentaje
+  double? get mortalityRate;
+  @override // Porcentaje
 // Métricas adicionales
-  @override
-  double? get feedConversionRatio; // kg alimento / kg ganancia
-  @override
+  double? get feedConversionRatio;
+  @override // kg alimento / kg ganancia
   double? get dailyFeedIntake;
-
-  /// Create a copy of AnimalStats
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AnimalStatsImplCopyWith<_$AnimalStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/router.dart';
 import 'package:porkapp/shared/design/app_theme.dart';
 import 'package:porkapp/supabase/supabase.dart';
+import 'package:porkapp/features/biometrics/data/local/biometric_sync_service.dart';
+import 'package:porkapp/features/biometrics/data/biometrics_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +19,19 @@ void main() async {
 
   // Initialize Supabase
   await initializeSupabase();
+
+  // Initialize Providers
+  final container = ProviderContainer();
+
+  // Initialize BiometricSyncService
+  try {
+    final syncService = container.read(biometricSyncServiceProvider);
+    await syncService.initialize();
+  } catch (e) {
+    print('Error initializing BiometricSyncService: $e');
+  } finally {
+    container.dispose();
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 }

@@ -58,6 +58,10 @@ class AnimalFormController {
     _isLoading = false;
   }
 
+  void clearError() {
+    _errorMessage = null;
+  }
+
   Future<bool> shouldPop(BuildContext context) async {
     if (!_isDirty) return true;
 

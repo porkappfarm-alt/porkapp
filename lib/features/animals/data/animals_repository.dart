@@ -3,6 +3,15 @@ import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/supabase/supabase.dart';
 
 class AnimalsRepository {
+  Future<bool> isIdentifierUnique(String identifier) async {
+    final response = await supabase
+        .from('animals')
+        .select('id')
+        .eq('identifier', identifier)
+        .maybeSingle();
+    return response == null;
+  }
+
   Future<List<Animal>> getAnimalsByBatch(String batchId) async {
     final response = await supabase
         .from('animals')
@@ -33,6 +42,13 @@ class AnimalsRepository {
     double? weight,
     String status = 'active',
   }) async {
+    // Verificar si el identificador ya existe
+    final isUnique = await isIdentifierUnique(identifier);
+    if (!isUnique) {
+      throw Exception(
+          'Ya existe un animal con el identificador/arete: $identifier');
+    }
+
     final currentTime = DateTime.now();
     final response = await supabase
         .from('animals')

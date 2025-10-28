@@ -8,6 +8,8 @@ import 'package:porkapp/features/animals/presentation/widgets/animal_type_fields
 import 'package:porkapp/features/animals/presentation/widgets/animal_status_change.dart';
 import 'package:porkapp/features/animals/presentation/widgets/form_feedback.dart';
 import 'package:porkapp/features/animals/presentation/controllers/animal_form_controller.dart';
+import 'package:porkapp/features/batches/providers/batch_provider.dart'
+    as single_batch;
 
 class AnimalFormDialog extends ConsumerStatefulWidget {
   final Animal? animal;
@@ -138,9 +140,11 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
           ),
         );
 
-        // Invalidar el caché para recargar la lista
+        // Invalidar los providers para recargar la lista
         if (widget.preselectedBatchId != null) {
           ref.invalidate(batchAnimalsProvider(widget.preselectedBatchId!));
+          ref.invalidate(
+              single_batch.batchProvider(widget.preselectedBatchId!));
         }
         Navigator.of(context).pop();
       }
@@ -223,17 +227,36 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
                   const SizedBox(height: 16),
 
                   // Identificador
-                  TextFormField(
-                    controller: _identifierController,
-                    decoration: const InputDecoration(
-                      labelText: 'Identificador/Arete',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'El identificador es requerido';
-                      }
-                      return null;
+                  Consumer(
+                    builder: (context, ref, child) {
+                      return TextFormField(
+                        controller: _identifierController,
+                        decoration: const InputDecoration(
+                          labelText: 'Identificador/Arete',
+                          border: OutlineInputBorder(),
+                          helperText: 'Este identificador debe ser único',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'El identificador es requerido';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) async {
+                          if (value.isNotEmpty && widget.animal == null) {
+                            final repository =
+                                ref.read(animalsRepositoryProvider);
+                            final isUnique =
+                                await repository.isIdentifierUnique(value);
+                            if (!isUnique) {
+                              _formController.setError(
+                                  'Este identificador ya está en uso');
+                            } else {
+                              _formController.clearError();
+                            }
+                          }
+                        },
+                      );
                     },
                   ),
                   const SizedBox(height: 16),

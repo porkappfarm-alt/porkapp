@@ -15,8 +15,8 @@ extension GetLocalBatchMeasurementCollection on Isar {
 }
 
 const LocalBatchMeasurementSchema = CollectionSchema(
-  name: r'BatchMeasurement',
-  id: 6456758431589494339,
+  name: r'LocalBatchMeasurement',
+  id: 8584122002759119181,
   properties: {
     r'animalCount': PropertySchema(
       id: 0,
@@ -81,19 +81,6 @@ const LocalBatchMeasurementSchema = CollectionSchema(
   deserializeProp: _localBatchMeasurementDeserializeProp,
   idName: r'id',
   indexes: {
-    r'remoteId': IndexSchema(
-      id: 6301175856541681032,
-      name: r'remoteId',
-      unique: true,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'remoteId',
-          type: IndexType.hash,
-          caseSensitive: true,
-        )
-      ],
-    ),
     r'batchId': IndexSchema(
       id: -5468368523860846432,
       name: r'batchId',
@@ -108,15 +95,7 @@ const LocalBatchMeasurementSchema = CollectionSchema(
       ],
     )
   },
-  links: {
-    r'animalMeasurements': LinkSchema(
-      id: -6310682354921845542,
-      name: r'animalMeasurements',
-      target: r'AnimalMeasurement',
-      single: false,
-      linkName: r'batchMeasurement',
-    )
-  },
+  links: {},
   embeddedSchemas: {},
   getId: _localBatchMeasurementGetId,
   getLinks: _localBatchMeasurementGetLinks,
@@ -245,72 +224,12 @@ Id _localBatchMeasurementGetId(LocalBatchMeasurement object) {
 
 List<IsarLinkBase<dynamic>> _localBatchMeasurementGetLinks(
     LocalBatchMeasurement object) {
-  return [object.animalMeasurements];
+  return [];
 }
 
 void _localBatchMeasurementAttach(
     IsarCollection<dynamic> col, Id id, LocalBatchMeasurement object) {
   object.id = id;
-  object.animalMeasurements.attach(col,
-      col.isar.collection<LocalAnimalMeasurement>(), r'animalMeasurements', id);
-}
-
-extension LocalBatchMeasurementByIndex
-    on IsarCollection<LocalBatchMeasurement> {
-  Future<LocalBatchMeasurement?> getByRemoteId(String? remoteId) {
-    return getByIndex(r'remoteId', [remoteId]);
-  }
-
-  LocalBatchMeasurement? getByRemoteIdSync(String? remoteId) {
-    return getByIndexSync(r'remoteId', [remoteId]);
-  }
-
-  Future<bool> deleteByRemoteId(String? remoteId) {
-    return deleteByIndex(r'remoteId', [remoteId]);
-  }
-
-  bool deleteByRemoteIdSync(String? remoteId) {
-    return deleteByIndexSync(r'remoteId', [remoteId]);
-  }
-
-  Future<List<LocalBatchMeasurement?>> getAllByRemoteId(
-      List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return getAllByIndex(r'remoteId', values);
-  }
-
-  List<LocalBatchMeasurement?> getAllByRemoteIdSync(
-      List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'remoteId', values);
-  }
-
-  Future<int> deleteAllByRemoteId(List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'remoteId', values);
-  }
-
-  int deleteAllByRemoteIdSync(List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'remoteId', values);
-  }
-
-  Future<Id> putByRemoteId(LocalBatchMeasurement object) {
-    return putByIndex(r'remoteId', object);
-  }
-
-  Id putByRemoteIdSync(LocalBatchMeasurement object, {bool saveLinks = true}) {
-    return putByIndexSync(r'remoteId', object, saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllByRemoteId(List<LocalBatchMeasurement> objects) {
-    return putAllByIndex(r'remoteId', objects);
-  }
-
-  List<Id> putAllByRemoteIdSync(List<LocalBatchMeasurement> objects,
-      {bool saveLinks = true}) {
-    return putAllByIndexSync(r'remoteId', objects, saveLinks: saveLinks);
-  }
 }
 
 extension LocalBatchMeasurementQueryWhereSort
@@ -390,73 +309,6 @@ extension LocalBatchMeasurementQueryWhere on QueryBuilder<LocalBatchMeasurement,
         upper: upperId,
         includeUpper: includeUpper,
       ));
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement, QAfterWhereClause>
-      remoteIdIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'remoteId',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement, QAfterWhereClause>
-      remoteIdIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'remoteId',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement, QAfterWhereClause>
-      remoteIdEqualTo(String? remoteId) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'remoteId',
-        value: [remoteId],
-      ));
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement, QAfterWhereClause>
-      remoteIdNotEqualTo(String? remoteId) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [],
-              upper: [remoteId],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [remoteId],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [remoteId],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [],
-              upper: [remoteId],
-              includeUpper: false,
-            ));
-      }
     });
   }
 
@@ -1723,71 +1575,7 @@ extension LocalBatchMeasurementQueryObject on QueryBuilder<
     LocalBatchMeasurement, LocalBatchMeasurement, QFilterCondition> {}
 
 extension LocalBatchMeasurementQueryLinks on QueryBuilder<LocalBatchMeasurement,
-    LocalBatchMeasurement, QFilterCondition> {
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-          QAfterFilterCondition>
-      animalMeasurements(FilterQuery<LocalAnimalMeasurement> q) {
-    return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'animalMeasurements');
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-      QAfterFilterCondition> animalMeasurementsLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'animalMeasurements', length, true, length, true);
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-      QAfterFilterCondition> animalMeasurementsIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'animalMeasurements', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-      QAfterFilterCondition> animalMeasurementsIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'animalMeasurements', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-      QAfterFilterCondition> animalMeasurementsLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'animalMeasurements', 0, true, length, include);
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-      QAfterFilterCondition> animalMeasurementsLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'animalMeasurements', length, include, 999999, true);
-    });
-  }
-
-  QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement,
-      QAfterFilterCondition> animalMeasurementsLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'animalMeasurements', lower, includeLower, upper, includeUpper);
-    });
-  }
-}
+    LocalBatchMeasurement, QFilterCondition> {}
 
 extension LocalBatchMeasurementQuerySortBy
     on QueryBuilder<LocalBatchMeasurement, LocalBatchMeasurement, QSortBy> {
@@ -2292,8 +2080,8 @@ extension GetLocalAnimalMeasurementCollection on Isar {
 }
 
 const LocalAnimalMeasurementSchema = CollectionSchema(
-  name: r'AnimalMeasurement',
-  id: -8896647013054287275,
+  name: r'LocalAnimalMeasurement',
+  id: -394671760993816711,
   properties: {
     r'adg': PropertySchema(
       id: 0,
@@ -2305,44 +2093,49 @@ const LocalAnimalMeasurementSchema = CollectionSchema(
       name: r'animalId',
       type: IsarType.string,
     ),
-    r'createdAt': PropertySchema(
+    r'batchMeasurementId': PropertySchema(
       id: 2,
+      name: r'batchMeasurementId',
+      type: IsarType.string,
+    ),
+    r'createdAt': PropertySchema(
+      id: 3,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'daysSinceLast': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'daysSinceLast',
       type: IsarType.long,
     ),
     r'notes': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'notes',
       type: IsarType.string,
     ),
     r'previousWeight': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'previousWeight',
       type: IsarType.double,
     ),
     r'remoteId': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'remoteId',
       type: IsarType.string,
     ),
     r'syncStatus': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'syncStatus',
       type: IsarType.string,
       enumMap: _LocalAnimalMeasurementsyncStatusEnumValueMap,
     ),
     r'weight': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'weight',
       type: IsarType.double,
     ),
     r'weightGain': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'weightGain',
       type: IsarType.double,
     )
@@ -2353,19 +2146,6 @@ const LocalAnimalMeasurementSchema = CollectionSchema(
   deserializeProp: _localAnimalMeasurementDeserializeProp,
   idName: r'id',
   indexes: {
-    r'remoteId': IndexSchema(
-      id: 6301175856541681032,
-      name: r'remoteId',
-      unique: true,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'remoteId',
-          type: IndexType.hash,
-          caseSensitive: true,
-        )
-      ],
-    ),
     r'animalId': IndexSchema(
       id: -8446297297210463032,
       name: r'animalId',
@@ -2380,14 +2160,7 @@ const LocalAnimalMeasurementSchema = CollectionSchema(
       ],
     )
   },
-  links: {
-    r'batchMeasurement': LinkSchema(
-      id: -8568065423915551013,
-      name: r'batchMeasurement',
-      target: r'BatchMeasurement',
-      single: true,
-    )
-  },
+  links: {},
   embeddedSchemas: {},
   getId: _localAnimalMeasurementGetId,
   getLinks: _localAnimalMeasurementGetLinks,
@@ -2402,6 +2175,7 @@ int _localAnimalMeasurementEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.animalId.length * 3;
+  bytesCount += 3 + object.batchMeasurementId.length * 3;
   {
     final value = object.notes;
     if (value != null) {
@@ -2426,14 +2200,15 @@ void _localAnimalMeasurementSerialize(
 ) {
   writer.writeDouble(offsets[0], object.adg);
   writer.writeString(offsets[1], object.animalId);
-  writer.writeDateTime(offsets[2], object.createdAt);
-  writer.writeLong(offsets[3], object.daysSinceLast);
-  writer.writeString(offsets[4], object.notes);
-  writer.writeDouble(offsets[5], object.previousWeight);
-  writer.writeString(offsets[6], object.remoteId);
-  writer.writeString(offsets[7], object.syncStatus.name);
-  writer.writeDouble(offsets[8], object.weight);
-  writer.writeDouble(offsets[9], object.weightGain);
+  writer.writeString(offsets[2], object.batchMeasurementId);
+  writer.writeDateTime(offsets[3], object.createdAt);
+  writer.writeLong(offsets[4], object.daysSinceLast);
+  writer.writeString(offsets[5], object.notes);
+  writer.writeDouble(offsets[6], object.previousWeight);
+  writer.writeString(offsets[7], object.remoteId);
+  writer.writeString(offsets[8], object.syncStatus.name);
+  writer.writeDouble(offsets[9], object.weight);
+  writer.writeDouble(offsets[10], object.weightGain);
 }
 
 LocalAnimalMeasurement _localAnimalMeasurementDeserialize(
@@ -2445,17 +2220,18 @@ LocalAnimalMeasurement _localAnimalMeasurementDeserialize(
   final object = LocalAnimalMeasurement();
   object.adg = reader.readDoubleOrNull(offsets[0]);
   object.animalId = reader.readString(offsets[1]);
-  object.createdAt = reader.readDateTime(offsets[2]);
-  object.daysSinceLast = reader.readLongOrNull(offsets[3]);
+  object.batchMeasurementId = reader.readString(offsets[2]);
+  object.createdAt = reader.readDateTime(offsets[3]);
+  object.daysSinceLast = reader.readLongOrNull(offsets[4]);
   object.id = id;
-  object.notes = reader.readStringOrNull(offsets[4]);
-  object.previousWeight = reader.readDoubleOrNull(offsets[5]);
-  object.remoteId = reader.readStringOrNull(offsets[6]);
+  object.notes = reader.readStringOrNull(offsets[5]);
+  object.previousWeight = reader.readDoubleOrNull(offsets[6]);
+  object.remoteId = reader.readStringOrNull(offsets[7]);
   object.syncStatus = _LocalAnimalMeasurementsyncStatusValueEnumMap[
-          reader.readStringOrNull(offsets[7])] ??
+          reader.readStringOrNull(offsets[8])] ??
       SyncStatus.synced;
-  object.weight = reader.readDouble(offsets[8]);
-  object.weightGain = reader.readDoubleOrNull(offsets[9]);
+  object.weight = reader.readDouble(offsets[9]);
+  object.weightGain = reader.readDoubleOrNull(offsets[10]);
   return object;
 }
 
@@ -2471,22 +2247,24 @@ P _localAnimalMeasurementDeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 5:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 6:
       return (reader.readStringOrNull(offset)) as P;
+    case 6:
+      return (reader.readDoubleOrNull(offset)) as P;
     case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
       return (_LocalAnimalMeasurementsyncStatusValueEnumMap[
               reader.readStringOrNull(offset)] ??
           SyncStatus.synced) as P;
-    case 8:
-      return (reader.readDouble(offset)) as P;
     case 9:
+      return (reader.readDouble(offset)) as P;
+    case 10:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2510,72 +2288,12 @@ Id _localAnimalMeasurementGetId(LocalAnimalMeasurement object) {
 
 List<IsarLinkBase<dynamic>> _localAnimalMeasurementGetLinks(
     LocalAnimalMeasurement object) {
-  return [object.batchMeasurement];
+  return [];
 }
 
 void _localAnimalMeasurementAttach(
     IsarCollection<dynamic> col, Id id, LocalAnimalMeasurement object) {
   object.id = id;
-  object.batchMeasurement.attach(col,
-      col.isar.collection<LocalBatchMeasurement>(), r'batchMeasurement', id);
-}
-
-extension LocalAnimalMeasurementByIndex
-    on IsarCollection<LocalAnimalMeasurement> {
-  Future<LocalAnimalMeasurement?> getByRemoteId(String? remoteId) {
-    return getByIndex(r'remoteId', [remoteId]);
-  }
-
-  LocalAnimalMeasurement? getByRemoteIdSync(String? remoteId) {
-    return getByIndexSync(r'remoteId', [remoteId]);
-  }
-
-  Future<bool> deleteByRemoteId(String? remoteId) {
-    return deleteByIndex(r'remoteId', [remoteId]);
-  }
-
-  bool deleteByRemoteIdSync(String? remoteId) {
-    return deleteByIndexSync(r'remoteId', [remoteId]);
-  }
-
-  Future<List<LocalAnimalMeasurement?>> getAllByRemoteId(
-      List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return getAllByIndex(r'remoteId', values);
-  }
-
-  List<LocalAnimalMeasurement?> getAllByRemoteIdSync(
-      List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'remoteId', values);
-  }
-
-  Future<int> deleteAllByRemoteId(List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'remoteId', values);
-  }
-
-  int deleteAllByRemoteIdSync(List<String?> remoteIdValues) {
-    final values = remoteIdValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'remoteId', values);
-  }
-
-  Future<Id> putByRemoteId(LocalAnimalMeasurement object) {
-    return putByIndex(r'remoteId', object);
-  }
-
-  Id putByRemoteIdSync(LocalAnimalMeasurement object, {bool saveLinks = true}) {
-    return putByIndexSync(r'remoteId', object, saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllByRemoteId(List<LocalAnimalMeasurement> objects) {
-    return putAllByIndex(r'remoteId', objects);
-  }
-
-  List<Id> putAllByRemoteIdSync(List<LocalAnimalMeasurement> objects,
-      {bool saveLinks = true}) {
-    return putAllByIndexSync(r'remoteId', objects, saveLinks: saveLinks);
-  }
 }
 
 extension LocalAnimalMeasurementQueryWhereSort
@@ -2655,73 +2373,6 @@ extension LocalAnimalMeasurementQueryWhere on QueryBuilder<
         upper: upperId,
         includeUpper: includeUpper,
       ));
-    });
-  }
-
-  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
-      QAfterWhereClause> remoteIdIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'remoteId',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
-      QAfterWhereClause> remoteIdIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'remoteId',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
-      QAfterWhereClause> remoteIdEqualTo(String? remoteId) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'remoteId',
-        value: [remoteId],
-      ));
-    });
-  }
-
-  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
-      QAfterWhereClause> remoteIdNotEqualTo(String? remoteId) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [],
-              upper: [remoteId],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [remoteId],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [remoteId],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'remoteId',
-              lower: [],
-              upper: [remoteId],
-              includeUpper: false,
-            ));
-      }
     });
   }
 
@@ -2990,6 +2641,144 @@ extension LocalAnimalMeasurementQueryFilter on QueryBuilder<
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'animalId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'batchMeasurementId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'batchMeasurementId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'batchMeasurementId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'batchMeasurementId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'batchMeasurementId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'batchMeasurementId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+          QAfterFilterCondition>
+      batchMeasurementIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'batchMeasurementId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+          QAfterFilterCondition>
+      batchMeasurementIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'batchMeasurementId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'batchMeasurementId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
+      QAfterFilterCondition> batchMeasurementIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'batchMeasurementId',
         value: '',
       ));
     });
@@ -3870,22 +3659,7 @@ extension LocalAnimalMeasurementQueryObject on QueryBuilder<
     LocalAnimalMeasurement, LocalAnimalMeasurement, QFilterCondition> {}
 
 extension LocalAnimalMeasurementQueryLinks on QueryBuilder<
-    LocalAnimalMeasurement, LocalAnimalMeasurement, QFilterCondition> {
-  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
-          QAfterFilterCondition>
-      batchMeasurement(FilterQuery<LocalBatchMeasurement> q) {
-    return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'batchMeasurement');
-    });
-  }
-
-  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement,
-      QAfterFilterCondition> batchMeasurementIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'batchMeasurement', 0, true, 0, true);
-    });
-  }
-}
+    LocalAnimalMeasurement, LocalAnimalMeasurement, QFilterCondition> {}
 
 extension LocalAnimalMeasurementQuerySortBy
     on QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QSortBy> {
@@ -3914,6 +3688,20 @@ extension LocalAnimalMeasurementQuerySortBy
       sortByAnimalIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'animalId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QAfterSortBy>
+      sortByBatchMeasurementId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchMeasurementId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QAfterSortBy>
+      sortByBatchMeasurementIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchMeasurementId', Sort.desc);
     });
   }
 
@@ -4061,6 +3849,20 @@ extension LocalAnimalMeasurementQuerySortThenBy on QueryBuilder<
   }
 
   QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QAfterSortBy>
+      thenByBatchMeasurementId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchMeasurementId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QAfterSortBy>
+      thenByBatchMeasurementIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchMeasurementId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QAfterSortBy>
       thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -4204,6 +4006,14 @@ extension LocalAnimalMeasurementQueryWhereDistinct
   }
 
   QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QDistinct>
+      distinctByBatchMeasurementId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'batchMeasurementId',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, LocalAnimalMeasurement, QDistinct>
       distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -4279,6 +4089,13 @@ extension LocalAnimalMeasurementQueryProperty on QueryBuilder<
       animalIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'animalId');
+    });
+  }
+
+  QueryBuilder<LocalAnimalMeasurement, String, QQueryOperations>
+      batchMeasurementIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'batchMeasurementId');
     });
   }
 

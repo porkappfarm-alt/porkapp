@@ -18,6 +18,16 @@ final batchListProvider = FutureProvider<List<Batch>>((ref) async {
   return result.fold((error) => throw error, (batches) => batches);
 });
 
+// Active Batches Provider
+final activeBatchesProvider = FutureProvider<List<Batch>>((ref) async {
+  final repository = ref.watch(batchRepositoryProvider);
+  final result = await repository.getBatches();
+  return result.fold(
+    (error) => throw error,
+    (batches) => batches.where((batch) => batch.status == 'active').toList(),
+  );
+});
+
 // Single Batch Provider
 final batchProvider = FutureProvider.family<Batch, String>((
   ref,

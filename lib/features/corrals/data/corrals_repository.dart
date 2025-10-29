@@ -43,6 +43,9 @@ class CorralsRepository {
       'notes': json['notes'],
       'image_url': json['image_url'] ?? '',
       'active_batch_count': activeBatchCount,
+      'active_batch_name': json['active_batch_name'],
+      'active_batch_entry_date': json['active_batch_entry_date'],
+      'last_biometry_avg_weight': json['last_biometry_avg_weight'],
       'status': status.name,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -51,28 +54,67 @@ class CorralsRepository {
   }
 
   Future<List<Corral>> getCorrals() async {
-    // Obtener los corrales directamente de la tabla corrals
-    final response = await supabase.from('corrals').select().order('name');
-
-    print('Raw response: $response');
+    // Obtener corrales con lote activo, cantidad de animales y última biometría
+    final response = await supabase.from('corrals').select('''
+          *,
+          batches!corral_id(
+            id,
+            name,
+            status,
+            animal_count,
+            entry_date,
+            batch_biometrics(
+              id,
+              measurement_date,
+              avg_weight
+            )
+          )
+        ''').order('name');
 
     try {
-      print('Supabase response: $response');
-
       final corrals = response.map<Corral>((json) {
-        print('Processing corral: $json');
+        // Buscar lote activo asociado al corral
+        final batches = json['batches'] as List<dynamic>?;
+        final activeBatch = batches?.firstWhere(
+          (b) => b['status'] == 'active',
+          orElse: () => null,
+        );
+        final animalCount =
+            activeBatch != null ? (activeBatch['animal_count'] ?? 0) : 0;
+        final batchName =
+            activeBatch != null ? (activeBatch['name'] as String?) : null;
+        final entryDateStr =
+            activeBatch != null ? (activeBatch['entry_date'] as String?) : null;
+        final entryDate =
+            entryDateStr != null ? DateTime.parse(entryDateStr) : null;
 
-        // Para corrals directamente, no tenemos active_batch_count
-        // así que lo establecemos en 0
+        // Obtener última biometría del lote activo
+        double? lastBiometryAvgWeight;
+        if (activeBatch != null) {
+          final biometrics = activeBatch['batch_biometrics'] as List<dynamic>?;
+          if (biometrics != null && biometrics.isNotEmpty) {
+            // Ordenar por fecha de medición descendente para obtener la más reciente
+            biometrics.sort((a, b) {
+              final dateA = DateTime.parse(a['measurement_date']);
+              final dateB = DateTime.parse(b['measurement_date']);
+              return dateB.compareTo(dateA);
+            });
+            final lastBiometry = biometrics.first;
+            lastBiometryAvgWeight = lastBiometry['avg_weight'] != null
+                ? (lastBiometry['avg_weight'] as num).toDouble()
+                : null;
+          }
+        }
+
         final mappedJson = _processCorralJson({
           ...json,
-          'active_batch_count': 0,
+          'active_batch_count': animalCount,
+          'active_batch_name': batchName,
+          'active_batch_entry_date': entryDate?.toIso8601String(),
+          'last_biometry_avg_weight': lastBiometryAvgWeight,
         });
-        print('Mapped JSON: $mappedJson');
         return Corral.fromJson(mappedJson);
       }).toList();
-
-      print('Processed corrals: $corrals');
       return corrals;
     } catch (e, stack) {
       print('Error getting corrals: $e');

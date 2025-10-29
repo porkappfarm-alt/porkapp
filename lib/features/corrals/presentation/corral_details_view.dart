@@ -181,7 +181,8 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
+                  border:
+                      Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -220,15 +221,14 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                           icon: Icons.circle,
                           label:
                               _getStatusText(corral['estado'] ?? 'Desconocido'),
-                          backgroundColor:
-                              _getStatusColor(corral['estado']).withOpacity(0.15),
+                          backgroundColor: _getStatusColor(corral['estado'])
+                              .withOpacity(0.15),
                           foregroundColor: _getStatusColor(corral['estado']),
                         ),
                         if ((corral['capacidad'] as int?) != null)
                           _buildStatusChip(
                             icon: Icons.groups_outlined,
-                            label:
-                                '${corral['capacidad']} capacidad',
+                            label: '${corral['capacidad']} capacidad',
                             backgroundColor: const Color(0xFFFFE5EC),
                             foregroundColor: const Color(0xFFFF4D6D),
                           ),

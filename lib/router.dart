@@ -199,10 +199,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'edit/:batchId',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
-                      final batchId = state.pathParameters['batchId'] ?? '';
-                      return CreateBatchView(
-                        batch: ref.read(batchProvider(batchId)).valueOrNull,
-                      );
+                      final batchId = state.pathParameters['batchId'];
+                      return CreateBatchView(batchId: batchId);
                     },
                   ),
                   GoRoute(

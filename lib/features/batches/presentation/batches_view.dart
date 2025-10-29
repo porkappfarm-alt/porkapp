@@ -174,16 +174,12 @@ class BatchesView extends ConsumerWidget {
                             final batch = batches[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
-                              child: Hero(
-                                tag: 'batch-${batch.id}',
-                                child: BatchCard(
-                                  batch: batch,
-                                  onTap: () =>
-                                      context.push('/batches/${batch.id}'),
-                                  onEdit: () => _onBatchEdit(context, batch),
-                                  onDelete: () =>
-                                      _onBatchDelete(context, batch),
-                                ),
+                              child: BatchCard(
+                                batch: batch,
+                                onTap: () =>
+                                    context.push('/batches/${batch.id}'),
+                                onEdit: () => _onBatchEdit(context, batch),
+                                onDelete: () => _onBatchDelete(context, batch),
                               ),
                             );
                           },
@@ -289,6 +285,7 @@ class BatchesView extends ConsumerWidget {
             ],
           ),
           child: FloatingActionButton.extended(
+            heroTag: 'batches_fab',
             onPressed: () => _showCreateBatchDialog(context, ref),
             backgroundColor: Colors.transparent,
             elevation: 0,

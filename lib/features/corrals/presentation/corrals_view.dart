@@ -13,7 +13,6 @@ class CorralsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final corralsState = ref.watch(corralsProvider);
-
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
@@ -45,32 +44,7 @@ class CorralsView extends ConsumerWidget {
             ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            color: const Color(0xFF4CAF50),
-            onPressed: () {
-              // TODO: Implementar filtros
-            },
-            tooltip: 'Filtrar corrales',
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            color: const Color(0xFFF07281),
-            onPressed: () async {
-              final result = await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const CreateCorralView(),
-                ),
-              );
-              // Si se devuelve un corral, recargamos la lista
-              if (result == true && context.mounted) {
-                ref.read(corralsProvider.notifier).loadCorrals();
-              }
-            },
-            tooltip: 'Añadir corral',
-          ),
-        ],
+        // Eliminados los botones de filtro y agregar corral
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -192,12 +166,12 @@ class CorralsView extends ConsumerWidget {
                             : MediaQuery.of(context).size.width > 600
                                 ? 3
                                 : 1, // Cambiado a 1 para móviles
-                        mainAxisSpacing: 16.0,
-                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 8.0,
+                        crossAxisSpacing: 8.0,
                         childAspectRatio: MediaQuery.of(context).size.width >
                                 600
                             ? 1.3
-                            : 2.0, // Ajustado para mejor visualización en móviles
+                            : 1.6, // Reducido para hacer las tarjetas más altas en móviles
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -219,6 +193,14 @@ class CorralsView extends ConsumerWidget {
                                 'creado_por': corral.createdBy,
                                 'actualizado_en':
                                     corral.updatedAt.toIso8601String(),
+                                // Datos del lote activo
+                                'active_batch_name': corral.activeBatchName,
+                                'active_batch_entry_date': corral
+                                    .activeBatchEntryDate
+                                    ?.toIso8601String(),
+                                // Promedio de peso de última biometría
+                                'last_biometry_avg_weight':
+                                    corral.lastBiometryAvgWeight ?? 0.0,
                               };
 
                               await Navigator.push(
@@ -274,7 +256,7 @@ class CorralsView extends ConsumerWidget {
               ),
             ],
           ),
-          child: FloatingActionButton.extended(
+          child: FloatingActionButton(
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -284,15 +266,7 @@ class CorralsView extends ConsumerWidget {
             },
             backgroundColor: Colors.transparent,
             elevation: 0,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
-              'Nuevo Corral',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
+            child: const Icon(Icons.add, color: Colors.white),
           ),
         ),
       ),
@@ -315,6 +289,14 @@ class CorralCard extends ConsumerWidget {
     if (percentage >= 75) return const Color(0xFFFFB74D); // Naranja
     if (percentage >= 50) return const Color(0xFFFFF176); // Amarillo
     return const Color(0xFF4CAF50); // Verde
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  int _getDaysElapsed(DateTime entryDate) {
+    return DateTime.now().difference(entryDate).inDays;
   }
 
   @override
@@ -392,31 +374,216 @@ class CorralCard extends ConsumerWidget {
               ),
             ),
             // Contenido
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Información de ocupación
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Mostrar información del lote activo de forma compacta
+                  if (corral.activeBatchCount > 0) ...[
+                    // Fecha de ingreso y días transcurridos
+                    if (corral.activeBatchEntryDate != null) ...[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.inventory_2_outlined,
+                                        size: 14, color: Color(0xFF2D3250)),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        '${corral.activeBatchName ?? ''} • ${corral.activeBatchCount} animales',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF2D3250),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today,
+                                        size: 14, color: Color(0xFF2D3250)),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'Fecha de ingreso:',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF2D3250),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 34),
+                                  child: Text(
+                                    _formatDate(corral.activeBatchEntryDate!),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF2D3250),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Center(
+                              child: Container(
+                                margin: const EdgeInsets.only(left: 8),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 4), // ancho aumentado
+                                constraints: const BoxConstraints(
+                                    minWidth:
+                                        56), // ancho mínimo para 3 dígitos
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Color(0xFF2D3250), width: 1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Días',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF2D3250),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${_getDaysElapsed(corral.activeBatchEntryDate!)}',
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        color: Color(0xFF2D3250),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // Ocupación
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
                             'Ocupación',
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            '${corral.activeBatchCount}/${corral.capacity ?? "∞"}',
+                            style: TextStyle(
+                              fontSize: 11,
                               color: Colors.grey[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: LinearProgressIndicator(
+                                value: ocupacionPorcentaje / 100,
+                                backgroundColor: Colors.grey[200],
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  _getOccupancyColor(
+                                      context, ocupacionPorcentaje),
+                                ),
+                                minHeight: 6,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${ocupacionPorcentaje.toStringAsFixed(0)}%',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _getOccupancyColor(
+                                  context, ocupacionPorcentaje),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ],
+                  // Nueva sección para mostrar capacidad y ocupación
+                  if (corral.status
+                      .toString()
+                      .toLowerCase()
+                      .contains('disponible')) ...[
+                    // Ocupación y capacidad igual que ocupados
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ocupación',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          '${corral.activeBatchCount}/${corral.capacity ?? "∞"}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: LinearProgressIndicator(
+                              value: ocupacionPorcentaje / 100,
+                              backgroundColor: Colors.grey[200],
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                _getOccupancyColor(
+                                    context, ocupacionPorcentaje),
+                              ),
+                              minHeight: 6,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
                         Text(
-                          '${corral.activeBatchCount}/${corral.capacity ?? "∞"}',
+                          '${ocupacionPorcentaje.toStringAsFixed(0)}%',
                           style: TextStyle(
                             fontSize: 12,
                             color: _getOccupancyColor(
@@ -427,69 +594,8 @@ class CorralCard extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    // Barra de progreso
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: const Color(0xFFFAFAFA),
-                      ),
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Ocupación',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _getOccupancyColor(
-                                          context, ocupacionPorcentaje)
-                                      .withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${ocupacionPorcentaje.toStringAsFixed(1)}%',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: _getOccupancyColor(
-                                        context, ocupacionPorcentaje),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: LinearProgressIndicator(
-                              value: ocupacionPorcentaje / 100,
-                              backgroundColor: Colors.grey[200],
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                _getOccupancyColor(
-                                    context, ocupacionPorcentaje),
-                              ),
-                              minHeight: 8,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
-                ),
+                ],
               ),
             ),
           ],

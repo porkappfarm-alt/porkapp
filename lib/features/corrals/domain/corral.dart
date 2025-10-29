@@ -27,6 +27,10 @@ class Corral with _$Corral {
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
     @JsonKey(name: 'active_batch_count') @Default(0) int activeBatchCount,
     @Default(CorralStatus.disponible) CorralStatus status,
+    // Información del lote activo
+    @JsonKey(name: 'active_batch_name') String? activeBatchName,
+    @JsonKey(name: 'active_batch_entry_date') DateTime? activeBatchEntryDate,
+    @JsonKey(name: 'last_biometry_avg_weight') double? lastBiometryAvgWeight,
   }) = _Corral;
 
   factory Corral.fromJson(Map<String, dynamic> json) => _$CorralFromJson(json);

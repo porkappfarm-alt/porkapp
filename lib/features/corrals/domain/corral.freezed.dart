@@ -34,7 +34,14 @@ mixin _$Corral {
   DateTime get updatedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'active_batch_count')
   int get activeBatchCount => throw _privateConstructorUsedError;
-  CorralStatus get status => throw _privateConstructorUsedError;
+  CorralStatus get status =>
+      throw _privateConstructorUsedError; // Información del lote activo
+  @JsonKey(name: 'active_batch_name')
+  String? get activeBatchName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'active_batch_entry_date')
+  DateTime? get activeBatchEntryDate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_biometry_avg_weight')
+  double? get lastBiometryAvgWeight => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -57,7 +64,11 @@ abstract class $CorralCopyWith<$Res> {
       @JsonKey(name: 'created_by') String createdBy,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
       @JsonKey(name: 'active_batch_count') int activeBatchCount,
-      CorralStatus status});
+      CorralStatus status,
+      @JsonKey(name: 'active_batch_name') String? activeBatchName,
+      @JsonKey(name: 'active_batch_entry_date') DateTime? activeBatchEntryDate,
+      @JsonKey(name: 'last_biometry_avg_weight')
+      double? lastBiometryAvgWeight});
 }
 
 /// @nodoc
@@ -84,6 +95,9 @@ class _$CorralCopyWithImpl<$Res, $Val extends Corral>
     Object? updatedAt = null,
     Object? activeBatchCount = null,
     Object? status = null,
+    Object? activeBatchName = freezed,
+    Object? activeBatchEntryDate = freezed,
+    Object? lastBiometryAvgWeight = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -130,6 +144,18 @@ class _$CorralCopyWithImpl<$Res, $Val extends Corral>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as CorralStatus,
+      activeBatchName: freezed == activeBatchName
+          ? _value.activeBatchName
+          : activeBatchName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      activeBatchEntryDate: freezed == activeBatchEntryDate
+          ? _value.activeBatchEntryDate
+          : activeBatchEntryDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastBiometryAvgWeight: freezed == lastBiometryAvgWeight
+          ? _value.lastBiometryAvgWeight
+          : lastBiometryAvgWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
     ) as $Val);
   }
 }
@@ -152,7 +178,11 @@ abstract class _$$CorralImplCopyWith<$Res> implements $CorralCopyWith<$Res> {
       @JsonKey(name: 'created_by') String createdBy,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
       @JsonKey(name: 'active_batch_count') int activeBatchCount,
-      CorralStatus status});
+      CorralStatus status,
+      @JsonKey(name: 'active_batch_name') String? activeBatchName,
+      @JsonKey(name: 'active_batch_entry_date') DateTime? activeBatchEntryDate,
+      @JsonKey(name: 'last_biometry_avg_weight')
+      double? lastBiometryAvgWeight});
 }
 
 /// @nodoc
@@ -177,6 +207,9 @@ class __$$CorralImplCopyWithImpl<$Res>
     Object? updatedAt = null,
     Object? activeBatchCount = null,
     Object? status = null,
+    Object? activeBatchName = freezed,
+    Object? activeBatchEntryDate = freezed,
+    Object? lastBiometryAvgWeight = freezed,
   }) {
     return _then(_$CorralImpl(
       id: null == id
@@ -223,6 +256,18 @@ class __$$CorralImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as CorralStatus,
+      activeBatchName: freezed == activeBatchName
+          ? _value.activeBatchName
+          : activeBatchName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      activeBatchEntryDate: freezed == activeBatchEntryDate
+          ? _value.activeBatchEntryDate
+          : activeBatchEntryDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastBiometryAvgWeight: freezed == lastBiometryAvgWeight
+          ? _value.lastBiometryAvgWeight
+          : lastBiometryAvgWeight // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -241,7 +286,10 @@ class _$CorralImpl implements _Corral {
       @JsonKey(name: 'created_by') required this.createdBy,
       @JsonKey(name: 'updated_at') required this.updatedAt,
       @JsonKey(name: 'active_batch_count') this.activeBatchCount = 0,
-      this.status = CorralStatus.disponible});
+      this.status = CorralStatus.disponible,
+      @JsonKey(name: 'active_batch_name') this.activeBatchName,
+      @JsonKey(name: 'active_batch_entry_date') this.activeBatchEntryDate,
+      @JsonKey(name: 'last_biometry_avg_weight') this.lastBiometryAvgWeight});
 
   factory _$CorralImpl.fromJson(Map<String, dynamic> json) =>
       _$$CorralImplFromJson(json);
@@ -273,10 +321,20 @@ class _$CorralImpl implements _Corral {
   @override
   @JsonKey()
   final CorralStatus status;
+// Información del lote activo
+  @override
+  @JsonKey(name: 'active_batch_name')
+  final String? activeBatchName;
+  @override
+  @JsonKey(name: 'active_batch_entry_date')
+  final DateTime? activeBatchEntryDate;
+  @override
+  @JsonKey(name: 'last_biometry_avg_weight')
+  final double? lastBiometryAvgWeight;
 
   @override
   String toString() {
-    return 'Corral(id: $id, name: $name, location: $location, capacity: $capacity, notes: $notes, imageUrl: $imageUrl, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, activeBatchCount: $activeBatchCount, status: $status)';
+    return 'Corral(id: $id, name: $name, location: $location, capacity: $capacity, notes: $notes, imageUrl: $imageUrl, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, activeBatchCount: $activeBatchCount, status: $status, activeBatchName: $activeBatchName, activeBatchEntryDate: $activeBatchEntryDate, lastBiometryAvgWeight: $lastBiometryAvgWeight)';
   }
 
   @override
@@ -301,7 +359,13 @@ class _$CorralImpl implements _Corral {
                 other.updatedAt == updatedAt) &&
             (identical(other.activeBatchCount, activeBatchCount) ||
                 other.activeBatchCount == activeBatchCount) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.activeBatchName, activeBatchName) ||
+                other.activeBatchName == activeBatchName) &&
+            (identical(other.activeBatchEntryDate, activeBatchEntryDate) ||
+                other.activeBatchEntryDate == activeBatchEntryDate) &&
+            (identical(other.lastBiometryAvgWeight, lastBiometryAvgWeight) ||
+                other.lastBiometryAvgWeight == lastBiometryAvgWeight));
   }
 
   @JsonKey(ignore: true)
@@ -318,7 +382,10 @@ class _$CorralImpl implements _Corral {
       createdBy,
       updatedAt,
       activeBatchCount,
-      status);
+      status,
+      activeBatchName,
+      activeBatchEntryDate,
+      lastBiometryAvgWeight);
 
   @JsonKey(ignore: true)
   @override
@@ -346,7 +413,12 @@ abstract class _Corral implements Corral {
       @JsonKey(name: 'created_by') required final String createdBy,
       @JsonKey(name: 'updated_at') required final DateTime updatedAt,
       @JsonKey(name: 'active_batch_count') final int activeBatchCount,
-      final CorralStatus status}) = _$CorralImpl;
+      final CorralStatus status,
+      @JsonKey(name: 'active_batch_name') final String? activeBatchName,
+      @JsonKey(name: 'active_batch_entry_date')
+      final DateTime? activeBatchEntryDate,
+      @JsonKey(name: 'last_biometry_avg_weight')
+      final double? lastBiometryAvgWeight}) = _$CorralImpl;
 
   factory _Corral.fromJson(Map<String, dynamic> json) = _$CorralImpl.fromJson;
 
@@ -376,6 +448,15 @@ abstract class _Corral implements Corral {
   int get activeBatchCount;
   @override
   CorralStatus get status;
+  @override // Información del lote activo
+  @JsonKey(name: 'active_batch_name')
+  String? get activeBatchName;
+  @override
+  @JsonKey(name: 'active_batch_entry_date')
+  DateTime? get activeBatchEntryDate;
+  @override
+  @JsonKey(name: 'last_biometry_avg_weight')
+  double? get lastBiometryAvgWeight;
   @override
   @JsonKey(ignore: true)
   _$$CorralImplCopyWith<_$CorralImpl> get copyWith =>

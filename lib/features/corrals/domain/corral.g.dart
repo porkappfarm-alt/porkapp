@@ -19,6 +19,12 @@ _$CorralImpl _$$CorralImplFromJson(Map<String, dynamic> json) => _$CorralImpl(
       activeBatchCount: (json['active_batch_count'] as num?)?.toInt() ?? 0,
       status: $enumDecodeNullable(_$CorralStatusEnumMap, json['status']) ??
           CorralStatus.disponible,
+      activeBatchName: json['active_batch_name'] as String?,
+      activeBatchEntryDate: json['active_batch_entry_date'] == null
+          ? null
+          : DateTime.parse(json['active_batch_entry_date'] as String),
+      lastBiometryAvgWeight:
+          (json['last_biometry_avg_weight'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$$CorralImplToJson(_$CorralImpl instance) =>
@@ -34,6 +40,10 @@ Map<String, dynamic> _$$CorralImplToJson(_$CorralImpl instance) =>
       'updated_at': instance.updatedAt.toIso8601String(),
       'active_batch_count': instance.activeBatchCount,
       'status': _$CorralStatusEnumMap[instance.status]!,
+      'active_batch_name': instance.activeBatchName,
+      'active_batch_entry_date':
+          instance.activeBatchEntryDate?.toIso8601String(),
+      'last_biometry_avg_weight': instance.lastBiometryAvgWeight,
     };
 
 const _$CorralStatusEnumMap = {

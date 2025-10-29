@@ -128,9 +128,11 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
               padding: const EdgeInsets.all(16.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  _buildStatusCard(),
+                  _buildCorralHeaderCard(),
                   const SizedBox(height: 16),
                   _buildDetailsCard(),
+                  const SizedBox(height: 16),
+                  _buildActiveBatchCard(),
                   const SizedBox(height: 16),
                   _buildOccupancyCard(),
                   if (isEditing) ...[
@@ -146,7 +148,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     );
   }
 
-  Widget _buildStatusCard() {
+  Widget _buildCorralHeaderCard() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
@@ -320,6 +322,122 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
             icon: Icons.pets_rounded,
             accentColor: const Color(0xFF9C27B0),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveBatchCard() {
+    final batchName = corral['active_batch_name'];
+    final entryDate = corral['active_batch_entry_date'];
+    final avgWeight = corral['last_biometry_avg_weight'];
+    final ocupacion = corral['ocupacion'];
+
+    if (batchName == null && entryDate == null && ocupacion == null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Text(
+          'Este corral no tiene lote asociado actualmente.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6B0338).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.inventory_2_outlined,
+                    color: Color(0xFF6B0338), size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Lote: ${batchName ?? "Sin nombre"}',
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF6B0338)),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (entryDate != null)
+            Row(
+              children: [
+                const Icon(Icons.calendar_today,
+                    size: 18, color: Color(0xFF6B0338)),
+                const SizedBox(width: 8),
+                Text(
+                    'Fecha de ingreso: ${entryDate.toString().substring(0, 10)}',
+                    style: const TextStyle(fontSize: 15)),
+              ],
+            ),
+          if (ocupacion != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.pets_rounded,
+                      size: 18, color: Color(0xFF6B0338)),
+                  const SizedBox(width: 8),
+                  Text('Animales vivos: $ocupacion',
+                      style: const TextStyle(fontSize: 15)),
+                ],
+              ),
+            ),
+          if (avgWeight != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.monitor_weight_outlined,
+                      size: 18, color: Color(0xFF6B0338)),
+                  const SizedBox(width: 8),
+                  Text('Promedio de peso: ${avgWeight.toStringAsFixed(2)} kg',
+                      style: const TextStyle(fontSize: 15)),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -690,5 +808,12 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     if (ratio < 0.7) return Colors.green;
     if (ratio < 0.9) return Colors.orange;
     return Colors.red;
+  }
+
+  String _formatDate(String dateString) {
+    // Suponiendo que la fecha viene en formato ISO 8601
+    final dateTime = DateTime.parse(dateString);
+    // Formatear la fecha como "DD/MM/YYYY"
+    return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}';
   }
 }

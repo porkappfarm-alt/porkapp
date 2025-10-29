@@ -18,7 +18,7 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -34,12 +34,14 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
                 // Barra superior
                 Center(
                   child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 20),
+                    width: 50,
+                    height: 5,
+                    margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFE8F5E9), Color(0xFFFFE5EC)],
+                      ),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                   ),
                 ),
@@ -47,14 +49,22 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2D3250).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF81C784),
+                          width: 1.5,
+                        ),
                       ),
                       child: const Icon(
-                        Icons.calendar_month,
-                        color: Color(0xFF2D3250),
+                        Icons.calendar_month_rounded,
+                        color: Color(0xFF4CAF50),
                         size: 28,
                       ),
                     ),
@@ -66,17 +76,17 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
                           Text(
                             'Nueva Biometría',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF2D3250),
                             ),
                           ),
-                          SizedBox(height: 4),
+                          SizedBox(height: 6),
                           Text(
                             'Selecciona la fecha de medición',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey,
+                              color: Color(0xFF9E9E9E),
                             ),
                           ),
                         ],
@@ -84,16 +94,30 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Fecha de la biometría',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D3250),
-                  ),
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF4CAF50),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'FECHA DE LA BIOMETRÍA',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF9E9E9E),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 InkWell(
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -106,7 +130,7 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
                         return Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: const ColorScheme.light(
-                              primary: Color(0xFF2D3250),
+                              primary: Color(0xFFFF4D6D),
                               onPrimary: Colors.white,
                               onSurface: Color(0xFF2D3250),
                             ),
@@ -123,68 +147,90 @@ class _BiometricDatePickerDialogState extends State<BiometricDatePickerDialog> {
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFFAFAFA),
+                      border: Border.all(
+                        color: const Color(0xFFE0E0E0),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.calendar_today,
-                          color: Color(0xFF2D3250),
-                          size: 20,
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.calendar_today_rounded,
+                            color: Color(0xFF4CAF50),
+                            size: 20,
+                          ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 14),
                         Text(
                           dateFormat.format(_selectedDate),
                           style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF2D3250),
                           ),
                         ),
                         const Spacer(),
-                        Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.grey.shade600,
+                        const Icon(
+                          Icons.arrow_drop_down_rounded,
+                          color: Color(0xFF81C784),
+                          size: 28,
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text(
-                        'Cancelar',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            color: Color(0xFF757575),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(_selectedDate),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2D3250),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(_selectedDate),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF4D6D),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Crear Biometría',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                        child: const Text(
+                          'Crear Biometría',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),

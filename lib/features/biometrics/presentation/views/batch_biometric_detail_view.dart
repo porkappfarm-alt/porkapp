@@ -46,16 +46,25 @@ class _BatchBiometricDetailViewState
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            colors: isPending 
+                ? [const Color(0xFFFFF9E6), Colors.white]
+                : [Colors.white, const Color(0xFFFAFAFA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
           border: isPending
-              ? Border.all(color: Colors.orange.shade300, width: 2)
-              : null,
+              ? Border.all(color: const Color(0xFFFFB74D), width: 3)
+              : Border.all(color: const Color(0xFFE0E0E0), width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: isPending 
+                  ? const Color(0xFFFFB74D).withOpacity(0.2)
+                  : Colors.black.withOpacity(0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+              spreadRadius: 1,
             ),
           ],
         ),
@@ -70,20 +79,20 @@ class _BatchBiometricDetailViewState
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: const Color(0xFFFFF3E0),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.orange.shade200),
+                    border: Border.all(color: const Color(0xFFFFE0B2)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.pending_actions,
-                          size: 16, color: Colors.orange.shade700),
+                      const Icon(Icons.pending_actions,
+                          size: 16, color: Color(0xFFF57C00)),
                       const SizedBox(width: 6),
-                      Text(
+                      const Text(
                         'Pendiente de medición',
                         style: TextStyle(
-                          color: Colors.orange.shade700,
+                          color: Color(0xFFF57C00),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -95,15 +104,27 @@ class _BatchBiometricDetailViewState
                 children: [
                   if (!isPending) ...[
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2D3250).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4CAF50).withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                       child: const Icon(
-                        Icons.scale_outlined,
-                        color: Color(0xFF2D3250),
-                        size: 20,
+                        Icons.monitor_weight_rounded,
+                        color: Colors.white,
+                        size: 28,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -281,20 +302,70 @@ class _BatchBiometricDetailViewState
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar Biometría'),
-        content: const Text(
-          '¿Estás seguro de que deseas eliminar esta biometría? '
-          'Esta acción no se puede deshacer.',
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFEBEE),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.delete_outline,
+                color: Color(0xFFE53935),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Eliminar Biometría',
+              style: TextStyle(
+                color: Color(0xFF2D3250),
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          '¿Estás seguro de que deseas eliminar esta biometría? Esta acción no se puede deshacer.',
+          style: TextStyle(
+            color: Color(0xFF757575),
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF757575),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE53935),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -389,21 +460,42 @@ class _BatchBiometricDetailViewState
     final batchAsync = ref.watch(batchProvider(widget.batchId));
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF2D3250)),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         title: batchAsync.when(
-          data: (batch) => Text(
-            batch.name,
-            style: const TextStyle(
-              color: Color(0xFF2D3250),
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+          data: (batch) => Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE5EC),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.analytics_outlined,
+                  color: Color(0xFFFF4D6D),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                batch.name,
+                style: const TextStyle(
+                  color: Color(0xFF2D3250),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
-          loading: () => const Text('Cargando...'),
-          error: (_, __) => Text('Lote ${widget.batchId}'),
+          loading: () => const Text('Cargando...', style: TextStyle(color: Color(0xFF2D3250))),
+          error: (_, __) => Text('Lote ${widget.batchId}', style: const TextStyle(color: Color(0xFF2D3250))),
         ),
       ),
       body: RefreshIndicator(
@@ -459,27 +551,25 @@ class _BatchBiometricDetailViewState
             ),
           ),
           data: (biometrics) => batchAsync.when(
-            data: (batch) => Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
+            data: (batch) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (biometrics.isNotEmpty) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                      margin: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFFFFE5EC),
+                          width: 2,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
+                            color: const Color(0xFFFF4D6D).withOpacity(0.08),
+                            blurRadius: 20,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -491,20 +581,35 @@ class _BatchBiometricDetailViewState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Última medición',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 4,
+                                      height: 4,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFF4D6D),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'ÚLTIMA MEDICIÓN',
+                                      style: TextStyle(
+                                        color: Color(0xFF9E9E9E),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
                                   _formatDate(biometrics.first.measurementDate),
                                   style: const TextStyle(
                                     color: Color(0xFF2D3250),
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                                    fontSize: 15,
                                   ),
                                 ),
                               ],
@@ -516,14 +621,29 @@ class _BatchBiometricDetailViewState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Promedio actual',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 4,
+                                      height: 4,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF4CAF50),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'PROMEDIO ACTUAL',
+                                      style: TextStyle(
+                                        color: Color(0xFF9E9E9E),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Row(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.baseline,
@@ -534,16 +654,16 @@ class _BatchBiometricDetailViewState
                                           .toStringAsFixed(1),
                                       style: const TextStyle(
                                         color: Color(0xFF2D3250),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 18,
                                       ),
                                     ),
                                     const SizedBox(width: 2),
-                                    Text(
+                                    const Text(
                                       'kg',
                                       style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
+                                        color: Color(0xFF9E9E9E),
+                                        fontSize: 13,
                                       ),
                                     ),
                                   ],
@@ -554,28 +674,40 @@ class _BatchBiometricDetailViewState
                           // Cantidad de animales
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
+                              horizontal: 18,
+                              vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2D3250).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(16),
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF4CAF50).withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                  spreadRadius: 1,
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(
                                   Icons.pets,
-                                  size: 14,
-                                  color: Color(0xFF2D3250),
+                                  size: 20,
+                                  color: Colors.white,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 8),
                                 Text(
                                   '${biometrics.first.animalCount}',
                                   style: const TextStyle(
-                                    color: Color(0xFF2D3250),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
                                   ),
                                 ),
                               ],
@@ -596,13 +728,13 @@ class _BatchBiometricDetailViewState
                                   Container(
                                     padding: const EdgeInsets.all(24),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[100],
+                                      color: const Color(0xFFF5F5F5),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: Icon(
+                                    child: const Icon(
                                       Icons.scale_outlined,
                                       size: 64,
-                                      color: Colors.grey[400],
+                                      color: Color(0xFFBDBDBD),
                                     ),
                                   ),
                                   const SizedBox(height: 24),
@@ -618,10 +750,10 @@ class _BatchBiometricDetailViewState
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
+                                  const Text(
                                     'Este lote aún no tiene biometrías.\nUsa el botón + para agregar la primera.',
                                     style: TextStyle(
-                                      color: Colors.grey[600],
+                                      color: Color(0xFF9E9E9E),
                                       fontSize: 14,
                                     ),
                                     textAlign: TextAlign.center,
@@ -631,10 +763,10 @@ class _BatchBiometricDetailViewState
                             ),
                           )
                         : ListView.separated(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             itemCount: biometrics.length,
                             separatorBuilder: (context, index) =>
-                                const Divider(height: 32),
+                                const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final measurement = biometrics[index];
                               final isPending = measurement.status == 'pending';
@@ -668,16 +800,9 @@ class _BatchBiometricDetailViewState
                   ),
                 ],
               ),
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: const Center(
-                child: Text('Error al cargar información del lote'),
-              ),
+            loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFFF4D6D))),
+            error: (_, __) => const Center(
+              child: Text('Error al cargar información del lote'),
             ),
           ),
         ),
@@ -687,8 +812,8 @@ class _BatchBiometricDetailViewState
         child: FloatingActionButton(
           onPressed: () => _showDatePickerAndNavigate(context),
           backgroundColor: const Color(0xFFFF4D6D),
-          elevation: 4,
-          child: const Icon(Icons.add, color: Colors.white),
+          elevation: 6,
+          child: const Icon(Icons.add, color: Colors.white, size: 24),
         ),
       ),
     );
@@ -735,14 +860,56 @@ class _BatchBiometricDetailViewState
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Biometría Pendiente'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF3E0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.pending_actions,
+                      color: Color(0xFFF57C00),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Biometría Pendiente',
+                      style: TextStyle(
+                        color: Color(0xFF2D3250),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               content: Text(
-                  'Ya existe una biometría pendiente del ${DateFormat('dd/MM/yyyy').format(pendingDate)}.\n\n'
-                  'Debes completarla o eliminarla antes de crear una nueva.'),
+                'Ya existe una biometría pendiente del ${DateFormat('dd/MM/yyyy').format(pendingDate)}.\n\nDebes completarla o eliminarla antes de crear una nueva.',
+                style: const TextStyle(
+                  color: Color(0xFF757575),
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancelar'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF757575),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -752,8 +919,16 @@ class _BatchBiometricDetailViewState
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF4D6D),
                     foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: const Text('Completar Ahora'),
+                  child: const Text(
+                    'Completar Ahora',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),

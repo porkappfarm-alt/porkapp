@@ -74,27 +74,66 @@ class _AnimalDetailViewState extends ConsumerState<AnimalDetailView> {
     debugPrint('AnimalDetailView: Current state: $animalAsync');
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2D3250)),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Detalle del Animal'),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFE5EC),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.pets_outlined,
+                color: Color(0xFFFF4D6D),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Detalle del Animal',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Color(0xFF2D3250),
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Información completa',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF9E9E9E),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
         actions: animalAsync.whenOrNull(
           data: (animal) => [
             IconButton(
-              icon: const Icon(Icons.edit),
+              icon: const Icon(Icons.edit_outlined, color: Color(0xFF4CAF50)),
               onPressed: () => _showEditDialog(context, animal),
             ),
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFFF4D6D)),
               onPressed: () => _confirmDelete(context, animal),
             ),
           ],
         ),
+        centerTitle: true,
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -219,140 +258,187 @@ class _AnimalDetailContent extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.all(16),
       children: [
         // Identificador y Estado
         Hero(
           tag: 'animal-${animal.id}',
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Text(
-                    animal.identifier,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStatusBadge(context),
-                ],
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFFE5EC), Colors.white],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: const Color(0xFFE0E0E0),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        // Información básica
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Información Básica',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                _buildInfoRow(
-                  context: context,
-                  icon: Icons.tag,
-                  label: 'ID',
-                  value: animal.identifier,
-                ),
-                _buildInfoRow(
-                  context: context,
-                  icon: Icons.category,
-                  label: 'Tipo',
-                  value: animal.type,
-                ),
-                _buildInfoRow(
-                  context: context,
-                  icon: Icons.pets,
-                  label: 'Raza',
-                  value: animal.breed,
-                ),
-                _buildInfoRow(
-                  context: context,
-                  icon: Icons.calendar_today,
-                  label: 'Fecha de nacimiento',
-                  value: _formatDate(animal.birthDate),
-                ),
-                if (animal.weight != null)
-                  _buildInfoRow(
-                    context: context,
-                    icon: Icons.monitor_weight,
-                    label: 'Peso inicial',
-                    value: '${animal.weight} kg',
+                Text(
+                  animal.identifier,
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFF4D6D),
+                    letterSpacing: 1.2,
                   ),
+                ),
+                const SizedBox(height: 16),
+                _buildStatusBadge(context),
               ],
             ),
           ),
         ),
         const SizedBox(height: 20),
-        // Historial
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.history,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Historial',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                _buildInfoRow(
-                  context: context,
-                  icon: Icons.login,
-                  label: 'Fecha de ingreso',
-                  value: _formatDate(animal.entryDate),
-                ),
-                _buildInfoRow(
-                  context: context,
-                  icon: Icons.offline_pin,
-                  label: 'Estado',
-                  value: _getStatusText(animal.status),
-                  valueColor: _getStatusColor(animal.status),
-                ),
-              ],
+        // Información básica
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFE0E0E0),
+              width: 1.5,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFF4D6D),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'INFORMACIÓN BÁSICA',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF9E9E9E),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildInfoRow(
+                context: context,
+                icon: Icons.tag,
+                label: 'ID',
+                value: animal.identifier,
+              ),
+              _buildInfoRow(
+                context: context,
+                icon: Icons.category,
+                label: 'Tipo',
+                value: animal.type,
+              ),
+              _buildInfoRow(
+                context: context,
+                icon: Icons.pets,
+                label: 'Raza',
+                value: animal.breed,
+              ),
+              _buildInfoRow(
+                context: context,
+                icon: Icons.calendar_today,
+                label: 'Fecha de nacimiento',
+                value: _formatDate(animal.birthDate),
+              ),
+              if (animal.weight != null)
+                _buildInfoRow(
+                  context: context,
+                  icon: Icons.monitor_weight,
+                  label: 'Peso inicial',
+                  value: '${animal.weight} kg',
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        // Historial
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFE0E0E0),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF4CAF50),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'HISTORIAL',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF9E9E9E),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildInfoRow(
+                context: context,
+                icon: Icons.login,
+                label: 'Fecha de ingreso',
+                value: _formatDate(animal.entryDate),
+              ),
+              _buildInfoRow(
+                context: context,
+                icon: Icons.offline_pin,
+                label: 'Estado',
+                value: _getStatusText(animal.status),
+                valueColor: _getStatusColor(animal.status),
+              ),
+            ],
           ),
         ),
         if (animal.notes != null && animal.notes!.isNotEmpty) ...[
@@ -418,34 +504,49 @@ class _AnimalDetailContent extends StatelessWidget {
     IconData? icon,
     Color? valueColor,
   }) {
-    final theme = Theme.of(context);
-
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 20,
-              color: theme.colorScheme.primary.withOpacity(0.7),
-            ),
-            const SizedBox(width: 12),
-          ],
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFE5EC),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: const Color(0xFFFF4D6D),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            value ?? 'No disponible',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: valueColor,
+            const SizedBox(width: 16),
+          ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                    color: Color(0xFF9E9E9E),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value ?? 'No especificada',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: valueColor ?? const Color(0xFF2D3250),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

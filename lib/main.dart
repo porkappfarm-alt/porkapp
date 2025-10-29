@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:porkapp/router.dart';
 import 'package:porkapp/shared/design/app_theme.dart';
 import 'package:porkapp/supabase/supabase.dart';
@@ -48,6 +49,16 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: router,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es', 'ES'),
+        Locale('en', 'US'),
+      ],
+      locale: const Locale('es', 'ES'),
     );
   }
 }

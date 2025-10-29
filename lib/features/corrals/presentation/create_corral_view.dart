@@ -104,15 +104,39 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.close, color: Color(0xFF2D3250)),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(isEditing ? 'Editar Corral' : 'Nuevo Corral'),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.home_work_outlined,
+                color: Color(0xFF4CAF50),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              isEditing ? 'Editar Corral' : 'Nuevo Corral',
+              style: const TextStyle(
+                color: Color(0xFF2D3250),
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -122,65 +146,102 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _buildField(
-                    controller: _nameController,
-                    label: 'Nombre',
-                    placeholder: 'ej. Corral Sector Norte',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese un nombre';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildField(
-                    controller: _locationController,
-                    label: 'Ubicación',
-                    placeholder: 'ej. Cerca del granero viejo',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildField(
-                    controller: _capacityController,
-                    label: 'Capacidad',
-                    placeholder: 'ej. 50',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese la capacidad';
-                      }
-                      final capacity = int.tryParse(value);
-                      if (capacity == null || capacity <= 0) {
-                        return 'Ingrese un número válido mayor a 0';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildField(
-                    controller: _notesController,
-                    label: 'Notas',
-                    placeholder: 'ej. Necesita reparación de puerta',
-                    maxLines: 4,
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFE0E0E0),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildField(
+                          controller: _nameController,
+                          label: 'Nombre',
+                          placeholder: 'ej. Corral Sector Norte',
+                          icon: Icons.label_outline,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor ingrese un nombre';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildField(
+                          controller: _locationController,
+                          label: 'Ubicación',
+                          placeholder: 'ej. Cerca del granero viejo',
+                          icon: Icons.location_on_outlined,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildField(
+                          controller: _capacityController,
+                          label: 'Capacidad',
+                          placeholder: 'ej. 50',
+                          icon: Icons.groups_outlined,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor ingrese la capacidad';
+                            }
+                            final capacity = int.tryParse(value);
+                            if (capacity == null || capacity <= 0) {
+                              return 'Ingrese un número válido mayor a 0';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildField(
+                          controller: _notesController,
+                          label: 'Notas',
+                          placeholder: 'ej. Necesita reparación de puerta',
+                          icon: Icons.note_outlined,
+                          maxLines: 4,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
               child: SizedBox(
                 width: double.infinity,
-                height: 48,
+                height: 54,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
+                    backgroundColor: const Color(0xFFFF4D6D),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 4,
+                    elevation: 0,
                   ),
                   child: _isLoading
                       ? const SizedBox.square(
@@ -190,10 +251,10 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
                             color: Colors.white,
                           ),
                         )
-                      : Text(
+                      : const Text(
                           'Guardar',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
+                          style: TextStyle(
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -210,60 +271,107 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
     required TextEditingController controller,
     required String label,
     required String placeholder,
+    required IconData icon,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     int? maxLines = 1,
   }) {
-    final theme = Theme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 4,
+              decoration: const BoxDecoration(
+                color: Color(0xFF4CAF50),
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF9E9E9E),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         TextFormField(
           controller: controller,
           validator: validator,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           maxLines: maxLines,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color(0xFF2D3250),
+          ),
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: TextStyle(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: Colors.grey[400],
+              fontSize: 15,
+            ),
+            prefixIcon: Container(
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFF4CAF50),
+                size: 20,
+              ),
             ),
             filled: true,
-            fillColor: theme.colorScheme.surface,
+            fillColor: const Color(0xFFFAFAFA),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.outline),
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: Color(0xFFE0E0E0),
+                width: 1.5,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: theme.colorScheme.outline.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: Color(0xFFE0E0E0),
+                width: 1.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: Color(0xFF4CAF50),
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.error),
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: Color(0xFFE53935),
+                width: 1.5,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: Color(0xFFE53935),
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
             ),
           ),
         ),

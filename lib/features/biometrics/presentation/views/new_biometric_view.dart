@@ -251,11 +251,38 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: const Text('Ingresar Pesos'),
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close, color: Color(0xFF2D3250)),
           onPressed: () => context.pop(),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFE5EC),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.scale_outlined,
+                color: Color(0xFFFF4D6D),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Ingresar Pesos',
+              style: TextStyle(
+                color: Color(0xFF2D3250),
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
       ),
       body: ref.watch(batchProvider(widget.initialBatchId)).when(
@@ -309,17 +336,22 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
               return SafeArea(
                 child: Column(
                   children: [
-                    // Header compacto
+                    // Header mejorado
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFFFFE5EC),
+                          width: 2,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
+                            color: const Color(0xFFFF4D6D).withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -329,37 +361,82 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  batch.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2D3250),
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 4,
+                                      height: 4,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFF4D6D),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      batch.name,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF2D3250),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    Icon(Icons.calendar_today,
-                                        size: 14, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      dateFormat.format(
-                                          _measurementDate ?? DateTime.now()),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF5F5F5),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.calendar_today,
+                                              size: 14, color: Color(0xFF757575)),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            dateFormat.format(
+                                                _measurementDate ?? DateTime.now()),
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFF757575),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
-                                    Icon(Icons.pets,
-                                        size: 14, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${liveAnimals.length} animales',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
+                                    const SizedBox(width: 12),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE8F5E9),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.pets,
+                                              size: 14, color: Color(0xFF4CAF50)),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            '${liveAnimals.length} animales',
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFF4CAF50),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -392,15 +469,22 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                             });
                           }
 
-                          return Card(
+                          return Container(
                             margin: const EdgeInsets.only(bottom: 12),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
-                                color: Colors.grey.shade300,
-                                width: 1,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFFE0E0E0),
+                                width: 1.5,
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -411,12 +495,30 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '#${animal.identifier}',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFE8F5E9),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: const Icon(
+                                                Icons.pets,
+                                                size: 16,
+                                                color: Color(0xFF4CAF50),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              '#${animal.identifier}',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF2D3250),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         if (animal.weight != null)
                                           Text(
@@ -446,15 +548,40 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'Peso',
-                                        suffixText: 'kg',
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey[400],
                                         ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 12,
+                                        suffixText: 'kg',
+                                        suffixStyle: const TextStyle(
+                                          color: Color(0xFF757575),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(0xFFFAFAFA),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFE0E0E0),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFE0E0E0),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFFF4D6D),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
                                         ),
                                       ),
                                       onSubmitted: (value) {
@@ -508,13 +635,14 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                           ? 'Actualizar'
                                           : 'Finalizar'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF2D3250),
+                                        backgroundColor: const Color(0xFFFF4D6D),
                                         foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 16),
-                                        disabledBackgroundColor:
-                                            Colors.grey[300],
+                                        padding: const EdgeInsets.symmetric(vertical: 18),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        elevation: 0,
+                                        disabledBackgroundColor: Colors.grey[300],
                                       ),
                                     ),
                                   ),

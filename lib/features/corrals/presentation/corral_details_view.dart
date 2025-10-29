@@ -26,18 +26,50 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          color: const Color(0xFF5D4037),
+          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2D3250)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Detalle de Corral',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            color: Color(0xFF5D4037),
-          ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.home_work_outlined,
+                color: Color(0xFF4CAF50),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Detalle de Corral',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Color(0xFF2D3250),
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Información y actividad',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF9E9E9E),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -87,9 +119,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
           const SizedBox(width: 8),
         ],
         centerTitle: true,
-        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        elevation: 0,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -119,24 +149,46 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   Widget _buildStatusCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE5E7EB),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE8F5E9), Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFE0E0E0),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Image.asset(
@@ -144,7 +196,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,42 +204,44 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                     Text(
                       'Corral ${corral['nombre'] ?? 'Sin nombre'}',
                       style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5D4037),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2D3250),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(corral['estado']),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _getStatusColor(corral['estado'])
-                                .withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        _getStatusText(corral['estado'] ?? 'Desconocido'),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildStatusChip(
+                          icon: Icons.circle,
+                          label:
+                              _getStatusText(corral['estado'] ?? 'Desconocido'),
+                          backgroundColor:
+                              _getStatusColor(corral['estado']).withOpacity(0.15),
+                          foregroundColor: _getStatusColor(corral['estado']),
                         ),
-                      ),
+                        if ((corral['capacidad'] as int?) != null)
+                          _buildStatusChip(
+                            icon: Icons.groups_outlined,
+                            label:
+                                '${corral['capacidad']} capacidad',
+                            backgroundColor: const Color(0xFFFFE5EC),
+                            foregroundColor: const Color(0xFFFF4D6D),
+                          ),
+                      ],
                     ),
                   ],
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.more_horiz,
+                  color: Color(0xFF9E9E9E),
                 ),
               ),
             ],
@@ -200,45 +254,71 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   Widget _buildDetailsCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFE5E7EB),
+          color: const Color(0xFFE0E0E0),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Información General',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF6B0338),
-            ),
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF4CAF50),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'INFORMACIÓN GENERAL',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF9E9E9E),
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildDetailRow(
             'Identificador',
             corral['nombre'] ?? 'Sin nombre',
             icon: Icons.tag_rounded,
+            accentColor: const Color(0xFFFF4D6D),
           ),
           _buildDetailRow(
             'Capacidad',
             '${corral['capacidad'] ?? 0} animales',
             icon: Icons.group_rounded,
+            accentColor: const Color(0xFF4CAF50),
           ),
           _buildDetailRow(
             'Estado',
             corral['estado'] ?? 'No especificado',
             icon: Icons.info_outline_rounded,
+            accentColor: const Color(0xFF2D9CDB),
           ),
           _buildDetailRow(
             'Ocupación',
             '${corral['ocupacion'] ?? 0} animales',
             icon: Icons.pets_rounded,
+            accentColor: const Color(0xFF9C27B0),
           ),
         ],
       ),
@@ -251,15 +331,26 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     final percentage =
         capacity > 0 ? ((occupancy / capacity) * 100).round() : 0;
 
+    final progress =
+        capacity > 0 ? (occupancy / capacity).clamp(0.0, 1.0) : 0.0;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFE5E7EB),
+          color: const Color(0xFFE0E0E0),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,12 +358,12 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color:
-                      _getOccupancyColor(occupancy, capacity).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                      _getOccupancyColor(occupancy, capacity).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   Icons.area_chart_rounded,
@@ -280,7 +371,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -288,10 +379,11 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                     'Ocupación',
                     style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF6B0338),
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3250),
                     ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     '$percentage% de capacidad utilizada',
                     style: TextStyle(
@@ -303,36 +395,80 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value:
-                  capacity > 0 ? (occupancy / capacity).clamp(0.0, 1.0) : 0.0,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                _getOccupancyColor(occupancy, capacity),
-              ),
-              minHeight: 8,
+          const SizedBox(height: 20),
+          Container(
+            height: 12,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F2F4),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Stack(
+              children: [
+                FractionallySizedBox(
+                  widthFactor: progress,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          _getOccupancyColor(occupancy, capacity),
+                          _getOccupancyColor(occupancy, capacity)
+                              .withOpacity(0.7),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '$occupancy animales',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Animales actuales',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF9E9E9E),
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$occupancy',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3250),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                'Máximo: $capacity',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text(
+                    'Capacidad máxima',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF9E9E9E),
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$capacity',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3250),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -347,6 +483,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     bool isEditable = false,
     ValueChanged<String>? onChanged,
     IconData? icon,
+    Color accentColor = const Color(0xFF4CAF50),
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -354,32 +491,34 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
         children: [
           if (icon != null) ...[
             Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF6B0338).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                color: accentColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF6B0338),
-                size: 20,
+                color: accentColor,
+                size: 22,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
           ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                    color: Color(0xFF9E9E9E),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 if (isEditable)
                   TextFormField(
                     initialValue: value,
@@ -401,11 +540,42 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3250),
                     ),
                   ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip({
+    required IconData icon,
+    required String label,
+    required Color backgroundColor,
+    required Color foregroundColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: foregroundColor),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: foregroundColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ],

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/presentation/edit_corral_view.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 import 'package:porkapp/features/corrals/providers/corral_edit_provider_new.dart';
-import 'package:porkapp/features/batches/presentation/batch_details_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 
 class CorralDetailsView extends ConsumerStatefulWidget {
@@ -36,20 +36,21 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     if (result == true && mounted) {
       // Recargar la lista de corrales
       ref.read(corralsProvider.notifier).loadCorrals();
-
-      // Mostrar mensaje de éxito
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Corral actualizado exitosamente'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-
-        // Cerrar la pantalla de detalles para que el usuario vea la lista actualizada
-        Navigator.pop(context);
+      // Invalidar el provider del corral editado para que otras vistas (como lote) se actualicen
+      final corralId = corral['id']?.toString();
+      if (corralId != null && corralId.isNotEmpty) {
+        ref.invalidate(corralByIdProvider(corralId));
       }
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Corral actualizado exitosamente'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      // Cerrar la pantalla de detalles para que el usuario vea la lista actualizada
+      Navigator.pop(context);
     }
   }
 
@@ -569,27 +570,10 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                       print('[DEBUG] batch encontrado: $batch');
                     }
 
-                    if (batch != null) {
-                      print('[DEBUG] batch type: ${batch.runtimeType}');
-                      
-                      // Si batch NO es un objeto Batch, mostrar error
-                      if (batch is! Batch) {
-                        print('[DEBUG] ERROR: batch debería ser un objeto Batch pero es: ${batch.runtimeType}');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Error: formato de lote incorrecto'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-                      
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BatchDetailsView(batch: batch),
-                        ),
-                      );
+                    if (batch != null && batch is Batch) {
+                      print(
+                          '[DEBUG] Navegando con GoRouter a /batches/${batch.id}');
+                      context.push('/batches/${batch.id}');
                     } else {
                       print('[DEBUG] No se encontró información del lote');
                       ScaffoldMessenger.of(context).showSnackBar(

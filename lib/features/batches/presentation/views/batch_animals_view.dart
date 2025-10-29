@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_provider.dart';
@@ -25,36 +26,9 @@ class BatchAnimalsView extends ConsumerWidget {
         foregroundColor: Colors.white,
         elevation: 2,
       ),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'Detalle de Lote',
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        actions: [
-          IconButton(
-            icon: Container(
-              width: 32,
-              height: 32,
-              decoration: const BoxDecoration(
-                color: Color(0xFF6B0338),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.person_outline_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onPressed: () {},
-          ),
-        ],
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
+      appBar: StandardAppBar(
+        title: 'Animales del Lote',
+        onBackPressed: () => context.pop(),
       ),
       body: batch.when(
         loading: () => const Center(child: CircularProgressIndicator()),

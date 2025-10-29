@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/corrals/domain/corral.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_controller.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
@@ -105,38 +106,8 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Color(0xFF2D3250)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.home_work_outlined,
-                color: Color(0xFF4CAF50),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              isEditing ? 'Editar Corral' : 'Nuevo Corral',
-              style: const TextStyle(
-                color: Color(0xFF2D3250),
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ],
-        ),
+      appBar: const StandardAppBar(
+        title: 'Nuevo Corral',
       ),
       body: Form(
         key: _formKey,
@@ -192,7 +163,9 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
                           placeholder: 'ej. 50',
                           icon: Icons.groups_outlined,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Por favor ingrese la capacidad';

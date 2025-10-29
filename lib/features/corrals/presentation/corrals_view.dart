@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/corrals/presentation/corral_details_view.dart';
 import 'package:porkapp/features/corrals/presentation/create_corral_view.dart';
 import 'package:porkapp/features/corrals/presentation/widgets/change_corral_status_dialog.dart';
@@ -15,36 +16,9 @@ class CorralsView extends ConsumerWidget {
     final corralsState = ref.watch(corralsProvider);
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        title: corralsState.when(
-          data: (corrals) => Text(
-            'Corrales (${corrals.length})',
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Color(0xFF5D4037),
-            ),
-          ),
-          loading: () => const Text(
-            'Cargando...',
-            style: TextStyle(
-              color: Color(0xFF5D4037),
-              fontSize: 18,
-            ),
-          ),
-          error: (error, stack) => const Text(
-            'Error',
-            style: TextStyle(
-              color: Color(0xFF5D4037),
-              fontSize: 18,
-            ),
-          ),
-        ),
-        // Eliminados los botones de filtro y agregar corral
+      appBar: const StandardAppBar(
+        title: 'Corrales',
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: RefreshIndicator(

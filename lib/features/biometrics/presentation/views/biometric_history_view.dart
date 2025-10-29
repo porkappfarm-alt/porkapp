@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import '../widgets/biometric_history_card.dart';
 import '../widgets/biometric_filters.dart';
 import '../widgets/feedback/biometric_feedback.dart';
@@ -22,26 +23,8 @@ class BiometricHistoryView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: const Color(0xFF5D4037),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Historial de Mediciones',
-          style: TextStyle(
-            color: const Color(0xFF5D4037),
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
-        ).withSemantics(
-          label: 'Historial de mediciones biométricas',
-        ),
-        centerTitle: false,
+      appBar: StandardAppBar(
+        title: 'Historial de Biometrías',
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 8),
@@ -65,7 +48,7 @@ class BiometricHistoryView extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    content: const BiometricFilters(),
+                    content: BiometricFilters(),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
@@ -95,7 +78,8 @@ class BiometricHistoryView extends ConsumerWidget {
                 ),
               ),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
             ).withSemantics(
               label: 'Ver evolución',
@@ -206,8 +190,8 @@ class BiometricHistoryView extends ConsumerWidget {
 
           return Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: BiometricFilters(),
               ),
               Expanded(
@@ -233,10 +217,10 @@ class BiometricHistoryView extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const BiometricLoadingState(
+        loading: () => BiometricLoadingState(
           isLoading: true,
           loadingText: 'Cargando historial...',
-          child: SizedBox(),
+          child: const SizedBox(),
         ),
         error: (error, stack) => Center(
           child: BiometricFeedback(
@@ -247,8 +231,8 @@ class BiometricHistoryView extends ConsumerWidget {
               value.whenData((data) {
                 if (data.isNotEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Datos actualizados'),
+                    SnackBar(
+                      content: const Text('Datos actualizados'),
                     ),
                   );
                 }

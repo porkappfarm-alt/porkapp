@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/corrals/presentation/edit_corral_view.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
@@ -25,101 +26,8 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2D3250)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.home_work_outlined,
-                color: Color(0xFF4CAF50),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text(
-                  'Detalle de Corral',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color(0xFF2D3250),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Información y actividad',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF9E9E9E),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            color: const Color(0xFF4CAF50),
-            onPressed: () async {
-              final wasUpdated = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditCorralView(
-                    corral: corral,
-                  ),
-                ),
-              );
-              if (wasUpdated == true && mounted) {
-                // Recargar la lista de corrales
-                ref.read(corralsProvider.notifier).loadCorrals();
-                // Mostrar mensaje de éxito
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Cambios guardados correctamente'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                // Cerrar la vista de detalles
-                Navigator.pop(context);
-              }
-            },
-          ),
-          IconButton(
-            icon: Container(
-              width: 32,
-              height: 32,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF07281),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.person_outline_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
-        centerTitle: true,
-        surfaceTintColor: Colors.transparent,
+      appBar: const StandardAppBar(
+        title: 'Detalle de Corral',
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -205,7 +113,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Corral ${corral['nombre'] ?? 'Sin nombre'}',
+                      corral['nombre'] ?? 'Sin nombre',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -215,35 +123,53 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildStatusChip(
-                          icon: Icons.circle,
-                          label:
-                              _getStatusText(corral['estado'] ?? 'Desconocido'),
-                          backgroundColor: _getStatusColor(corral['estado'])
-                              .withOpacity(0.15),
-                          foregroundColor: _getStatusColor(corral['estado']),
-                        ),
-                        if ((corral['capacidad'] as int?) != null)
-                          _buildStatusChip(
-                            icon: Icons.groups_outlined,
-                            label: '${corral['capacidad']} capacidad',
-                            backgroundColor: const Color(0xFFFFE5EC),
-                            foregroundColor: const Color(0xFFFF4D6D),
-                          ),
-                      ],
+                    _buildStatusChip(
+                      icon: Icons.circle,
+                      label:
+                          _getStatusText(corral['estado'] ?? 'Desconocido'),
+                      backgroundColor: _getStatusColor(corral['estado'])
+                          .withOpacity(0.15),
+                      foregroundColor: _getStatusColor(corral['estado']),
                     ),
                   ],
                 ),
               ),
               IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.more_horiz,
-                  color: Color(0xFF9E9E9E),
+                onPressed: () async {
+                  final wasUpdated = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditCorralView(
+                        corral: corral,
+                      ),
+                    ),
+                  );
+                  if (wasUpdated == true && mounted) {
+                    // Recargar la lista de corrales
+                    ref.read(corralsProvider.notifier).loadCorrals();
+                    // Mostrar mensaje de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Cambios guardados correctamente'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    // Cerrar la vista de detalles
+                    Navigator.pop(context);
+                  }
+                },
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.edit_outlined,
+                    color: Color(0xFF4CAF50),
+                    size: 20,
+                  ),
                 ),
               ),
             ],
@@ -299,25 +225,13 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
           ),
           const SizedBox(height: 20),
           _buildDetailRow(
-            'Identificador',
-            corral['nombre'] ?? 'Sin nombre',
-            icon: Icons.tag_rounded,
-            accentColor: const Color(0xFFFF4D6D),
-          ),
-          _buildDetailRow(
             'Capacidad',
             '${corral['capacidad'] ?? 0} animales',
             icon: Icons.group_rounded,
             accentColor: const Color(0xFF4CAF50),
           ),
           _buildDetailRow(
-            'Estado',
-            corral['estado'] ?? 'No especificado',
-            icon: Icons.info_outline_rounded,
-            accentColor: const Color(0xFF2D9CDB),
-          ),
-          _buildDetailRow(
-            'Ocupación',
+            'Ocupación actual',
             '${corral['ocupacion'] ?? 0} animales',
             icon: Icons.pets_rounded,
             accentColor: const Color(0xFF9C27B0),
@@ -411,19 +325,6 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                     'Fecha de ingreso: ${entryDate.toString().substring(0, 10)}',
                     style: const TextStyle(fontSize: 15)),
               ],
-            ),
-          if (ocupacion != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.pets_rounded,
-                      size: 18, color: Color(0xFF6B0338)),
-                  const SizedBox(width: 8),
-                  Text('Animales vivos: $ocupacion',
-                      style: const TextStyle(fontSize: 15)),
-                ],
-              ),
             ),
           if (avgWeight != null)
             Padding(

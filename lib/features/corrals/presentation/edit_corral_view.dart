@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/corrals/providers/corral_edit_provider_new.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
@@ -107,52 +108,8 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2D3250)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.home_work_outlined,
-                color: Color(0xFF4CAF50),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text(
-                  'Editar Corral',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color(0xFF2D3250),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Actualiza la información del espacio',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF9E9E9E),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+      appBar: StandardAppBar(
+        title: 'Editar Corral',
         actions: [
           if (_hasChanges && !editState.isLoading)
             IconButton(
@@ -161,7 +118,6 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
               tooltip: 'Guardar cambios',
             ),
         ],
-        centerTitle: true,
       ),
       body: Form(
         key: _formKey,

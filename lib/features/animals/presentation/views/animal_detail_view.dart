@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/animals/providers/animal_detail_provider.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_form_dialog.dart';
@@ -75,52 +76,9 @@ class _AnimalDetailViewState extends ConsumerState<AnimalDetailView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2D3250)),
-          onPressed: () => context.pop(),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFE5EC),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.pets_outlined,
-                color: Color(0xFFFF4D6D),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text(
-                  'Detalle del Animal',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color(0xFF2D3250),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Información completa',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF9E9E9E),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+      appBar: StandardAppBar(
+        title: 'Detalle del Animal',
+        onBackPressed: () => context.pop(),
         actions: animalAsync.whenOrNull(
           data: (animal) => [
             IconButton(
@@ -133,7 +91,6 @@ class _AnimalDetailViewState extends ConsumerState<AnimalDetailView> {
             ),
           ],
         ),
-        centerTitle: true,
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),

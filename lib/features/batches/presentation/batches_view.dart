@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/batches/presentation/widgets/batch_card.dart';
@@ -15,19 +16,9 @@ class BatchesView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        title: const Text(
-          'Gestión de Lotes',
-          style: TextStyle(
-            color: Color(0xFF5D4037),
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
+      appBar: const StandardAppBar(
+        title: 'Gestión de Lotes',
+        automaticallyImplyLeading: false,
       ),
       body: RefreshIndicator(
         onRefresh: () async {

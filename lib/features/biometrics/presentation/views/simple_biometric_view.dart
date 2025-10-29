@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 
 class SimpleBiometricView extends ConsumerStatefulWidget {
@@ -37,29 +38,15 @@ class _SimpleBiometricViewState extends ConsumerState<SimpleBiometricView> {
 
     return Scaffold(
       backgroundColor: _softPink,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: _darkText,
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              context.pop();
-            } else {
-              context.go('/dashboard');
-            }
-          },
-        ),
-        title: Text(
-          'Biometrías',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _darkText,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        centerTitle: true,
+      appBar: StandardAppBar(
+        title: 'Biometrías',
+        onBackPressed: () {
+          if (Navigator.of(context).canPop()) {
+            context.pop();
+          } else {
+            context.go('/dashboard');
+          }
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

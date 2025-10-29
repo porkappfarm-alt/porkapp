@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
+import 'package:porkapp/features/batches/providers/batches_provider.dart';
+import 'package:porkapp/features/batches/presentation/widgets/batch_form_dialog.dart';
+import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/presentation/widgets/batch_list_item.dart';
-import 'package:porkapp/features/batches/providers/batch_providers.dart';
 
 class BatchesView extends ConsumerWidget {
   const BatchesView({super.key});
@@ -13,10 +16,9 @@ class BatchesView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lotes'),
-        centerTitle: true,
-        backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: const StandardAppBar(
+        title: 'Gestión de Lotes',
+        automaticallyImplyLeading: false,
       ),
       body: ref
           .watch(batchListProvider)
@@ -101,10 +103,14 @@ class BatchesView extends ConsumerWidget {
               ),
             ),
           ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateBatchDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Nuevo Lote'),
+        backgroundColor: const Color(0xFFFF4D6D),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 28,
+        ),
       ),
     );
   }

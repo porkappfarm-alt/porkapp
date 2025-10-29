@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import '../../providers/batch_biometrics_provider.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -461,42 +462,8 @@ class _BatchBiometricDetailViewState
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF2D3250)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: batchAsync.when(
-          data: (batch) => Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE5EC),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.analytics_outlined,
-                  color: Color(0xFFFF4D6D),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                batch.name,
-                style: const TextStyle(
-                  color: Color(0xFF2D3250),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
-          loading: () => const Text('Cargando...', style: TextStyle(color: Color(0xFF2D3250))),
-          error: (_, __) => Text('Lote ${widget.batchId}', style: const TextStyle(color: Color(0xFF2D3250))),
-        ),
+      appBar: const StandardAppBar(
+        title: 'Detalle Biometría',
       ),
       body: RefreshIndicator(
         onRefresh: () async {

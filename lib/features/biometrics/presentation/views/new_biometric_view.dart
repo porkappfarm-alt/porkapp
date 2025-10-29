@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -252,38 +253,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Color(0xFF2D3250)),
-          onPressed: () => context.pop(),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFE5EC),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.scale_outlined,
-                color: Color(0xFFFF4D6D),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'Ingresar Pesos',
-              style: TextStyle(
-                color: Color(0xFF2D3250),
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ],
-        ),
+      appBar: const StandardAppBar(
+        title: 'Nueva Biometría',
       ),
       body: ref.watch(batchProvider(widget.initialBatchId)).when(
             loading: () => const Center(child: CircularProgressIndicator()),

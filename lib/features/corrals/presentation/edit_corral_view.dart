@@ -255,7 +255,8 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
-                onPressed: _hasChanges && !editState.isLoading ? _saveChanges : null,
+                onPressed:
+                    _hasChanges && !editState.isLoading ? _saveChanges : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF4D6D),
                   foregroundColor: Colors.white,
@@ -309,35 +310,6 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: editState.isLoading ? null : _confirmDelete,
-              icon: editState.isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Color(0xFFFF4D6D),
-                      ),
-                    )
-                  : const Icon(Icons.delete_forever_rounded, color: Color(0xFFFF4D6D)),
-              label: Text(
-                editState.isLoading ? 'Eliminando...' : 'Eliminar corral',
-              ),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
-                foregroundColor: const Color(0xFFFF4D6D),
-                backgroundColor: const Color(0xFFFFF1F4),
-                side: const BorderSide(color: Color(0xFFFF4D6D)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                textStyle: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -369,9 +341,7 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
             ),
             const SizedBox(width: 8),
             Text(
-              isRequired
-                  ? '${label.toUpperCase()} *'
-                  : label.toUpperCase(),
+              isRequired ? '${label.toUpperCase()} *' : label.toUpperCase(),
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -491,38 +461,6 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
           ),
         );
       }
-    }
-  }
-
-  Future<void> _confirmDelete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar eliminación'),
-        content: Text(
-            '¿Está seguro que desea eliminar el corral "${widget.corral['nombre'] ?? 'Sin nombre'}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      // Ejecutar la eliminación
-      // El listener se encargará de cerrar la vista cuando termine
-      await ref
-          .read(corralEditProvider.notifier)
-          .deleteCorral(widget.corral['id']);
     }
   }
 }

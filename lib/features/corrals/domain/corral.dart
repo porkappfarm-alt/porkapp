@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:porkapp/features/batches/domain/batch.dart';
+
 part 'corral.freezed.dart';
 part 'corral.g.dart';
 
@@ -31,6 +33,8 @@ class Corral with _$Corral {
     @JsonKey(name: 'active_batch_name') String? activeBatchName,
     @JsonKey(name: 'active_batch_entry_date') DateTime? activeBatchEntryDate,
     @JsonKey(name: 'last_biometry_avg_weight') double? lastBiometryAvgWeight,
+    @JsonKey(name: 'batches') List<Batch>? batches,
+    @JsonKey(name: 'active_batch_id') String? activeBatchId,
   }) = _Corral;
 
   factory Corral.fromJson(Map<String, dynamic> json) => _$CorralFromJson(json);

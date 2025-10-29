@@ -48,7 +48,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
               ),
               const SizedBox(height: 24),
               DropdownButtonFormField<String>(
-                initialValue: _eventType,
+                value: _eventType,
                 decoration: const InputDecoration(labelText: 'Tipo de Evento'),
                 items: const [
                   DropdownMenuItem(value: 'weighing', child: Text('Pesaje')),

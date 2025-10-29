@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/presentation/edit_corral_view.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
+import 'package:porkapp/features/corrals/providers/corral_edit_provider_new.dart';
+import 'package:porkapp/features/batches/presentation/batch_details_view.dart';
+import 'package:porkapp/features/batches/domain/batch.dart';
 
 class CorralDetailsView extends ConsumerStatefulWidget {
   final Map<String, dynamic> corral;
@@ -21,105 +24,227 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   Map<String, dynamic> get corral => widget.corral;
   bool get isEditing => widget.isEditing;
 
+  Future<void> _editCorral() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCorralView(corral: corral),
+      ),
+    );
+
+    // Si la edición fue exitosa, refrescar la lista de corrales y cerrar los detalles
+    if (result == true && mounted) {
+      // Recargar la lista de corrales
+      ref.read(corralsProvider.notifier).loadCorrals();
+
+      // Mostrar mensaje de éxito
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Corral actualizado exitosamente'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Cerrar la pantalla de detalles para que el usuario vea la lista actualizada
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  Future<void> _deleteCorral() async {
+    if (!mounted) return;
+
+    final nombreCorral = corral['nombre'] ?? 'Sin nombre';
+
+    // Mostrar diálogo de confirmación
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: Text(
+          '¿Está seguro que desea eliminar el corral "$nombreCorral"?\n\nEsta acción no se puede deshacer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    // Mostrar indicador de carga
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: 16),
+            Text('Eliminando corral...'),
+          ],
+        ),
+        duration: Duration(minutes: 1),
+      ),
+    );
+
+    try {
+      // Ejecutar la eliminación
+      await ref
+          .read(corralEditProvider.notifier)
+          .deleteCorral(corral['id'].toString());
+
+      if (!mounted) return;
+
+      // Recargar la lista de corrales
+      ref.read(corralsProvider.notifier).loadCorrals();
+
+      // Limpiar indicadores y mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Corral "$nombreCorral" eliminado exitosamente'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Cerrar la pantalla de detalles
+      Navigator.pop(context);
+    } catch (error) {
+      if (!mounted) return;
+
+      // Limpiar el indicador de carga
+      ScaffoldMessenger.of(context).clearSnackBars();
+
+      // Detectar si el error es por lotes asociados
+      final errorMessage = error.toString().toLowerCase();
+      final hasRelatedBatches = errorMessage.contains('batch') ||
+          errorMessage.contains('lote') ||
+          errorMessage.contains('foreign key') ||
+          errorMessage.contains('constraint') ||
+          errorMessage.contains('referenced');
+
+      if (hasRelatedBatches) {
+        // Error específico por lotes asociados
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'No se puede eliminar el corral',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Este corral tiene o ha tenido lotes asociados. No es posible eliminarlo para mantener el historial de datos.',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFFD32F2F),
+            duration: const Duration(seconds: 5),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      } else {
+        // Error genérico
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Error al eliminar',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFFD32F2F),
+            duration: const Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2D3250)),
+          icon: const Icon(Icons.arrow_back_rounded),
+          color: const Color(0xFF5D4037),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.home_work_outlined,
-                color: Color(0xFF4CAF50),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text(
-                  'Detalle de Corral',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color(0xFF2D3250),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Información y actividad',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF9E9E9E),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        title: const Text(
+          'Detalle de Corral',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: Color(0xFF5D4037),
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            color: const Color(0xFF4CAF50),
-            onPressed: () async {
-              final wasUpdated = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditCorralView(
-                    corral: corral,
-                  ),
-                ),
-              );
-              if (wasUpdated == true && mounted) {
-                // Recargar la lista de corrales
-                ref.read(corralsProvider.notifier).loadCorrals();
-                // Mostrar mensaje de éxito
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Cambios guardados correctamente'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                // Cerrar la vista de detalles
-                Navigator.pop(context);
-              }
-            },
-          ),
-          IconButton(
-            icon: Container(
-              width: 32,
-              height: 32,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF07281),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.person_outline_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
         centerTitle: true,
+        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -130,11 +255,9 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                 delegate: SliverChildListDelegate([
                   _buildCorralHeaderCard(),
                   const SizedBox(height: 16),
-                  _buildDetailsCard(),
-                  const SizedBox(height: 16),
                   _buildActiveBatchCard(),
-                  const SizedBox(height: 16),
-                  _buildOccupancyCard(),
+                  // const SizedBox(height: 16),
+                  // _buildOccupancyCard(),
                   if (isEditing) ...[
                     const SizedBox(height: 24),
                     _buildEditButtons(context),
@@ -149,6 +272,13 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   }
 
   Widget _buildCorralHeaderCard() {
+    final nombre = corral['nombre'] ?? 'Sin nombre';
+    final estado = corral['estado'] ?? 'Desconocido';
+    final capacidad = corral['capacidad'] ?? 0;
+    final ocupacion = corral['ocupacion'] ?? 0;
+    final percentage =
+        capacidad > 0 ? ((ocupacion / capacidad) * 100).round() : 0;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
@@ -165,7 +295,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withAlpha(10),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -175,7 +305,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 56,
@@ -187,7 +317,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                       Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withAlpha(13),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -201,126 +331,87 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Corral ${corral['nombre'] ?? 'Sin nombre'}',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF2D3250),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildStatusChip(
-                          icon: Icons.circle,
-                          label:
-                              _getStatusText(corral['estado'] ?? 'Desconocido'),
-                          backgroundColor: _getStatusColor(corral['estado'])
-                              .withOpacity(0.15),
-                          foregroundColor: _getStatusColor(corral['estado']),
-                        ),
-                        if ((corral['capacidad'] as int?) != null)
-                          _buildStatusChip(
-                            icon: Icons.groups_outlined,
-                            label: '${corral['capacidad']} capacidad',
-                            backgroundColor: const Color(0xFFFFE5EC),
-                            foregroundColor: const Color(0xFFFF4D6D),
-                          ),
-                      ],
-                    ),
-                  ],
+                child: Text(
+                  '$nombre',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2D3250),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.more_horiz,
-                  color: Color(0xFF9E9E9E),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: 'Editar corral',
+                    icon: const Icon(Icons.edit, color: Color(0xFF6B0338)),
+                    onPressed: _editCorral,
+                  ),
+                  if (_canDeleteCorral())
+                    IconButton(
+                      tooltip: 'Eliminar corral',
+                      icon: const Icon(Icons.delete_outline,
+                          color: Color(0xFFB71C1C)),
+                      onPressed: _deleteCorral,
+                    ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailsCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFE0E0E0),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          const SizedBox(height: 12),
           Row(
             children: [
-              Container(
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF4CAF50),
-                  shape: BoxShape.circle,
+              Flexible(
+                child: _buildStatusChip(
+                  icon: Icons.circle,
+                  label: _getStatusText(estado),
+                  backgroundColor: _getStatusColor(estado).withAlpha(38),
+                  foregroundColor: _getStatusColor(estado),
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
-                'INFORMACIÓN GENERAL',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF9E9E9E),
-                  letterSpacing: 0.5,
+              Flexible(
+                child: _buildStatusChip(
+                  icon: Icons.groups_outlined,
+                  label: '$capacidad capacidad',
+                  backgroundColor: const Color(0xFFFFE5EC),
+                  foregroundColor: const Color(0xFFFF4D6D),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _buildDetailRow(
-            'Identificador',
-            corral['nombre'] ?? 'Sin nombre',
-            icon: Icons.tag_rounded,
-            accentColor: const Color(0xFFFF4D6D),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(Icons.pets_rounded,
+                  size: 18, color: Color(0xFF6B0338)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Ocupación: $ocupacion / $capacidad animales',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-          _buildDetailRow(
-            'Capacidad',
-            '${corral['capacidad'] ?? 0} animales',
-            icon: Icons.group_rounded,
-            accentColor: const Color(0xFF4CAF50),
-          ),
-          _buildDetailRow(
-            'Estado',
-            corral['estado'] ?? 'No especificado',
-            icon: Icons.info_outline_rounded,
-            accentColor: const Color(0xFF2D9CDB),
-          ),
-          _buildDetailRow(
-            'Ocupación',
-            '${corral['ocupacion'] ?? 0} animales',
-            icon: Icons.pets_rounded,
-            accentColor: const Color(0xFF9C27B0),
+          const SizedBox(height: 12),
+          Text('$percentage% de capacidad utilizada',
+              style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value:
+                  capacidad > 0 ? (ocupacion / capacidad).clamp(0.0, 1.0) : 0.0,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
+              minHeight: 8,
+            ),
           ),
         ],
       ),
@@ -333,14 +424,19 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     final avgWeight = corral['last_biometry_avg_weight'];
     final ocupacion = corral['ocupacion'];
 
-    if (batchName == null && entryDate == null && ocupacion == null) {
+    // Si no hay lote asociado, mostrar mensaje informativo
+    // Verificamos si batchName es null o si es una cadena vacía
+    final hasActiveBatch =
+        batchName != null && batchName.toString().trim().isNotEmpty;
+
+    if (!hasActiveBatch) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          color: const Color(0xFFFFF8E1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFFFD54F), width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -349,9 +445,41 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
             ),
           ],
         ),
-        child: const Text(
-          'Este corral no tiene lote asociado actualmente.',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD54F).withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.inventory_2_outlined,
+                size: 40,
+                color: Color(0xFFF57C00),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Sin lote asociado',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFF57C00),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Este corral no tiene ningún lote asignado actualmente.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF6D4C41),
+                height: 1.4,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -365,7 +493,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -380,7 +508,7 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6B0338).withOpacity(0.1),
+                  color: const Color(0xFF6B0338).withAlpha(25),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.inventory_2_outlined,
@@ -398,6 +526,81 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (batchName != null && batchName.toString().trim().isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.open_in_new_rounded,
+                      color: Color(0xFF6B0338)),
+                  tooltip: 'Ver detalle de lote',
+                  onPressed: () {
+                    final batches = corral['batches'];
+                    final batchId = corral['active_batch_id'] ??
+                        corral['batch_id'] ??
+                        corral['id_lote'];
+                    print('[DEBUG] batchId: $batchId');
+                    print('[DEBUG] batches: $batches');
+                    print('[DEBUG] batches type: ${batches.runtimeType}');
+
+                    dynamic batch;
+                    if (batches != null && batches is List && batchId != null) {
+                      // Verificar si batches es una lista de objetos Batch o de Maps
+                      if (batches.isNotEmpty) {
+                        final firstElement = batches.first;
+                        print(
+                            '[DEBUG] First batch type: ${firstElement.runtimeType}');
+
+                        try {
+                          batch = batches.firstWhere(
+                            (b) {
+                              // Si b es un objeto Batch, usar b.id
+                              if (b is Batch) {
+                                return b.id == batchId;
+                              }
+                              // Si b es un Map, usar b['id']
+                              return b['id'] == batchId ||
+                                  b['id_lote'] == batchId;
+                            },
+                          );
+                        } catch (e) {
+                          print(
+                              '[DEBUG] No se encontró el batch con id: $batchId');
+                          batch = null;
+                        }
+                      }
+                      print('[DEBUG] batch encontrado: $batch');
+                    }
+
+                    if (batch != null) {
+                      print('[DEBUG] batch type: ${batch.runtimeType}');
+                      
+                      // Si batch NO es un objeto Batch, mostrar error
+                      if (batch is! Batch) {
+                        print('[DEBUG] ERROR: batch debería ser un objeto Batch pero es: ${batch.runtimeType}');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error: formato de lote incorrecto'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+                      
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BatchDetailsView(batch: batch),
+                        ),
+                      );
+                    } else {
+                      print('[DEBUG] No se encontró información del lote');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No se encontró información del lote.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -438,234 +641,6 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                 ],
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOccupancyCard() {
-    final occupancy = corral['ocupacion'] as int? ?? 0;
-    final capacity = corral['capacidad'] as int? ?? 0;
-    final percentage =
-        capacity > 0 ? ((occupancy / capacity) * 100).round() : 0;
-
-    final progress =
-        capacity > 0 ? (occupancy / capacity).clamp(0.0, 1.0) : 0.0;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFE0E0E0),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color:
-                      _getOccupancyColor(occupancy, capacity).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.area_chart_rounded,
-                  color: _getOccupancyColor(occupancy, capacity),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Ocupación',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3250),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$percentage% de capacidad utilizada',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Container(
-            height: 12,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F2F4),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Stack(
-              children: [
-                FractionallySizedBox(
-                  widthFactor: progress,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          _getOccupancyColor(occupancy, capacity),
-                          _getOccupancyColor(occupancy, capacity)
-                              .withOpacity(0.7),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Animales actuales',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF9E9E9E),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$occupancy',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3250),
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    'Capacidad máxima',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF9E9E9E),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$capacity',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3250),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(
-    String label,
-    String value, {
-    bool isEditable = false,
-    ValueChanged<String>? onChanged,
-    IconData? icon,
-    Color accentColor = const Color(0xFF4CAF50),
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        children: [
-          if (icon != null) ...[
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: accentColor,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 16),
-          ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.4,
-                    color: Color(0xFF9E9E9E),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                if (isEditable)
-                  TextFormField(
-                    initialValue: value,
-                    onChanged: onChanged,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                      border: OutlineInputBorder(),
-                    ),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  )
-                else
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3250),
-                    ),
-                  ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -802,18 +777,30 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     return status[0].toUpperCase() + status.substring(1).toLowerCase();
   }
 
-  Color _getOccupancyColor(int occupancy, int capacity) {
-    if (capacity <= 0) return Colors.grey;
-    final ratio = occupancy / capacity;
-    if (ratio < 0.7) return Colors.green;
-    if (ratio < 0.9) return Colors.orange;
-    return Colors.red;
-  }
+  bool _canDeleteCorral() {
+    // Verificar si el corral ha tenido algún lote asociado (activo, inactivo o cerrado)
+    // Un corral solo se puede eliminar si NUNCA ha tenido lotes
 
-  String _formatDate(String dateString) {
-    // Suponiendo que la fecha viene en formato ISO 8601
-    final dateTime = DateTime.parse(dateString);
-    // Formatear la fecha como "DD/MM/YYYY"
-    return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}';
+    // Verificar si hay información de lote activo
+    final activeBatchName = corral['active_batch_name'];
+    if (activeBatchName != null &&
+        activeBatchName.toString().trim().isNotEmpty) {
+      return false; // Tiene lote activo
+    }
+
+    // Verificar si hay un array de batches (histórico)
+    final batches = corral['batches'];
+    if (batches != null && batches is List && batches.isNotEmpty) {
+      return false; // Ha tenido lotes en algún momento
+    }
+
+    // Verificar el campo batch directamente
+    final batch = corral['batch'];
+    if (batch != null) {
+      return false; // Tiene referencia a un lote
+    }
+
+    // Si llegamos aquí, el corral nunca ha tenido lotes asociados
+    return true;
   }
 }

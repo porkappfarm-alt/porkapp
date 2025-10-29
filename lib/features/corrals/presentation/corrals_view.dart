@@ -201,6 +201,9 @@ class CorralsView extends ConsumerWidget {
                                 // Promedio de peso de última biometría
                                 'last_biometry_avg_weight':
                                     corral.lastBiometryAvgWeight ?? 0.0,
+                                // NUEVO: array de lotes y id del lote activo
+                                'batches': corral.batches,
+                                'active_batch_id': corral.activeBatchId,
                               };
 
                               await Navigator.push(

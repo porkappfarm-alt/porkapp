@@ -101,7 +101,7 @@ class _AnimalFiltersState extends ConsumerState<AnimalFilters> {
               // Filtro por estado
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: _selectedStatus,
+                  value: _selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'Estado',
                     border: OutlineInputBorder(),

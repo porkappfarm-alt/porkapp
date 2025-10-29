@@ -54,3 +54,9 @@ final corralsProvider =
     StateNotifierProvider<CorralsNotifier, AsyncValue<List<Corral>>>((ref) {
   return CorralsNotifier(ref.read(corralsRepositoryProvider));
 });
+
+/// Provider que obtiene solo los corrales disponibles (sin lotes activos)
+final availableCorralsProvider = FutureProvider<List<Corral>>((ref) async {
+  final repository = ref.watch(corralsRepositoryProvider);
+  return await repository.getAvailableCorrals();
+});

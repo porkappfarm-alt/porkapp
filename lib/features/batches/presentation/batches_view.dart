@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/batches/presentation/widgets/batch_card.dart';
-import 'package:porkapp/features/batches/presentation/widgets/batch_form_dialog.dart';
+import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 
 class BatchesView extends ConsumerWidget {
   const BatchesView({super.key});
@@ -88,7 +88,8 @@ class BatchesView extends ConsumerWidget {
                             ],
                           ),
                           child: ElevatedButton.icon(
-                            onPressed: () => _showCreateBatchDialog(context),
+                            onPressed: () =>
+                                _showCreateBatchDialog(context, ref),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -173,16 +174,12 @@ class BatchesView extends ConsumerWidget {
                             final batch = batches[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
-                              child: Hero(
-                                tag: 'batch-${batch.id}',
-                                child: BatchCard(
-                                  batch: batch,
-                                  onTap: () =>
-                                      context.push('/batches/${batch.id}'),
-                                  onEdit: () => _onBatchEdit(context, batch),
-                                  onDelete: () =>
-                                      _onBatchDelete(context, batch),
-                                ),
+                              child: BatchCard(
+                                batch: batch,
+                                onTap: () =>
+                                    context.push('/batches/${batch.id}'),
+                                onEdit: () => _onBatchEdit(context, batch),
+                                onDelete: () => _onBatchDelete(context, batch),
                               ),
                             );
                           },
@@ -288,7 +285,8 @@ class BatchesView extends ConsumerWidget {
             ],
           ),
           child: FloatingActionButton.extended(
-            onPressed: () => _showCreateBatchDialog(context),
+            heroTag: 'batches_fab',
+            onPressed: () => _showCreateBatchDialog(context, ref),
             backgroundColor: Colors.transparent,
             elevation: 0,
             icon: const Icon(Icons.add, color: Colors.white),
@@ -340,10 +338,16 @@ class BatchesView extends ConsumerWidget {
     );
   }
 
-  void _showCreateBatchDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const BatchFormDialog(),
+  void _showCreateBatchDialog(BuildContext context, WidgetRef ref) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => const CreateBatchView(),
+      ),
     );
+
+    // Si se creó el lote exitosamente, actualizar la lista
+    if (result == true && context.mounted) {
+      ref.invalidate(batchListProvider);
+    }
   }
 }

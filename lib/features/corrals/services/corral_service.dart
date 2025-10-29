@@ -54,4 +54,23 @@ class CorralService {
       rethrow;
     }
   }
+
+  Future<void> deleteCorral(String id) async {
+    try {
+      // Validar que el corral no tenga lotes activos antes de eliminar
+      final corral = await _repository.getCorral(id);
+
+      if (corral.activeBatchCount > 0) {
+        throw Exception(
+            'No se puede eliminar un corral que tiene lotes activos. '
+            'Por favor, mueva o finalice los lotes antes de eliminar.');
+      }
+
+      // Eliminar el corral
+      await _repository.deleteCorral(id);
+    } catch (e) {
+      print('Error en CorralService.deleteCorral: $e');
+      rethrow;
+    }
+  }
 }

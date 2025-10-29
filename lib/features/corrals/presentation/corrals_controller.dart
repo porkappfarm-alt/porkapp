@@ -11,24 +11,28 @@ class CorralsController extends StateNotifier<AsyncValue<List<Corral>>> {
 
   Future<void> loadCorrals() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => 
-      ref.read(corralsRepositoryProvider).getCorrals()
-    );
+    state = await AsyncValue.guard(
+        () => ref.read(corralsRepositoryProvider).getCorrals());
   }
 
-  Future<void> createCorral({
+  Future<Corral> createCorral({
     required String name,
     String? location,
     int? capacity,
     String? notes,
   }) async {
-    await ref.read(corralsRepositoryProvider).createCorral(
-      name: name,
-      location: location,
-      capacity: capacity,
-      notes: notes,
-    );
-    loadCorrals();
+    // Esperar a que se complete la creación en Supabase
+    final newCorral = await ref.read(corralsRepositoryProvider).createCorral(
+          name: name,
+          location: location,
+          capacity: capacity,
+          notes: notes,
+        );
+
+    // Recargar los corrales en el controlador
+    await loadCorrals();
+
+    return newCorral;
   }
 
   Future<void> updateCorral({
@@ -39,12 +43,12 @@ class CorralsController extends StateNotifier<AsyncValue<List<Corral>>> {
     String? notes,
   }) async {
     await ref.read(corralsRepositoryProvider).updateCorral(
-      id: id,
-      name: name,
-      location: location,
-      capacity: capacity,
-      notes: notes,
-    );
+          id: id,
+          name: name,
+          location: location,
+          capacity: capacity,
+          notes: notes,
+        );
     loadCorrals();
   }
 
@@ -54,6 +58,7 @@ class CorralsController extends StateNotifier<AsyncValue<List<Corral>>> {
   }
 }
 
-final corralsControllerProvider = StateNotifierProvider<CorralsController, AsyncValue<List<Corral>>>((ref) {
+final corralsControllerProvider =
+    StateNotifierProvider<CorralsController, AsyncValue<List<Corral>>>((ref) {
   return CorralsController(ref);
 });

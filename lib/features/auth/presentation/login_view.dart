@@ -37,8 +37,8 @@ class _LoginViewState extends ConsumerState<LoginView>
 
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-        );
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
 
     _animationController.forward();
   }
@@ -132,7 +132,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFFF07281).withOpacity(0.3),
+                                      color: const Color(0xFFF07281)
+                                          .withOpacity(0.3),
                                       blurRadius: 20,
                                       offset: const Offset(0, 8),
                                     ),
@@ -221,20 +222,23 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   ),
                                   prefixIcon: Icon(
                                     Icons.email_outlined,
-                                    color: const Color(0xFF5D4037).withOpacity(0.5),
+                                    color: const Color(0xFF5D4037)
+                                        .withOpacity(0.5),
                                     size: 20,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide(
-                                      color: const Color(0xFF5D4037).withOpacity(0.2),
+                                      color: const Color(0xFF5D4037)
+                                          .withOpacity(0.2),
                                       width: 1.5,
                                     ),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide(
-                                      color: const Color(0xFF5D4037).withOpacity(0.2),
+                                      color: const Color(0xFF5D4037)
+                                          .withOpacity(0.2),
                                       width: 1.5,
                                     ),
                                   ),
@@ -293,7 +297,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   ),
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
-                                    color: const Color(0xFF5D4037).withOpacity(0.5),
+                                    color: const Color(0xFF5D4037)
+                                        .withOpacity(0.5),
                                     size: 20,
                                   ),
                                   suffixIcon: IconButton(
@@ -301,7 +306,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                                       _obscurePassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: const Color(0xFF5D4037).withOpacity(0.5),
+                                      color: const Color(0xFF5D4037)
+                                          .withOpacity(0.5),
                                       size: 20,
                                     ),
                                     onPressed: () {
@@ -313,14 +319,16 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide(
-                                      color: const Color(0xFF5D4037).withOpacity(0.2),
+                                      color: const Color(0xFF5D4037)
+                                          .withOpacity(0.2),
                                       width: 1.5,
                                     ),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide(
-                                      color: const Color(0xFF5D4037).withOpacity(0.2),
+                                      color: const Color(0xFF5D4037)
+                                          .withOpacity(0.2),
                                       width: 1.5,
                                     ),
                                   ),
@@ -366,14 +374,16 @@ class _LoginViewState extends ConsumerState<LoginView>
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                                        color: const Color(0xFFFF5A6E)
+                                            .withOpacity(0.4),
                                         blurRadius: 16,
                                         offset: const Offset(0, 6),
                                       ),
                                     ],
                                   ),
                                   child: ElevatedButton(
-                                    onPressed: loginState.isLoading ? null : _onSubmit,
+                                    onPressed:
+                                        loginState.isLoading ? null : _onSubmit,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       foregroundColor: Colors.white,
@@ -389,7 +399,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                                             height: 24,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              valueColor: AlwaysStoppedAnimation<Color>(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
                                                 Colors.white,
                                               ),
                                             ),
@@ -438,31 +449,6 @@ class _LoginViewState extends ConsumerState<LoginView>
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    child: Text(
-                                      '|',
-                                      style: TextStyle(
-                                        color: Colors.grey[300],
-                                      ),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: Size.zero,
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    child: Text(
-                                      'Registrarse',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: const Color(0xFF4CAF50),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                               const SizedBox(height: 24),
@@ -499,16 +485,18 @@ class _LoginViewState extends ConsumerState<LoginView>
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        color: const Color(0xFFF5F5F5),
-        child: Text(
-          'Criadero San Andrés © 2025',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[500],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          color: const Color(0xFFF5F5F5),
+          child: Text(
+            'Criadero San Andrés © 2025',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );

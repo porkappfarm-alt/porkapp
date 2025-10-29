@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/domain/corral.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_controller.dart';
+import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
 class CreateCorralView extends ConsumerStatefulWidget {
   final Corral? corral;
@@ -52,40 +53,36 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
 
     try {
       if (isEditing) {
-        await ref
-            .read(corralsControllerProvider.notifier)
-            .updateCorral(
+        await ref.read(corralsControllerProvider.notifier).updateCorral(
               id: widget.corral!.id,
               name: _nameController.text,
               location: _locationController.text.isEmpty
                   ? null
                   : _locationController.text,
-              capacity: _capacityController.text.isEmpty
-                  ? null
-                  : int.parse(_capacityController.text),
-              notes: _notesController.text.isEmpty
-                  ? null
-                  : _notesController.text,
+              capacity: int.parse(_capacityController.text),
+              notes:
+                  _notesController.text.isEmpty ? null : _notesController.text,
             );
       } else {
-        await ref
-            .read(corralsControllerProvider.notifier)
-            .createCorral(
-              name: _nameController.text,
-              location: _locationController.text.isEmpty
-                  ? null
-                  : _locationController.text,
-              capacity: _capacityController.text.isEmpty
-                  ? null
-                  : int.parse(_capacityController.text),
-              notes: _notesController.text.isEmpty
-                  ? null
-                  : _notesController.text,
-            );
+        // Crear el corral en la base de datos y obtener el corral creado
+        final newCorral =
+            await ref.read(corralsControllerProvider.notifier).createCorral(
+                  name: _nameController.text,
+                  location: _locationController.text.isEmpty
+                      ? null
+                      : _locationController.text,
+                  capacity: int.parse(_capacityController.text),
+                  notes: _notesController.text.isEmpty
+                      ? null
+                      : _notesController.text,
+                );
+
+        // Agregar el corral optimísticamente a la lista
+        ref.read(corralsProvider.notifier).addCorralOptimistic(newCorral);
       }
 
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true); // Retornar true para indicar éxito
       }
     } catch (e) {
       if (mounted) {
@@ -149,6 +146,16 @@ class _CreateCorralViewState extends ConsumerState<CreateCorralView> {
                     placeholder: 'ej. 50',
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingrese la capacidad';
+                      }
+                      final capacity = int.tryParse(value);
+                      if (capacity == null || capacity <= 0) {
+                        return 'Ingrese un número válido mayor a 0';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   _buildField(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/presentation/edit_corral_view.dart';
+import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
-class CorralDetailsView extends StatefulWidget {
+class CorralDetailsView extends ConsumerStatefulWidget {
   final Map<String, dynamic> corral;
   final bool isEditing;
 
@@ -12,10 +14,10 @@ class CorralDetailsView extends StatefulWidget {
   });
 
   @override
-  State<CorralDetailsView> createState() => _CorralDetailsViewState();
+  ConsumerState<CorralDetailsView> createState() => _CorralDetailsViewState();
 }
 
-class _CorralDetailsViewState extends State<CorralDetailsView> {
+class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   Map<String, dynamic> get corral => widget.corral;
   bool get isEditing => widget.isEditing;
 
@@ -41,19 +43,29 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             color: const Color(0xFF4CAF50),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final wasUpdated = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditCorralView(
                     corral: corral,
                   ),
                 ),
-              ).then((wasUpdated) {
-                if (wasUpdated == true) {
-                  Navigator.pop(context);
-                }
-              });
+              );
+              if (wasUpdated == true && mounted) {
+                // Recargar la lista de corrales
+                ref.read(corralsProvider.notifier).loadCorrals();
+                // Mostrar mensaje de éxito
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Cambios guardados correctamente'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                // Cerrar la vista de detalles
+                Navigator.pop(context);
+              }
             },
           ),
           IconButton(
@@ -158,7 +170,8 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: _getStatusColor(corral['estado']).withOpacity(0.3),
+                            color: _getStatusColor(corral['estado'])
+                                .withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -234,8 +247,9 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
 
   Widget _buildOccupancyCard() {
     final occupancy = corral['ocupacion'] as int? ?? 0;
-    final capacity = corral['capacidad'] as int? ?? 1;
-    final percentage = ((occupancy / capacity) * 100).round();
+    final capacity = corral['capacidad'] as int? ?? 0;
+    final percentage =
+        capacity > 0 ? ((occupancy / capacity) * 100).round() : 0;
 
     return Container(
       width: double.infinity,
@@ -293,7 +307,8 @@ class _CorralDetailsViewState extends State<CorralDetailsView> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: (occupancy / capacity).clamp(0.0, 1.0),
+              value:
+                  capacity > 0 ? (occupancy / capacity).clamp(0.0, 1.0) : 0.0,
               backgroundColor: Colors.grey[200],
               valueColor: AlwaysStoppedAnimation<Color>(
                 _getOccupancyColor(occupancy, capacity),

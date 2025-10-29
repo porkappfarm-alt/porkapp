@@ -12,7 +12,7 @@ class CorralsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final corralsAsyncValue = ref.watch(corralsProvider);
+    final corralsState = ref.watch(corralsProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
@@ -21,30 +21,30 @@ class CorralsView extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: ref.watch(corralsProvider).when(
-              data: (corrals) => Text(
-                'Corrales (${corrals.length})',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: Color(0xFF5D4037),
-                ),
-              ),
-              loading: () => const Text(
-                'Cargando...',
-                style: TextStyle(
-                  color: Color(0xFF5D4037),
-                  fontSize: 18,
-                ),
-              ),
-              error: (error, stack) => const Text(
-                'Error',
-                style: TextStyle(
-                  color: Color(0xFF5D4037),
-                  fontSize: 18,
-                ),
-              ),
+        title: corralsState.when(
+          data: (corrals) => Text(
+            'Corrales (${corrals.length})',
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              color: Color(0xFF5D4037),
             ),
+          ),
+          loading: () => const Text(
+            'Cargando...',
+            style: TextStyle(
+              color: Color(0xFF5D4037),
+              fontSize: 18,
+            ),
+          ),
+          error: (error, stack) => const Text(
+            'Error',
+            style: TextStyle(
+              color: Color(0xFF5D4037),
+              fontSize: 18,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -57,12 +57,16 @@ class CorralsView extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.add),
             color: const Color(0xFFF07281),
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              final result = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const CreateCorralView(),
                 ),
               );
+              // Si se devuelve un corral, recargamos la lista
+              if (result == true && context.mounted) {
+                ref.read(corralsProvider.notifier).loadCorrals();
+              }
             },
             tooltip: 'Añadir corral',
           ),
@@ -71,185 +75,184 @@ class CorralsView extends ConsumerWidget {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(corralsProvider);
+            await ref.read(corralsProvider.notifier).loadCorrals();
           },
-          child: ref.watch(corralsProvider).when(
-                data: (corrals) {
-                  if (corrals.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 200,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFF07281)
-                                        .withOpacity(0.2),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
+          child: corralsState.when(
+            data: (corrals) {
+              if (corrals.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 200,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFF07281).withOpacity(0.2),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset(
-                                  'imagenes/corrales-de-animales.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            Text(
-                              'No hay corrales disponibles',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF5D4037),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Crea un nuevo corral para comenzar\na gestionar tus instalaciones',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey[600],
-                                height: 1.5,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 40),
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFFF5A6E),
-                                    Color(0xFFFF7F8F),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFFF5A6E)
-                                        .withOpacity(0.4),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CreateCorralView(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                icon:
-                                    const Icon(Icons.add, color: Colors.white),
-                                label: const Text(
-                                  'Crear corral',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  return CustomScrollView(
-                    slivers: [
-                      SliverPadding(
-                        padding: const EdgeInsets.all(16.0),
-                        sliver: SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount:
-                                MediaQuery.of(context).size.width > 900
-                                    ? 4
-                                    : MediaQuery.of(context).size.width > 600
-                                        ? 3
-                                        : 1, // Cambiado a 1 para móviles
-                            mainAxisSpacing: 16.0,
-                            crossAxisSpacing: 16.0,
-                            childAspectRatio: MediaQuery.of(context)
-                                        .size
-                                        .width >
-                                    600
-                                ? 1.3
-                                : 2.0, // Ajustado para mejor visualización en móviles
+                            ],
                           ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final corral = corrals[index];
-
-                              return CorralCard(
-                                corral: corral,
-                                onTap: () {
-                                  final corralMap = {
-                                    'id': corral.id,
-                                    'nombre': corral.name,
-                                    'ubicacion': corral.location ?? '',
-                                    'capacidad': corral.capacity ?? 0,
-                                    'notas': corral.notes ?? '',
-                                    'imagen_url': corral.imageUrl,
-                                    'estado': 'Activo',
-                                    'ocupacion': corral.activeBatchCount,
-                                    'creado_en':
-                                        corral.createdAt.toIso8601String(),
-                                    'creado_por': corral.createdBy,
-                                    'actualizado_en':
-                                        corral.updatedAt.toIso8601String(),
-                                  };
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CorralDetailsView(
-                                        corral: corralMap,
-                                      ),
-                                    ),
-                                  );
-                                },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              'imagenes/corrales-de-animales.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        Text(
+                          'No hay corrales disponibles',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF5D4037),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Crea un nuevo corral para comenzar\na gestionar tus instalaciones',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[600],
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 40),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFFF5A6E),
+                                Color(0xFFFF7F8F),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateCorralView(),
+                                ),
                               );
                             },
-                            childCount: corrals.length,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            icon: const Icon(Icons.add, color: Colors.white),
+                            label: const Text(
+                              'Crear corral',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16.0),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: MediaQuery.of(context).size.width > 900
+                            ? 4
+                            : MediaQuery.of(context).size.width > 600
+                                ? 3
+                                : 1, // Cambiado a 1 para móviles
+                        mainAxisSpacing: 16.0,
+                        crossAxisSpacing: 16.0,
+                        childAspectRatio: MediaQuery.of(context).size.width >
+                                600
+                            ? 1.3
+                            : 2.0, // Ajustado para mejor visualización en móviles
                       ),
-                    ],
-                  );
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                error: (error, stack) => Center(
-                  child: Text('Error: $error'),
-                ),
-              ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final corral = corrals[index];
+
+                          return CorralCard(
+                            corral: corral,
+                            onTap: () async {
+                              final corralMap = {
+                                'id': corral.id,
+                                'nombre': corral.name,
+                                'ubicacion': corral.location ?? '',
+                                'capacidad': corral.capacity ?? 0,
+                                'notas': corral.notes ?? '',
+                                'imagen_url': corral.imageUrl,
+                                'estado': 'Activo',
+                                'ocupacion': corral.activeBatchCount,
+                                'creado_en': corral.createdAt.toIso8601String(),
+                                'creado_por': corral.createdBy,
+                                'actualizado_en':
+                                    corral.updatedAt.toIso8601String(),
+                              };
+
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CorralDetailsView(
+                                    corral: corralMap,
+                                  ),
+                                ),
+                              );
+                              // Refrescar la lista cuando se vuelva de los detalles
+                              // (en caso de que se haya editado o eliminado)
+                              if (context.mounted) {
+                                ref
+                                    .read(corralsProvider.notifier)
+                                    .loadCorrals();
+                              }
+                            },
+                          );
+                        },
+                        childCount: corrals.length,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            error: (error, stack) => Center(
+              child: Text('Error: $error'),
+            ),
+          ),
         ),
       ),
       floatingActionButton: Padding(

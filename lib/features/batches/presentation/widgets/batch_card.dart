@@ -24,7 +24,8 @@ class BatchCard extends StatelessWidget {
     return Card(
       elevation: 2,
       color: const Color(0xFFFFFFFF), // Blanco
-      margin: EdgeInsets.zero, // Removido el margen ya que está en el SliverPadding
+      margin:
+          EdgeInsets.zero, // Removido el margen ya que está en el SliverPadding
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(

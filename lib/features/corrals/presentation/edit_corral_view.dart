@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/providers/corral_edit_provider_new.dart';
+import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
 class EditCorralView extends ConsumerStatefulWidget {
   final Map<String, dynamic> corral;
@@ -21,22 +22,23 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
   late TextEditingController _notesController;
   final _formKey = GlobalKey<FormState>();
   bool _hasChanges = false;
+  bool _isClosing = false;
 
   @override
   void initState() {
     super.initState();
     // Asegurarnos de que los valores sean del tipo correcto
-    String name = (widget.corral['name'] ?? '').toString();
-    String location = (widget.corral['location'] ?? '').toString();
-    String notes = (widget.corral['notes'] ?? '').toString();
+    String name = (widget.corral['nombre'] ?? '').toString();
+    String location = (widget.corral['ubicacion'] ?? '').toString();
+    String notes = (widget.corral['notas'] ?? '').toString();
 
     // Manejar capacity específicamente ya que debe ser un número
     String capacity = '';
-    if (widget.corral['capacity'] != null) {
+    if (widget.corral['capacidad'] != null) {
       try {
-        capacity = widget.corral['capacity'].toString();
+        capacity = widget.corral['capacidad'].toString();
       } catch (e) {
-        print('Error convirtiendo capacity: $e');
+        print('Error convirtiendo capacidad: $e');
       }
     }
 
@@ -75,20 +77,27 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
       (previous, next) {
         next.whenOrNull(
           error: (error, stack) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: $error'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            if (mounted && !_isClosing) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: $error'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           },
           data: (_) {
-            Navigator.pop(context, true);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Corral actualizado correctamente'),
-              ),
-            );
+            if (mounted && !_isClosing) {
+              _isClosing = true;
+              // Recargar la lista de corrales
+              ref.read(corralsProvider.notifier).loadCorrals();
+              // Usar addPostFrameCallback para asegurar que el cierre ocurra después del frame actual
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  Navigator.pop(context, true);
+                }
+              });
+            }
           },
         );
       },
@@ -201,9 +210,24 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
             ],
             const SizedBox(height: 32),
             OutlinedButton.icon(
-              onPressed: _confirmDelete,
-              icon: const Icon(Icons.delete_forever, color: Colors.red),
-              label: const Text('Eliminar corral'),
+              onPressed: ref.watch(corralEditProvider).isLoading
+                  ? null
+                  : _confirmDelete,
+              icon: ref.watch(corralEditProvider).isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.red,
+                      ),
+                    )
+                  : const Icon(Icons.delete_forever, color: Colors.red),
+              label: Text(
+                ref.watch(corralEditProvider).isLoading
+                    ? 'Eliminando...'
+                    : 'Eliminar corral',
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.red,
                 minimumSize: const Size(double.infinity, 48),
@@ -258,7 +282,7 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
       builder: (context) => AlertDialog(
         title: const Text('Confirmar eliminación'),
         content: Text(
-            '¿Está seguro que desea eliminar el corral "${widget.corral['name']}"?'),
+            '¿Está seguro que desea eliminar el corral "${widget.corral['nombre'] ?? 'Sin nombre'}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -276,17 +300,11 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
     );
 
     if (confirmed == true && mounted) {
+      // Ejecutar la eliminación
+      // El listener se encargará de cerrar la vista cuando termine
       await ref
           .read(corralEditProvider.notifier)
           .deleteCorral(widget.corral['id']);
-      if (mounted) {
-        Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Corral eliminado correctamente'),
-          ),
-        );
-      }
     }
   }
 }

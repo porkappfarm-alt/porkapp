@@ -42,7 +42,7 @@ class CorralEditNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> deleteCorral(String id) async {
     try {
       state = const AsyncValue.loading();
-      // Implementar lógica de eliminación aquí
+      await _service.deleteCorral(id);
       state = const AsyncValue.data(null);
     } catch (error, stack) {
       state = AsyncValue.error(error, stack);

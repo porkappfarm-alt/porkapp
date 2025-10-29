@@ -419,33 +419,6 @@ class _LoginViewState extends ConsumerState<LoginView>
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 12),
-                                        child: Text(
-                                          '|',
-                                          style: TextStyle(
-                                            color: Colors.grey[300],
-                                          ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {},
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          minimumSize: Size.zero,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                        ),
-                                        child: Text(
-                                          'Registrarse',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: const Color(0xFF4CAF50),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 24),
@@ -484,16 +457,18 @@ class _LoginViewState extends ConsumerState<LoginView>
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        color: const Color(0xFFF5F5F5),
-        child: Text(
-          'Criadero San Andrés © 2025',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[500],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          color: const Color(0xFFF5F5F5),
+          child: Text(
+            'Criadero San Andrés © 2025',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );

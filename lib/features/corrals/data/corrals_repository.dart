@@ -21,11 +21,25 @@ class CorralsRepository {
         ? DateTime.parse(json['updated_at'])
         : DateTime.now();
 
+    // Procesar capacity de forma segura
+    int? capacity;
+    if (json['capacity'] != null) {
+      final rawCapacity = json['capacity'];
+      if (rawCapacity is int) {
+        capacity = rawCapacity;
+      } else if (rawCapacity is num) {
+        // Verificar que no sea infinito o NaN
+        if (rawCapacity.isFinite && !rawCapacity.isNaN) {
+          capacity = rawCapacity.toInt();
+        }
+      }
+    }
+
     return {
       'id': json['id'],
       'name': json['name'] ?? 'Corral sin nombre',
       'location': json['location'],
-      'capacity': json['capacity'],
+      'capacity': capacity,
       'notes': json['notes'],
       'image_url': json['image_url'] ?? '',
       'active_batch_count': activeBatchCount,
@@ -37,9 +51,8 @@ class CorralsRepository {
   }
 
   Future<List<Corral>> getCorrals() async {
-    // Obtener los corrales con su estado actual y conteo de lotes activos
-    final response =
-        await supabase.from('corral_batch_counts').select().order('name');
+    // Obtener los corrales directamente de la tabla corrals
+    final response = await supabase.from('corrals').select().order('name');
 
     print('Raw response: $response');
 
@@ -49,7 +62,12 @@ class CorralsRepository {
       final corrals = response.map<Corral>((json) {
         print('Processing corral: $json');
 
-        final mappedJson = _processCorralJson(json);
+        // Para corrals directamente, no tenemos active_batch_count
+        // así que lo establecemos en 0
+        final mappedJson = _processCorralJson({
+          ...json,
+          'active_batch_count': 0,
+        });
         print('Mapped JSON: $mappedJson');
         return Corral.fromJson(mappedJson);
       }).toList();
@@ -65,72 +83,17 @@ class CorralsRepository {
 
   Future<Corral> getCorral(String id) async {
     try {
-      final response = await supabase
-          .from('corral_batch_counts')
-          .select()
-          .eq('id', id)
-          .single();
+      final response =
+          await supabase.from('corrals').select().eq('id', id).single();
 
       print('Raw response for single corral: $response');
 
-      print('Getting single corral response: $response');
-
-      if (response['name'] == null) {
-        print('Warning: name is null for corral ${response['id']}');
-        response['name'] = 'Corral sin nombre';
-      }
-
-      if (response['id'] == null) {
-        print('Warning: id is null for corral');
-        response['id'] = id;
-      }
-
-      final createdAt = response['created_at'] != null
-          ? DateTime.parse(response['created_at'])
-          : DateTime.now();
-
-      final updatedAt = response['updated_at'] != null
-          ? DateTime.parse(response['updated_at'])
-          : DateTime.now();
-
-      int activeBatchCount = 0;
-
-      try {
-        final rawCount = response['active_batch_count'];
-        if (rawCount != null && rawCount is List && rawCount.isNotEmpty) {
-          final count = rawCount[0]['count'];
-          if (count != null) {
-            activeBatchCount = int.parse(count.toString());
-          }
-        }
-      } catch (e) {
-        print('Error processing active_batch_count: $e');
-        activeBatchCount = 0;
-      }
-      final hasActiveBatches = activeBatchCount > 0;
-
-      // Si el estado no es mantenimiento y hay lotes activos, asegurarse de que esté ocupado
-      final status = response['status'] == 'mantenimiento'
-          ? CorralStatus.mantenimiento
-          : hasActiveBatches
-              ? CorralStatus.ocupado
-              : CorralStatus.disponible;
-
-      // Creamos un nuevo mapa sin los campos que no necesitamos
-      final mappedJson = {
-        'id': response['id'],
-        'name': response['name'],
-        'location': response['location'],
-        'capacity': response['capacity'],
-        'notes': response['notes'],
-        'image_url': response['image_url'],
-        'active_batch_count': activeBatchCount,
-        'status': status.name,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'created_by':
-            response['created_by'] ?? supabase.auth.currentUser?.id ?? '',
-      };
+      // Para corrals directamente, no tenemos active_batch_count en la respuesta
+      // así que lo establecemos en 0
+      final mappedJson = _processCorralJson({
+        ...response,
+        'active_batch_count': 0,
+      });
 
       print('Mapped single corral JSON: $mappedJson');
       return Corral.fromJson(mappedJson);
@@ -153,27 +116,28 @@ class CorralsRepository {
       throw Exception('Usuario no autenticado');
     }
 
-    final response = await supabase.from('corrals').insert({
-      'name': name,
-      'location': location,
-      'capacity': capacity,
-      'notes': notes,
-      'image_url': imageUrl,
-      'created_by': userId,
-      'status': CorralStatus.disponible
-          .name, // Aseguramos que siempre tenga un estado por defecto
-    }).select('''
-          *,
-          active_batch_count:batches!inner(count).eq(status, 'active')
-        ''').single();
+    final response = await supabase
+        .from('corrals')
+        .insert({
+          'name': name,
+          'location': location,
+          'capacity': capacity,
+          'notes': notes,
+          'image_url': imageUrl,
+          'created_by': userId,
+          'status': CorralStatus.disponible
+              .name, // Aseguramos que siempre tenga un estado por defecto
+        })
+        .select()
+        .single();
 
-    return Corral.fromJson({
+    // Procesar el resultado igual que en getCorral
+    final mappedJson = _processCorralJson({
       ...response,
-      'createdAt': response['created_at'],
-      'updatedAt': response['updated_at'],
-      'createdBy': response['created_by'],
-      'activeBatchCount': response['active_batch_count']?[0]?['count'] ?? 0,
+      'active_batch_count': 0, // Un corral nuevo no tiene lotes activos
     });
+
+    return Corral.fromJson(mappedJson);
   }
 
   Future<Corral> updateCorral({
@@ -216,18 +180,18 @@ class CorralsRepository {
           'updated_by': userId,
         })
         .eq('id', id)
-        .select('''
-          *,
-          active_batch_count:batches!inner(count).eq(status, 'active')
-        ''')
+        .select()
         .single();
 
+    // Procesar la respuesta usando el método helper
+    final processedData = _processCorralJson(response);
+
     return Corral.fromJson({
-      ...response,
-      'createdAt': response['created_at'],
-      'updatedAt': response['updated_at'],
-      'createdBy': response['created_by'],
-      'activeBatchCount': response['active_batch_count']?[0]?['count'] ?? 0,
+      ...processedData,
+      'createdAt': processedData['created_at'],
+      'updatedAt': processedData['updated_at'],
+      'createdBy': processedData['created_by'],
+      'activeBatchCount': processedData['active_batch_count'],
     });
   }
 

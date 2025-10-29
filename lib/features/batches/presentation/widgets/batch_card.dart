@@ -19,7 +19,9 @@ class BatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final progress = batch.animals.length / batch.headcountStart;
+    final progress = batch.headcountStart > 0
+        ? batch.animals.length / batch.headcountStart
+        : 0.0;
 
     return Card(
       elevation: 2,
@@ -286,50 +288,32 @@ class _InfoItem extends StatelessWidget {
         color: const Color(0xFFFCD8D4).withOpacity(0.3), // Rosa cerdito
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFFFF), // Blanco
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
-                color: const Color(0xFFE94C5D).withOpacity(0.3), // Coral
-                width: 1,
-              ),
-            ),
-            child: Icon(
-              icon,
-              size: 14,
-              color: const Color(0xFFE94C5D), // Coral
-            ),
+          Icon(
+            icon,
+            size: 16,
+            color: const Color(0xFFE94C5D), // Coral
           ),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 11,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  value,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 13,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontSize: 11,
             ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+              fontSize: 14,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

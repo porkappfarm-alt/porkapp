@@ -232,6 +232,26 @@ class CorralsRepository {
       'activeBatchCount': response['active_batch_count']?[0]?['count'] ?? 0,
     });
   }
+
+  /// Obtiene solo los corrales que no tienen lotes activos
+  Future<List<Corral>> getAvailableCorrals() async {
+    try {
+      final response = await supabase.rpc('get_available_corrals');
+
+      return (response as List).map((json) {
+        final mappedJson = _processCorralJson({
+          ...json,
+          'active_batch_count':
+              0, // Por definición, estos corrales no tienen lotes activos
+        });
+        return Corral.fromJson(mappedJson);
+      }).toList();
+    } catch (e, stack) {
+      print('Error getting available corrals: $e');
+      print('Stack trace: $stack');
+      rethrow;
+    }
+  }
 }
 
 final corralsRepositoryProvider = Provider((ref) => CorralsRepository());

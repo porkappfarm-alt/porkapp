@@ -19,33 +19,53 @@ class BatchesRepository {
     return Batch.fromJson(response);
   }
 
+  /// Verifica si un corral tiene un lote activo
+  Future<bool> corralHasActiveBatch(String corralId) async {
+    final response = await supabase.rpc('check_corral_has_active_batch',
+        params: {'p_corral_id': corralId});
+    return response as bool;
+  }
+
+  /// Crea un nuevo lote con solo 3 campos requeridos
   Future<Batch> createBatch({
     required String corralId,
-    required DateTime createdAt,
-    required int headcountStart,
-    double? initialAvgWeight,
-    String? notes,
+    required DateTime entryDate,
+    required int animalCount,
   }) async {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) {
       throw Exception('Usuario no autenticado');
     }
 
+    // Verificar que el corral no tenga un lote activo
+    final hasActiveBatch = await corralHasActiveBatch(corralId);
+    if (hasActiveBatch) {
+      throw Exception('El corral seleccionado ya tiene un lote activo');
+    }
+
+    // Crear el lote (name se genera automáticamente)
     final response = await supabase
         .from('batches')
         .insert({
-          // 'name' se genera automáticamente en la base de datos
           'corral_id': corralId,
-          'created_at': createdAt.toIso8601String(),
-          'headcount_start': headcountStart,
-          'initial_avg_weight': initialAvgWeight,
-          'notes': notes,
+          'entry_date': entryDate.toIso8601String().split('T')[0],
+          'animal_count': animalCount,
+          'headcount_start': animalCount, // Inicializar con el mismo valor
           'status': 'active',
         })
         .select()
         .single();
 
-    return Batch.fromJson(response);
+    final batch = Batch.fromJson(response);
+
+    // Crear los animales automáticamente
+    await supabase.rpc('create_batch_animals', params: {
+      'p_batch_id': batch.id,
+      'p_animal_count': animalCount,
+      'p_entry_date': entryDate.toIso8601String().split('T')[0],
+    });
+
+    return batch;
   }
 
   Future<Batch> updateBatch({

@@ -24,21 +24,18 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
     }
   }
 
-  Future<void> createBatch({
+  Future<Batch> createBatch({
     required String corralId,
-    required DateTime createdAt,
-    required int headcountStart,
-    double? initialAvgWeight,
-    String? notes,
+    required DateTime entryDate,
+    required int animalCount,
   }) async {
-    await ref.read(batchesRepositoryProvider).createBatch(
+    final batch = await ref.read(batchesRepositoryProvider).createBatch(
           corralId: corralId,
-          createdAt: createdAt,
-          headcountStart: headcountStart,
-          initialAvgWeight: initialAvgWeight,
-          notes: notes,
+          entryDate: entryDate,
+          animalCount: animalCount,
         );
-    loadBatches();
+    await loadBatches();
+    return batch;
   }
 
   Future<void> updateBatch({

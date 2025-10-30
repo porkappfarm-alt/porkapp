@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:porkapp/features/animals/presentation/widgets/animal_form_dialog.dart';
-import 'package:porkapp/features/animals/providers/animals_provider.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
-import 'package:porkapp/features/batches/providers/batch_provider.dart'
-    as single_batch;
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
-import 'package:porkapp/features/biometrics/providers/biometric_providers.dart';
+import 'package:porkapp/features/biometrics/providers/batch_biometrics_provider.dart';
 import 'package:porkapp/features/batches/presentation/widgets/error_view.dart';
-import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
 class BatchDetailView extends ConsumerWidget {
   final String batchId;
@@ -18,10 +13,6 @@ class BatchDetailView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final batchAsync = ref.watch(single_batch.batchProvider(batchId));
-    // Eliminado: lógica incorrecta y referencias a Corral/corralProvider
-
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
@@ -61,132 +52,80 @@ class BatchDetailView extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          // Información del lote
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ref.watch(single_batch.batchProvider(batchId)).when(
-                  data: (batch) => _BatchHeader(batch: batch),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => BatchErrorView(
-                    error: error.toString(),
-                    onRetry: () =>
-                        ref.invalidate(single_batch.batchProvider(batchId)),
-                  ),
-                ),
-          ),
-
-          // Botones para gestión de animales y biometría
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.push('/batches/$batchId/animals');
-                    },
-                    icon: const Icon(Icons.pets),
-                    label: const Text('Gestionar animales'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFF07281),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Información del lote
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ref.watch(batchProvider(batchId)).when(
+                      data: (batch) {
+                        print('=== BatchDetailView main build ===');
+                        print('Batch loaded: ${batch.id}');
+                        print('Animals count: ${batch.animals.length}');
+                        return _BatchHeader(batch: batch);
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (error, stack) => BatchErrorView(
+                        error: error.toString(),
+                        onRetry: () => ref.invalidate(batchProvider(batchId)),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.push('/biometrics/batch/$batchId');
-                    },
-                    icon: const Icon(Icons.monitor_weight),
-                    label: const Text('Gestionar biometría'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4CAF50),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      textStyle: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: batchAsync.when(
-        data: (batch) {
-          final corralId = batch.corralId;
-          if (corralId == null) {
-            return FloatingActionButton(
-              onPressed: null,
-              backgroundColor: Colors.grey,
-              child: const Icon(Icons.add, color: Colors.white),
-              tooltip: 'No se encontró corral',
-            );
-          }
-          final corralAsync = ref.watch(corralByIdProvider(corralId));
-          return corralAsync.when(
-            data: (corral) {
-              final corralCapacity = corral?.capacity ?? 0;
-              return ref.watch(batchAnimalsProvider(batchId)).when(
-                    data: (animals) {
-                      final isFull = corralCapacity > 0 &&
-                          animals.length >= corralCapacity;
-                      return FloatingActionButton(
-                        onPressed: isFull
-                            ? () => _showMaxCapacityDialog(context)
-                            : () => _showAddAnimalDialog(context),
-                        backgroundColor:
-                            isFull ? Colors.grey : const Color(0xFFFF5A6E),
-                        elevation: 4,
-                        child: const Icon(Icons.add, color: Colors.white),
-                        tooltip: isFull
-                            ? 'Capacidad máxima alcanzada'
-                            : 'Agregar animal',
-                      );
-                    },
-                    loading: () => const SizedBox.shrink(),
-                    error: (e, s) => const SizedBox.shrink(),
-                  );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (e, s) => const SizedBox.shrink(),
-          );
-        },
-        loading: () => const SizedBox.shrink(),
-        error: (e, s) => const SizedBox.shrink(),
-      ),
-    );
-  }
 
-  void _showAddAnimalDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AnimalFormDialog(preselectedBatchId: batchId),
-    );
-  }
-
-  void _showMaxCapacityDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Capacidad máxima alcanzada'),
-        content: const Text(
-            'No se pueden agregar más animales, el corral está lleno.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Aceptar'),
-          ),
-        ],
+            // Botones para gestión de animales y biometría
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        // Use parentNavigatorKey to ensure navigation works like biometrics
+                        GoRouter.of(context).push('/batches/$batchId/animals');
+                      },
+                      icon: const Icon(Icons.pets, size: 20),
+                      label: const Text('Gestionar animales'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF07281),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.push('/biometrics/batch/$batchId');
+                      },
+                      icon: const Icon(Icons.monitor_weight, size: 20),
+                      label: const Text('Gestionar biometría'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF4CAF50),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -202,263 +141,427 @@ class _BatchHeader extends ConsumerWidget {
     final entryDate = batch.entryDate ?? batch.createdAt;
     final daysElapsed = DateTime.now().difference(entryDate).inDays;
     final weekElapsed = (daysElapsed / 7).ceil();
-    final animalsVivos =
-        batch.animals.where((a) => a.status == 'active').length;
+
     final animalsMuertos =
         batch.animals.where((a) => a.status == 'deceased').length;
     final biometricsAsync = ref.watch(batchBiometricsProvider(batch.id));
 
+    return SingleChildScrollView(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con nombre y estado
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFF07281).withOpacity(0.1),
+                    Colors.white,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF07281),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.view_module_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          batch.name,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF5D4037),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Semana $weekElapsed • $daysElapsed días',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4CAF50),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF4CAF50).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      'ACTIVO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Sección de Información Principal (Peso, Alimento, Consumo)
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.insights_rounded,
+                        size: 20,
+                        color: Colors.grey[700],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Información Principal',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Peso Promedio
+                  biometricsAsync.when(
+                    data: (measurements) {
+                      if (measurements.isEmpty) {
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.info_outline,
+                                  color: Colors.grey[500], size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'No hay mediciones biométricas registradas',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      final lastMeasurement = measurements.last;
+
+                      return _InfoCard(
+                        icon: Icons.scale_rounded,
+                        label:
+                            'Peso Promedio (${measurements.length} mediciones)',
+                        value:
+                            '${lastMeasurement.averageWeight.toStringAsFixed(1)} kg',
+                        color: const Color(0xFF4CAF50),
+                      );
+                    },
+                    loading: () => Container(
+                      padding: const EdgeInsets.all(20),
+                      child: const Center(
+                        child: SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                    error: (e, stack) {
+                      print('❌ ERROR EN BATCH DETAIL BIOMETRICS: $e');
+                      print('❌ STACK: $stack');
+                      return Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.orange[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange[200]!),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded,
+                                color: Colors.orange[700], size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'No se pudieron cargar las mediciones',
+                                style: TextStyle(
+                                  color: Colors.orange[700],
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Tipo de Alimento
+                  _InfoCard(
+                    icon: Icons.restaurant_rounded,
+                    label: 'Tipo de Alimento',
+                    value: 'Balanceado Premium',
+                    color: const Color(0xFF795548),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Consumo Diario
+                  _InfoCard(
+                    icon: Icons.inventory_rounded,
+                    label: 'Consumo Diario Estimado',
+                    value:
+                        '${(batch.animals.length * 2.5).toStringAsFixed(1)} kg/día',
+                    color: const Color(0xFF607D8B),
+                  ),
+                ],
+              ),
+            ),
+
+            Divider(height: 1, color: Colors.grey[200]),
+
+            // Sección de Información del Lote
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_rounded,
+                        size: 20,
+                        color: Colors.grey[700],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Detalles del Lote',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Primera fila: Animales y Fallecidos
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.group_rounded,
+                          label: 'Animales Activos',
+                          value:
+                              '${batch.animals.length}/${batch.headcountStart}',
+                          color: const Color(0xFF4CAF50),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.error_rounded,
+                          label: 'Fallecidos',
+                          value: '$animalsMuertos',
+                          color: const Color(0xFFE94C5D),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Segunda fila: Fecha Ingreso
+                  _InfoCard(
+                    icon: Icons.calendar_today_rounded,
+                    label: 'Fecha de Ingreso',
+                    value: _formatDate(entryDate),
+                    color: const Color(0xFF2196F3),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Tercera fila: Días y Semana
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.timer_rounded,
+                          label: 'Días Transcurridos',
+                          value: '$daysElapsed días',
+                          color: const Color(0xFFFF9800),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.event_note_rounded,
+                          label: 'Semana Actual',
+                          value: 'Sem. $weekElapsed',
+                          color: const Color(0xFF9C27B0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic'
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+}
+
+// Widget para tarjetas de información compactas
+class _InfoCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _InfoCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFF07281).withOpacity(0.15),
-          width: 1,
+          color: color.withOpacity(0.2),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: color.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  batch.name,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5D4037),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF4CAF50).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Text(
-                  'Activo',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFAFAFA),
-              borderRadius: BorderRadius.circular(12),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.calendar_today_rounded,
-                        label: 'Ingreso',
-                        value: _formatDate(entryDate),
-                        iconColor: const Color(0xFFF07281),
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.grey[300],
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.monitor_weight,
-                        label: 'Peso Prom. Última Biom.',
-                        value: biometricsAsync.when(
-                          data: (measurements) => measurements.isNotEmpty
-                              ? '${measurements.last.averageWeight.toStringAsFixed(1)} kg'
-                              : '--',
-                          loading: () => '...',
-                          error: (e, _) => '--',
-                        ),
-                        iconColor: const Color(0xFF4CAF50),
-                      ),
-                    ),
-                  ],
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.group,
-                        label: 'Animales',
-                        value: '$animalsVivos/${batch.headcountStart}',
-                        iconColor: const Color(0xFF3B1D2D),
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.grey[300],
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.timer,
-                        label: 'Días desde ingreso',
-                        value: '$daysElapsed',
-                        iconColor: const Color(0xFFF07281),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.calendar_view_week,
-                        label: 'Semana actual',
-                        value: '$weekElapsed',
-                        iconColor: const Color(0xFF4CAF50),
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.grey[300],
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.food_bank,
-                        label: 'Tipo de alimento',
-                        value: 'Balanceado Premium', // mock
-                        iconColor: const Color(0xFFE94C5D),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.scale,
-                        label: 'Cantidad alimento diario',
-                        value: '2.5 kg', // mock
-                        iconColor: const Color(0xFF3B1D2D),
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.grey[300],
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _InfoItem(
-                        icon: Icons.sentiment_very_dissatisfied,
-                        label: 'Animales muertos',
-                        value: '$animalsMuertos',
-                        iconColor: const Color(0xFFE94C5D),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-}
-
-class _InfoItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color iconColor;
-
-  const _InfoItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: iconColor,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF5D4037),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

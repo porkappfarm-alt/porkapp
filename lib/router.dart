@@ -14,8 +14,6 @@ import 'package:porkapp/features/biometrics/presentation/views/biometric_history
 import 'package:porkapp/features/biometrics/presentation/views/batch_biometric_detail_view.dart';
 import 'package:porkapp/features/biometrics/presentation/views/new_biometric_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
-
-import 'package:porkapp/features/batches/providers/batch_provider.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 
 // Debug helper
@@ -210,29 +208,28 @@ final routerProvider = Provider<GoRouter>((ref) {
                       final batchId = state.pathParameters['batchId'] ?? '';
                       return BatchDetailView(batchId: batchId);
                     },
+                  ),
+                  // Vista de lista de animales del lote - MOVIDA FUERA DEL ANIDAMIENTO
+                  GoRoute(
+                    path: ':batchId/animals',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final batchId = state.pathParameters['batchId'] ?? '';
+                      return BatchAnimalsView(batchId: batchId);
+                    },
                     routes: [
-                      // Vista de lista de animales del lote
+                      // Detalle individual del animal
                       GoRoute(
-                        path: 'animals',
+                        path: ':animalId',
+                        name: 'animal-detail',
+                        parentNavigatorKey: _rootNavigatorKey,
                         builder: (context, state) {
-                          final batchId = state.pathParameters['batchId'] ?? '';
-                          return BatchAnimalsView(batchId: batchId);
+                          final animalId =
+                              state.pathParameters['animalId'] ?? '';
+                          print(
+                              'Building AnimalDetailView for animalId: $animalId'); // Debug log
+                          return AnimalDetailView(animalId: animalId);
                         },
-                        routes: [
-                          // Detalle individual del animal
-                          GoRoute(
-                            path: ':animalId',
-                            name: 'animal-detail',
-                            parentNavigatorKey: _rootNavigatorKey,
-                            builder: (context, state) {
-                              final animalId =
-                                  state.pathParameters['animalId'] ?? '';
-                              print(
-                                  'Building AnimalDetailView for animalId: $animalId'); // Debug log
-                              return AnimalDetailView(animalId: animalId);
-                            },
-                          ),
-                        ],
                       ),
                     ],
                   ),

@@ -8,8 +8,7 @@ import 'package:porkapp/features/animals/presentation/widgets/animal_type_fields
 import 'package:porkapp/features/animals/presentation/widgets/animal_status_change.dart';
 import 'package:porkapp/features/animals/presentation/widgets/form_feedback.dart';
 import 'package:porkapp/features/animals/presentation/controllers/animal_form_controller.dart';
-import 'package:porkapp/features/batches/providers/batch_provider.dart'
-    as single_batch;
+import 'package:porkapp/features/batches/providers/batch_providers.dart';
 
 class AnimalFormDialog extends ConsumerStatefulWidget {
   final Animal? animal;
@@ -143,8 +142,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
         // Invalidar los providers para recargar la lista
         if (widget.preselectedBatchId != null) {
           ref.invalidate(batchAnimalsProvider(widget.preselectedBatchId!));
-          ref.invalidate(
-              single_batch.batchProvider(widget.preselectedBatchId!));
+          ref.invalidate(batchProvider(widget.preselectedBatchId!));
         }
         Navigator.of(context).pop();
       }

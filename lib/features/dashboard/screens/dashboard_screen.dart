@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_providers.dart';
 import 'package:porkapp/features/dashboard/domain/domain.dart';
 import 'package:porkapp/features/dashboard/widgets/stat_card.dart';
@@ -21,23 +22,14 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Dashboard',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            color: Color(0xFF5D4037),
-          ),
-        ),
+      appBar: StandardAppBar(
+        title: 'Dashboard',
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            color: const Color(0xFFF07281),
+            icon: const Icon(Icons.logout_rounded),
+            color: const Color(0xFFFF4D6D),
+            tooltip: 'Cerrar sesión',
             onPressed: () async {
               await supabase.auth.signOut();
             },

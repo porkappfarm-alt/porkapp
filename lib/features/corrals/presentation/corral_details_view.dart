@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/corrals/presentation/edit_corral_view.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 import 'package:porkapp/features/corrals/providers/corral_edit_provider_new.dart';
@@ -228,24 +229,8 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          color: const Color(0xFF5D4037),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Detalle de Corral',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            color: Color(0xFF5D4037),
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
+      appBar: const StandardAppBar(
+        title: 'Detalle de Corral',
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -282,141 +267,302 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE8F5E9), Colors.white],
+        gradient: LinearGradient(
+          colors: [
+            _getBackgroundColorByStatus(estado),
+            _getBackgroundColorByStatus(estado).withOpacity(0.95),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFE0E0E0),
-          width: 1.5,
+          color: _getBorderColorByStatus(estado),
+          width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 12,
+            color: const Color(0xFFF07281).withOpacity(0.15),
+            blurRadius: 16,
             offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header con ícono y nombre
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Ícono cerdito circular con gradiente
               Container(
-                width: 56,
-                height: 56,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border:
-                      Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFFFFFF),
+                      Color(0xFFFFF5F5),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFFF07281).withOpacity(0.3),
+                    width: 2.5,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(13),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: const Color(0xFFF07281).withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: Image.asset(
-                  'assets/images/3800591.png',
-                  fit: BoxFit.cover,
+                child: const Center(
+                  child: Text(
+                    '🐷',
+                    style: TextStyle(fontSize: 26),
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '$nombre',
+                  nombre,
                   style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF2D3250),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF6B5E55), // Gris Taupe
+                    fontFamily: 'Poppins',
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    tooltip: 'Editar corral',
-                    icon: const Icon(Icons.edit, color: Color(0xFF6B0338)),
-                    onPressed: _editCorral,
+              IconButton(
+                tooltip: 'Editar corral',
+                icon: const Icon(Icons.edit, color: Color(0xFFF07281), size: 20),
+                onPressed: _editCorral,
+                padding: const EdgeInsets.all(8),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Badges de estado
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF4CAF50),
+                      Color(0xFF66BB6A),
+                    ],
                   ),
-                  if (_canDeleteCorral())
-                    IconButton(
-                      tooltip: 'Eliminar corral',
-                      icon: const Icon(Icons.delete_outline,
-                          color: Color(0xFFB71C1C)),
-                      onPressed: _deleteCorral,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4CAF50).withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.5),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'Activo',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Poppins',
+                        shadows: [
+                          Shadow(
+                            color: Colors.black26,
+                            offset: Offset(0, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFFFC1CC),
+                      const Color(0xFFFFD6DD),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFF07281).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '🏠 $capacidad capacidad',
+                  style: const TextStyle(
+                    color: Color(0xFFD81B60),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Texto de ocupación
+          Row(
+            children: [
+              Icon(
+                Icons.pets_rounded,
+                size: 16,
+                color: Color(0xFF6B5E55),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Ocupación: $ocupacion / $capacidad animales',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF7B7B7B),
+                  fontFamily: 'Nunito Sans',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '$percentage% de capacidad utilizada',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF7B7B7B),
+              fontFamily: 'Nunito Sans',
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Barra de progreso con gradiente
+          Container(
+            height: 14,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    color: const Color(0xFFE9E9E9),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: capacidad > 0 ? (ocupacion / capacidad).clamp(0.0, 1.0) : 0.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: _getProgressGradient(percentage),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getProgressColor(percentage).withOpacity(0.5),
+                            blurRadius: 8,
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Flexible(
-                child: _buildStatusChip(
-                  icon: Icons.circle,
-                  label: _getStatusText(estado),
-                  backgroundColor: _getStatusColor(estado).withAlpha(38),
-                  foregroundColor: _getStatusColor(estado),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: _buildStatusChip(
-                  icon: Icons.groups_outlined,
-                  label: '$capacidad capacidad',
-                  backgroundColor: const Color(0xFFFFE5EC),
-                  foregroundColor: const Color(0xFFFF4D6D),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.pets_rounded,
-                  size: 18, color: Color(0xFF6B0338)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Ocupación: $ocupacion / $capacidad animales',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text('$percentage% de capacidad utilizada',
-              style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value:
-                  capacidad > 0 ? (ocupacion / capacidad).clamp(0.0, 1.0) : 0.0,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
-              minHeight: 8,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Color _getProgressColor(int percentage) {
+    if (percentage == 0) return const Color(0xFF4CAF50);
+    if (percentage < 70) return const Color(0xFF4CAF50);
+    if (percentage < 90) return const Color(0xFFF9C851);
+    return const Color(0xFFF07281);
+  }
+
+  List<Color> _getProgressGradient(int percentage) {
+    if (percentage == 0) return [const Color(0xFF66BB6A), const Color(0xFF4CAF50)];
+    if (percentage < 70) return [const Color(0xFF66BB6A), const Color(0xFF4CAF50)];
+    if (percentage < 90) return [const Color(0xFFFFD54F), const Color(0xFFF9C851)];
+    return [const Color(0xFFFF6B7A), const Color(0xFFF07281)];
+  }
+
+  Color _getBackgroundColorByStatus(String status) {
+    final statusLower = status.toLowerCase();
+    if (statusLower.contains('activo')) {
+      return const Color(0xFFFFF7F3); // Fondo verde claro
+    } else if (statusLower.contains('ocupado')) {
+      return const Color(0xFFFFF5F5); // Fondo rosa claro
+    } else if (statusLower.contains('mantenimiento')) {
+      return const Color(0xFFFFFBE6); // Fondo amarillo claro
+    }
+    return const Color(0xFFFFF5EC); // Default crema pastel
+  }
+
+  Color _getBorderColorByStatus(String status) {
+    final statusLower = status.toLowerCase();
+    if (statusLower.contains('activo')) {
+      return const Color(0xFF5DA271); // Borde verde
+    } else if (statusLower.contains('ocupado')) {
+      return const Color(0xFFF07281); // Borde rosa
+    } else if (statusLower.contains('mantenimiento')) {
+      return const Color(0xFFF9C851); // Borde amarillo
+    }
+    return const Color(0xFFF07281).withOpacity(0.2); // Default
   }
 
   Widget _buildActiveBatchCard() {
@@ -426,7 +572,6 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
     final ocupacion = corral['ocupacion'];
 
     // Si no hay lote asociado, mostrar mensaje informativo
-    // Verificamos si batchName es null o si es una cadena vacía
     final hasActiveBatch =
         batchName != null && batchName.toString().trim().isNotEmpty;
 
@@ -487,14 +632,29 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFFFFFFF),
+            Color(0xFFFFFAFA),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFF07281).withOpacity(0.15),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
+            color: const Color(0xFFF07281).withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -503,35 +663,38 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6B0338).withAlpha(25),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.inventory_2_outlined,
-                    color: Color(0xFF6B0338), size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Lote: ${batchName ?? "Sin nombre"}',
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF6B0338)),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.inventory_2_outlined,
+                    size: 20,
+                    color: Color(0xFFF07281),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Lote: ${batchName ?? "Sin nombre"}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF6B5E55),
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ],
               ),
               if (batchName != null && batchName.toString().trim().isNotEmpty)
                 IconButton(
-                  icon: const Icon(Icons.open_in_new_rounded,
-                      color: Color(0xFF6B0338)),
+                  icon: const Icon(
+                    Icons.open_in_new_rounded,
+                    color: Color(0xFFF07281),
+                    size: 18,
+                  ),
                   tooltip: 'Ver detalle de lote',
+                  padding: const EdgeInsets.all(4),
                   onPressed: () {
                     final batches = corral['batches'];
                     final batchId = corral['active_batch_id'] ??
@@ -588,45 +751,103 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
             ],
           ),
           const SizedBox(height: 16),
+          // Fecha de ingreso
           if (entryDate != null)
-            Row(
-              children: [
-                const Icon(Icons.calendar_today,
-                    size: 18, color: Color(0xFF6B0338)),
-                const SizedBox(width: 8),
-                Text(
-                    'Fecha de ingreso: ${entryDate.toString().substring(0, 10)}',
-                    style: const TextStyle(fontSize: 15)),
-              ],
+            _buildInfoRow(
+              icon: Icons.calendar_today,
+              iconColor: const Color(0xFF4CAF50),
+              backgroundColor: const Color(0xFFF0F9F4),
+              label: 'Fecha de ingreso',
+              value: entryDate.toString().substring(0, 10),
             ),
+          if (entryDate != null && ocupacion != null) const SizedBox(height: 12),
+          // Animales vivos
           if (ocupacion != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.pets_rounded,
-                      size: 18, color: Color(0xFF6B0338)),
-                  const SizedBox(width: 8),
-                  Text('Animales vivos: $ocupacion',
-                      style: const TextStyle(fontSize: 15)),
-                ],
-              ),
+            _buildInfoRow(
+              icon: Icons.pets_rounded,
+              iconColor: const Color(0xFF6B5E55),
+              backgroundColor: const Color(0xFFFFF5EC),
+              label: 'Animales vivos',
+              value: '$ocupacion',
             ),
+          if (ocupacion != null && avgWeight != null) const SizedBox(height: 12),
+          // Promedio de peso
           if (avgWeight != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.monitor_weight_outlined,
-                      size: 18, color: Color(0xFF6B0338)),
-                  const SizedBox(width: 8),
-                  Text('Promedio de peso: ${avgWeight.toStringAsFixed(2)} kg',
-                      style: const TextStyle(fontSize: 15)),
-                ],
-              ),
+            _buildInfoRow(
+              icon: Icons.monitor_weight_outlined,
+              iconColor: const Color(0xFFF07281),
+              backgroundColor: const Color(0xFFFFF0F2),
+              label: 'Promedio de peso',
+              value: '${avgWeight.toStringAsFixed(2)} kg',
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoRow({
+    required IconData icon,
+    required Color iconColor,
+    required Color backgroundColor,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                backgroundColor,
+                backgroundColor.withOpacity(0.7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: iconColor.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: iconColor,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF7B7B7B),
+                  fontFamily: 'Nunito Sans',
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF6B5E55),
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import '../../providers/batch_biometrics_provider.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -41,253 +42,248 @@ class _BatchBiometricDetailViewState
     final isPending = status == 'pending';
     final canEdit = isLastMeasurement && isBatchActive && !isPending;
 
+    const pink = Color(0xFFF07281);
+    const yellow = Color(0xFFF9C851);
+
     return InkWell(
       onTap: isPending ? null : onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isPending 
-                ? [const Color(0xFFFFF9E6), Colors.white]
-                : [Colors.white, const Color(0xFFFAFAFA)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isPending ? yellow.withOpacity(0.45) : const Color(0xFFF1EAEA),
+            width: 1,
           ),
-          borderRadius: BorderRadius.circular(24),
-          border: isPending
-              ? Border.all(color: const Color(0xFFFFB74D), width: 3)
-              : Border.all(color: const Color(0xFFE0E0E0), width: 1),
           boxShadow: [
             BoxShadow(
-              color: isPending 
-                  ? const Color(0xFFFFB74D).withOpacity(0.2)
-                  : Colors.black.withOpacity(0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-              spreadRadius: 1,
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (isPending)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF3E0),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFFFE0B2)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.pending_actions,
-                          size: 16, color: Color(0xFFF57C00)),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'Pendiente de medición',
-                        style: TextStyle(
-                          color: Color(0xFFF57C00),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                color: isPending ? yellow : pink,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
                 ),
-              Row(
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!isPending) ...[
+                  if (isPending)
                     Container(
-                      padding: const EdgeInsets.all(14),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF4CAF50).withOpacity(0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                            spreadRadius: 1,
+                        color: const Color(0xFFFFF3E0),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFFFFE0B2)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.pending_actions,
+                              size: 16, color: Color(0xFFF57C00)),
+                          SizedBox(width: 6),
+                          Text(
+                            'Pendiente de medición',
+                            style: TextStyle(
+                              color: Color(0xFFF57C00),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.monitor_weight_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
                     ),
-                    const SizedBox(width: 12),
-                  ],
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          date,
-                          style: const TextStyle(
-                            color: Color(0xFF2D3250),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                  Row(
+                    children: [
+                      if (!isPending)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFE3E8),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          note,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
+                          child: const Icon(
+                            Icons.monitor_weight_outlined,
+                            color: pink,
+                            size: 22,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
                         ),
-                      ],
-                    ),
-                  ),
-                  if (isPending) ...[
-                    ElevatedButton(
-                      onPressed: onEdit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2D3250),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Icon(Icons.edit, size: 18),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: onDelete,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Icon(Icons.delete_outline, size: 18),
-                    ),
-                  ],
-                  if (!isPending)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
+                      if (!isPending) const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              weight.toStringAsFixed(1),
+                              date,
                               style: const TextStyle(
-                                color: Color(0xFF2D3250),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
+                                color: Color(0xFF3E3E3E),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 2),
+                            const SizedBox(height: 4),
                             Text(
-                              'kg',
-                              style: TextStyle(
-                                color: Colors.grey[600],
+                              note,
+                              style: const TextStyle(
+                                color: Color(0xFF7B7B7B),
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Nunito Sans',
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isPending) ...[
+                        ElevatedButton(
+                          onPressed: onEdit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: pink,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Icon(Icons.edit, size: 18),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: onDelete,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFE45B5B),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Icon(Icons.delete_outline, size: 18),
+                        ),
+                      ],
+                      if (!isPending)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  weight.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    color: Color(0xFF3E3E3E),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  'kg',
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF4D6D).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.pets,
+                                    size: 12,
+                                    color: Color(0xFFF07281),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$animalCount',
+                                    style: const TextStyle(
+                                      color: Color(0xFFF07281),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF4D6D).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.pets,
-                                size: 12,
-                                color: const Color(0xFFFF4D6D).withOpacity(0.8),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '$animalCount',
-                                style: TextStyle(
-                                  color:
-                                      const Color(0xFFFF4D6D).withOpacity(0.8),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                    ],
+                  ),
+                  if (canEdit && (onEdit != null || onDelete != null))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (onEdit != null)
+                            TextButton.icon(
+                              onPressed: onEdit,
+                              icon: const Icon(Icons.edit, size: 18),
+                              label: const Text('Editar'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: pink,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
+                            ),
+                          if (onEdit != null && onDelete != null)
+                            const SizedBox(width: 8),
+                          if (onDelete != null)
+                            TextButton.icon(
+                              onPressed: onDelete,
+                              icon: const Icon(Icons.delete, size: 18),
+                              label: const Text('Eliminar'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: const Color(0xFFE45B5B),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                 ],
               ),
-              // Botones de editar y eliminar para la última medición
-              if (canEdit && (onEdit != null || onDelete != null))
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (onEdit != null)
-                        TextButton.icon(
-                          onPressed: onEdit,
-                          icon: const Icon(Icons.edit, size: 18),
-                          label: const Text('Editar'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF2D3250),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          ),
-                        ),
-                      if (onEdit != null && onDelete != null)
-                        const SizedBox(width: 8),
-                      if (onDelete != null)
-                        TextButton.icon(
-                          onPressed: onDelete,
-                          icon: const Icon(Icons.delete, size: 18),
-                          label: const Text('Eliminar'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -461,42 +457,8 @@ class _BatchBiometricDetailViewState
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF2D3250)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: batchAsync.when(
-          data: (batch) => Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE5EC),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.analytics_outlined,
-                  color: Color(0xFFFF4D6D),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                batch.name,
-                style: const TextStyle(
-                  color: Color(0xFF2D3250),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
-          loading: () => const Text('Cargando...', style: TextStyle(color: Color(0xFF2D3250))),
-          error: (_, __) => Text('Lote ${widget.batchId}', style: const TextStyle(color: Color(0xFF2D3250))),
-        ),
+      appBar: const StandardAppBar(
+        title: 'Detalle Biometría',
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -807,13 +769,26 @@ class _BatchBiometricDetailViewState
           ),
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFF07281).withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: FloatingActionButton(
           onPressed: () => _showDatePickerAndNavigate(context),
-          backgroundColor: const Color(0xFFFF4D6D),
-          elevation: 6,
-          child: const Icon(Icons.add, color: Colors.white, size: 24),
+          backgroundColor: const Color(0xFFF07281),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
         ),
       ),
     );

@@ -9,6 +9,15 @@ class EditAnimalView extends ConsumerStatefulWidget {
 
   const EditAnimalView({super.key, this.animalId, required this.batchId});
 
+  static Future<void> show(BuildContext context, {String? animalId, required String batchId}) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EditAnimalView(animalId: animalId, batchId: batchId),
+    );
+  }
+
   @override
   ConsumerState<EditAnimalView> createState() => _EditAnimalViewState();
 }
@@ -23,6 +32,7 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
   late TextEditingController _notesController;
   late DateTime _birthDate;
   late DateTime _entryDate;
+  String _selectedGender = 'male';
 
   @override
   void initState() {
@@ -118,8 +128,7 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
       status: 'active',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      gender:
-          'unknown', // You might want to add a field to capture gender in your form
+      gender: _selectedGender
     );
 
     final repository = ref.read(animalRepositoryProvider);
@@ -150,115 +159,410 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.animalId != null ? 'Editar Animal' : 'Nuevo Animal'),
-        actions: [
-          IconButton(onPressed: _saveAnimal, icon: const Icon(Icons.save)),
-        ],
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Identificador
-            TextFormField(
-              controller: _identifierController,
-              decoration: const InputDecoration(
-                labelText: 'Identificador (Arete)',
-                border: OutlineInputBorder(),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Barra superior
+                  Center(
+                    child: Container(
+                      width: 50,
+                      height: 5,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFE5EC), Color(0xFFFFF0F2)],
+                        ),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  // Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFFE5EC), Color(0xFFFFF0F2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFF07281),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.pets_rounded,
+                          color: Color(0xFFF07281),
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.animalId != null ? 'Editar Animal' : 'Nuevo Animal',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2D3250),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            const Text(
+                              'Completa la información del animal',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF9E9E9E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                      _buildField(
+                        label: 'Tipo de animal',
+                        controller: _typeController,
+                        placeholder: 'Lechón',
+                        icon: Icons.pets_outlined,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'El tipo de animal es requerido';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildField(
+                        label: 'Identificador/Arete',
+                        controller: _identifierController,
+                        placeholder: 'L0004-0001',
+                        icon: Icons.tag_outlined,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'El identificador es requerido';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Este identificador debe ser único',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF7B7B7B),
+                          fontFamily: 'Nunito Sans',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildField(
+                        label: 'Peso inicial (kg)',
+                        controller: _weightController,
+                        placeholder: '',
+                        icon: Icons.monitor_weight_outlined,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'El peso es requerido';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'Ingrese un número válido';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildDateField(
+                        label: 'Fecha de nacimiento',
+                        date: _birthDate,
+                        onTap: () => _selectDate(context, true),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildField(
+                        label: 'Raza/Línea genética',
+                        controller: _breedController,
+                        placeholder: 'No especificada',
+                        icon: Icons.science_outlined,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Género:',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF7B7B7B),
+                          fontFamily: 'Nunito Sans',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildGenderButton('Macho', true),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildGenderButton('Hembra', false),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildField(
+                        label: 'Notas (opcional)',
+                        controller: _notesController,
+                        placeholder: '',
+                        icon: Icons.note_outlined,
+                        maxLines: 3,
+                      ),
+                  const SizedBox(height: 28),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Cancelar',
+                            style: TextStyle(
+                              color: Color(0xFF757575),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: _saveAnimal,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF4D6D),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Guardar',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El identificador es requerido';
-                }
-                return null;
-              },
             ),
-            const SizedBox(height: 16),
-            // Peso
-            TextFormField(
-              controller: _weightController,
-              decoration: const InputDecoration(
-                labelText: 'Peso (kg)',
-                border: OutlineInputBorder(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required String label,
+    required TextEditingController controller,
+    required String placeholder,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+            color: Color(0xFF7B7B7B),
+            fontFamily: 'Nunito Sans',
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          keyboardType: keyboardType,
+          maxLines: maxLines,
+          style: const TextStyle(
+            fontSize: 15,
+            color: Color(0xFF3E3E3E),
+            fontFamily: 'Nunito Sans',
+          ),
+          decoration: InputDecoration(
+            hintText: placeholder,
+            hintStyle: const TextStyle(
+              color: Color(0xFFBDBDBD),
+              fontSize: 15,
+              fontFamily: 'Nunito Sans',
+            ),
+            prefixIcon: Icon(
+              icon,
+              color: const Color(0xFF7B7B7B),
+              size: 22,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFE9E9E9),
+                width: 1,
               ),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El peso es requerido';
-                }
-                if (double.tryParse(value) == null) {
-                  return 'Ingrese un número válido';
-                }
-                return null;
-              },
             ),
-            const SizedBox(height: 16),
-            // Tipo de animal
-            TextFormField(
-              controller: _typeController,
-              decoration: const InputDecoration(
-                labelText: 'Tipo de Animal',
-                border: OutlineInputBorder(),
-                hintText: 'Ej: Cerdo de engorde, Reproductor, etc.',
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFE9E9E9),
+                width: 1,
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El tipo de animal es requerido';
-                }
-                return null;
-              },
             ),
-            const SizedBox(height: 16),
-            // Raza
-            TextFormField(
-              controller: _breedController,
-              decoration: const InputDecoration(
-                labelText: 'Raza',
-                border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFF07281),
+                width: 2,
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'La raza es requerida';
-                }
-                return null;
-              },
             ),
-            const SizedBox(height: 16),
-            // Fecha de nacimiento
-            ListTile(
-              title: const Text('Fecha de nacimiento'),
-              subtitle: Text(_formatDate(_birthDate)),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () => _selectDate(context, true),
-            ),
-            const SizedBox(height: 16),
-            // Fecha de ingreso
-            ListTile(
-              title: const Text('Fecha de ingreso'),
-              subtitle: Text(_formatDate(_entryDate)),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () => _selectDate(context, false),
-            ),
-            const SizedBox(height: 16),
-            // Notas
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notas',
-                border: OutlineInputBorder(),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFE45B5B),
+                width: 1,
               ),
-              maxLines: 3,
             ),
-          ],
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFE45B5B),
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateField({
+    required String label,
+    required DateTime date,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+            color: Color(0xFF7B7B7B),
+            fontFamily: 'Nunito Sans',
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFE9E9E9)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  color: Color(0xFF7B7B7B),
+                  size: 22,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  _formatDate(date),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF3E3E3E),
+                    fontFamily: 'Nunito Sans',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderButton(String label, bool isMale) {
+    final isSelected = isMale; // Puedes agregar lógica de estado aquí
+    return OutlinedButton(
+      onPressed: () {
+        // Agregar lógica de selección
+      },
+      style: OutlinedButton.styleFrom(
+        backgroundColor: isSelected ? const Color(0xFF5DA271) : Colors.white,
+        foregroundColor: isSelected ? Colors.white : const Color(0xFF6B5E55),
+        side: BorderSide(
+          color: isSelected ? const Color(0xFF5DA271) : const Color(0xFFE9E9E9),
+          width: 1.5,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Poppins',
+          fontSize: 15,
         ),
       ),
     );
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }

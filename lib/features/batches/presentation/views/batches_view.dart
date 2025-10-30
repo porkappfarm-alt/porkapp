@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/features/batches/providers/batches_provider.dart';
+import 'package:porkapp/features/batches/presentation/widgets/batch_form_dialog.dart';
+import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/presentation/widgets/batch_list_item.dart';
-import 'package:porkapp/features/batches/providers/batch_providers.dart';
 
 class BatchesView extends ConsumerWidget {
   const BatchesView({super.key});
@@ -13,10 +15,35 @@ class BatchesView extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: const Text('Lotes'),
-        centerTitle: true,
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Gestión de Lotes',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF6B5E55),
+                fontFamily: 'Poppins',
+              ),
+            ),
+            ref.watch(batchListProvider).maybeWhen(
+              data: (batches) => Text(
+                'Total: ${batches.length} lotes',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF7B7B7B),
+                ),
+              ),
+              orElse: () => const SizedBox.shrink(),
+            ),
+          ],
+        ),
+        automaticallyImplyLeading: false,
       ),
       body: ref
           .watch(batchListProvider)
@@ -42,10 +69,9 @@ class BatchesView extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      ElevatedButton.icon(
+                      ElevatedButton(
                         onPressed: () => _showCreateBatchDialog(context),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Crear Lote'),
+                        child: const Text('Crear Lote'),
                       ),
                     ],
                   ),
@@ -101,10 +127,27 @@ class BatchesView extends ConsumerWidget {
               ),
             ),
           ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateBatchDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Nuevo Lote'),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF5DA271).withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          heroTag: 'batches_fab',
+          onPressed: () => _showCreateBatchDialog(context),
+          backgroundColor: const Color(0xFF5DA271),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
+        ),
       ),
     );
   }

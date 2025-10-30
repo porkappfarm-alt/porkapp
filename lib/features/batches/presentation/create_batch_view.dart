@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/batches/presentation/batches_controller.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
@@ -124,22 +125,8 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF5D4037)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          isEditing ? 'Editar Lote' : 'Nuevo Lote',
-          style: const TextStyle(
-            color: Color(0xFF5D4037),
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
+      appBar: StandardAppBar(
+        title: isEditing ? 'Editar Lote' : 'Crear Lote',
       ),
       body: Form(
         key: _formKey,
@@ -413,11 +400,13 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEC407A),
+                      backgroundColor: const Color(0xFFFF4D6D),
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
                     ),
                     child: _isLoading
                         ? const SizedBox.square(

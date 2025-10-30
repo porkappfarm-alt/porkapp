@@ -200,19 +200,17 @@ class _BatchAnimalsManagerViewState
   }
 
   void _showAddAnimalDialog(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => EditAnimalView(batchId: widget.batchId),
-      ),
+    EditAnimalView.show(
+      context,
+      batchId: widget.batchId,
     );
   }
 
   void _showEditAnimalDialog(BuildContext context, String animalId) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) =>
-            EditAnimalView(animalId: animalId, batchId: widget.batchId),
-      ),
+    EditAnimalView.show(
+      context,
+      animalId: animalId,
+      batchId: widget.batchId,
     );
   }
 

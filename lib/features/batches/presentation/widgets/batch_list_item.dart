@@ -9,6 +9,8 @@ class BatchListItem extends StatelessWidget {
   final String status;
   final String? imageUrl;
   final VoidCallback onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const BatchListItem({
     super.key,
@@ -19,163 +21,307 @@ class BatchListItem extends StatelessWidget {
     required this.status,
     this.imageUrl,
     required this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
+    final progress = _calculateProgress();
+    
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Imagen del lote con overlay
-            Stack(
-              children: [
-                // Imagen
-                SizedBox(
-                  height: 150,
-                  width: double.infinity,
-                  child: imageUrl != null
-                      ? Image.network(
-                          imageUrl!,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return const _DefaultBatchImage();
-                          },
-                        )
-                      : const _DefaultBatchImage(),
-                ),
-                // Overlay oscuro
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.7),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Título y estado
-                Positioned(
-                  bottom: 12,
-                  left: 12,
-                  right: 12,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        name,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(status),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _getStatusText(status),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFF1EAEA), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Franja superior de color según estado
+          Container(
+            height: 10,
+            decoration: BoxDecoration(
+              color: _getStatusColor(status),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(14),
+              ),
             ),
-            // Información del lote
-            Padding(
+          ),
+          // Contenido de la tarjeta
+          InkWell(
+            onTap: onTap,
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(14),
+            ),
+            child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header: Nombre y Badge de Estado
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF3E3E3E),
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(status).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _getStatusText(status),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Campos de información
                   Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: theme.textTheme.bodySmall?.color,
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAFB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 14,
+                                    color: Color(0xFFF07281),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Inicio',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF6B5E55),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _formatDate(startDate),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF6B5E55),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAFB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.pets_outlined,
+                                    size: 14,
+                                    color: Color(0xFFF07281),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Animales',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF6B5E55),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '$initialCount/$initialCount',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF6B5E55),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Progreso del Lote
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Progreso del Lote',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6B5E55),
+                        ),
+                      ),
                       Text(
-                        'Fecha inicio: ${_formatDate(startDate)}',
-                        style: theme.textTheme.bodyMedium,
+                        '${progress.toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF6B5E55),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.pets,
-                        size: 16,
-                        color: theme.textTheme.bodySmall?.color,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress / 100,
+                      minHeight: 8,
+                      backgroundColor: const Color(0xFFE9E9E9),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFF5DA271),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Cantidad inicial: $initialCount cerdos',
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  if (initialAvgWeight > 0) ...[
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.scale,
-                          size: 16,
-                          color: theme.textTheme.bodySmall?.color,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Peso inicial promedio: ${initialAvgWeight.toStringAsFixed(1)} kg',
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                      ],
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          // Botones de Acción
+          Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Color(0xFFF0E0E0), width: 1),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: onEdit,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(14),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          right: BorderSide(color: Color(0xFFF0E0E0), width: 1),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: Color(0xFFF07281),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Editar',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFF07281),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: onDelete,
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(14),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            size: 16,
+                            color: Color(0xFF6B5E55),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Eliminar',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF6B5E55),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  double _calculateProgress() {
+    // Por ahora retornamos 100% si está activo, 0% si está pendiente
+    switch (status.toLowerCase()) {
+      case 'activo':
+      case 'active':
+        return 100.0;
+      case 'finalizado':
+      case 'finished':
+        return 100.0;
+      case 'pendiente':
+      case 'pending':
+        return 0.0;
+      default:
+        return 50.0;
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -186,15 +332,18 @@ class BatchListItem extends StatelessWidget {
     switch (status.toLowerCase()) {
       case 'activo':
       case 'active':
-        return Colors.green;
+        return const Color(0xFFF07281); // Rosa Cerdito
       case 'finalizado':
       case 'finished':
-        return Colors.blue;
+        return const Color(0xFF5DA271); // Verde Agro
+      case 'pendiente':
+      case 'pending':
+        return const Color(0xFFF9C851); // Amarillo Suave
       case 'cancelado':
       case 'cancelled':
-        return Colors.red;
+        return const Color(0xFFE45B5B); // Rojo Suave
       default:
-        return Colors.grey;
+        return const Color(0xFFC7C7C7); // Gris Neutro
     }
   }
 
@@ -206,29 +355,14 @@ class BatchListItem extends StatelessWidget {
       case 'finalizado':
       case 'finished':
         return 'Finalizado';
+      case 'pendiente':
+      case 'pending':
+        return 'Pendiente';
       case 'cancelado':
       case 'cancelled':
         return 'Cancelado';
       default:
         return 'Desconocido';
     }
-  }
-}
-
-class _DefaultBatchImage extends StatelessWidget {
-  const _DefaultBatchImage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Center(
-        child: Icon(
-          Icons.pets,
-          size: 48,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
   }
 }

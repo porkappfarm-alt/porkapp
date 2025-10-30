@@ -113,7 +113,7 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
         actions: [
           if (_hasChanges && !editState.isLoading)
             IconButton(
-              icon: const Icon(Icons.check_rounded, color: Color(0xFF4CAF50)),
+              icon: const Icon(Icons.check_rounded, color: Color(0xFF5DA271)),
               onPressed: _saveChanges,
               tooltip: 'Guardar cambios',
             ),
@@ -124,126 +124,109 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: const Color(0xFFE0E0E0),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildField(
-                    controller: _nameController,
-                    label: 'Nombre',
-                    placeholder: 'Ej. Corral Sector Norte',
-                    icon: Icons.label_outline,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'El nombre es requerido';
-                      }
-                      return null;
-                    },
-                    isRequired: true,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildField(
-                    controller: _locationController,
-                    label: 'Ubicación',
-                    placeholder: 'Ej. Cerca del granero viejo',
-                    icon: Icons.location_on_outlined,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildField(
-                    controller: _capacityController,
-                    label: 'Capacidad',
-                    placeholder: 'Ej. 50',
-                    icon: Icons.groups_outlined,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return null;
-                      }
-
-                      value = value.trim();
-                      if (!RegExp(r'^\d+$').hasMatch(value)) {
-                        return 'Ingrese solo números';
-                      }
-
-                      try {
-                        final number = int.parse(value);
-                        if (number < 0) {
-                          return 'La capacidad no puede ser negativa';
-                        }
-                        if (number > 1000) {
-                          return 'La capacidad parece muy alta';
-                        }
-                      } catch (e) {
-                        return 'Número no válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  _buildField(
-                    controller: _notesController,
-                    label: 'Notas',
-                    placeholder: 'Ej. Necesita reparación de puerta',
-                    icon: Icons.note_outlined,
-                    maxLines: 4,
-                  ),
-                ],
-              ),
+            _buildField(
+              controller: _nameController,
+              label: 'Nombre',
+              placeholder: 'Ej. Corral Sector Norte',
+              icon: Icons.label_outline,
+              iconColor: const Color(0xFFF07281),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El nombre es requerido';
+                }
+                return null;
+              },
+              isRequired: true,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+            _buildField(
+              controller: _locationController,
+              label: 'Ubicación',
+              placeholder: 'Ej. Cerca del granero viejo',
+              icon: Icons.location_on_outlined,
+              iconColor: const Color(0xFF5DA271),
+            ),
+            const SizedBox(height: 12),
+            _buildField(
+              controller: _capacityController,
+              label: 'Capacidad',
+              placeholder: 'Ej. 50',
+              icon: Icons.groups_outlined,
+              iconColor: const Color(0xFF6B5E55),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return null;
+                }
+
+                value = value.trim();
+                if (!RegExp(r'^\d+$').hasMatch(value)) {
+                  return 'Ingrese solo números';
+                }
+
+                try {
+                  final number = int.parse(value);
+                  if (number < 0) {
+                    return 'La capacidad no puede ser negativa';
+                  }
+                  if (number > 1000) {
+                    return 'La capacidad parece muy alta';
+                  }
+                } catch (e) {
+                  return 'Número no válido';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildField(
+              controller: _notesController,
+              label: 'Notas',
+              placeholder: 'Ej. Necesita reparación de puerta',
+              icon: Icons.note_outlined,
+              iconColor: const Color(0xFF7B7B7B), // Gris Medio
+              maxLines: 4,
+            ),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              height: 54,
+              height: 48,
               child: ElevatedButton(
                 onPressed:
                     _hasChanges && !editState.isLoading ? _saveChanges : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF4D6D),
+                  backgroundColor: const Color(0xFFFF4D6D), // Rosa Cerdito corporativo
                   foregroundColor: Colors.white,
                   elevation: 0,
+                  shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: editState.maybeWhen(
                   loading: () => const SizedBox.square(
-                    dimension: 24,
+                    dimension: 22,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
+                      strokeWidth: 2.5,
                       color: Colors.white,
                     ),
                   ),
                   orElse: () => const Text(
                     'Guardar cambios',
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Poppins',
                     ),
                   ),
                 ),
               ),
             ),
             if (_hasChanges) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 48,
                 child: OutlinedButton(
                   onPressed: editState.isLoading
                       ? null
@@ -251,8 +234,12 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
                           Navigator.of(context).pop();
                         },
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF4CAF50),
-                    side: const BorderSide(color: Color(0xFF81C784)),
+                    foregroundColor: const Color(0xFF6B5E55),
+                    backgroundColor: Colors.white,
+                    side: const BorderSide(
+                      color: Color(0xFFE9E9E9),
+                      width: 1.5,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -261,6 +248,8 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
                     'Descartar cambios',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
                     ),
                   ),
                 ),
@@ -277,6 +266,7 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
     required String label,
     required String placeholder,
     required IconData icon,
+    required Color iconColor,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
     int maxLines = 1,
@@ -285,91 +275,71 @@ class _EditCorralViewState extends ConsumerState<EditCorralView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 4,
-              height: 4,
-              decoration: const BoxDecoration(
-                color: Color(0xFF4CAF50),
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              isRequired ? '${label.toUpperCase()} *' : label.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.4,
-                color: Color(0xFF9E9E9E),
-              ),
-            ),
-          ],
+        Text(
+          isRequired ? '${label.toUpperCase()} *' : label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+            color: Color(0xFF7B7B7B),
+            fontFamily: 'Nunito Sans',
+          ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           validator: validator,
           keyboardType: keyboardType,
           maxLines: maxLines,
           style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF2D3250),
+            fontSize: 15,
+            color: Color(0xFF3E3E3E),
+            fontFamily: 'Nunito Sans',
           ),
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: TextStyle(
               color: Colors.grey[400],
               fontSize: 15,
+              fontFamily: 'Nunito Sans',
             ),
-            prefixIcon: Container(
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                icon,
-                color: const Color(0xFF4CAF50),
-                size: 20,
-              ),
+            prefixIcon: Icon(
+              icon,
+              color: iconColor,
+              size: 22,
             ),
-            filled: true,
-            fillColor: const Color(0xFFFAFAFA),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFFE0E0E0),
-                width: 1.5,
+                color: Color(0xFFE9E9E9),
+                width: 1,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFFE0E0E0),
-                width: 1.5,
+                color: Color(0xFFE9E9E9),
+                width: 1,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFF4CAF50),
+                color: Color(0xFFF07281),
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFFE53935),
-                width: 1.5,
+                color: Color(0xFFE45B5B),
+                width: 1,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFFE53935),
+                color: Color(0xFFE45B5B),
                 width: 2,
               ),
             ),

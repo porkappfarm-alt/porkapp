@@ -18,305 +18,332 @@ class BatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final progress = batch.headcountStart > 0
-        ? batch.animals.length / batch.headcountStart
-        : 0.0;
-
-    return Card(
-      elevation: 2,
-      color: const Color(0xFFFFFFFF), // Blanco
-      margin:
-          EdgeInsets.zero, // Removido el margen ya que está en el SliverPadding
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: const Color(0xFFE94C5D).withOpacity(0.15), // Coral suave
-          width: 1.5,
-        ),
+    final progress = _calculateProgress();
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFF1EAEA), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Encabezado con estado
-            Container(
-              decoration: BoxDecoration(
-                color: _getStatusColor(context, batch.status),
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    _getStatusColor(context, batch.status),
-                    _getStatusColor(context, batch.status).withOpacity(0.8),
-                  ],
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Icon(
-                    _getStatusIcon(batch.status),
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _getStatusText(batch.status),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+      child: Column(
+        children: [
+          // Franja superior de color según estado
+          Container(
+            height: 10,
+            decoration: BoxDecoration(
+              color: _getStatusColor(batch.status),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(14),
               ),
             ),
-            // Contenido principal
-            Padding(
+          ),
+          // Contenido de la tarjeta
+          InkWell(
+            onTap: onTap,
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(14),
+            ),
+            child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nombre del lote
-                  Text(
-                    batch.name,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3B1D2D), // Burdeos
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Información del lote
+                  // Header: Nombre y Badge de Estado
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: _InfoItem(
-                          icon: Icons.calendar_today,
-                          label: 'Inicio',
-                          value: _formatDate(batch.createdAt),
+                      Text(
+                        batch.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF3E3E3E),
+                          fontFamily: 'Poppins',
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _InfoItem(
-                          icon: Icons.group,
-                          label: 'Animales',
-                          value:
-                              '${batch.animals.length}/${batch.headcountStart}',
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(batch.status).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _getStatusText(batch.status),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _getStatusColor(batch.status),
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Barra de progreso
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE94C5D)
-                          .withOpacity(0.08), // Coral muy suave
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE94C5D).withOpacity(0.12),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Progreso del Lote',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
+                  // Campos de información
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAFB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 14,
+                                    color: Color(0xFFF07281),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Inicio',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF6B5E55),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE94C5D), // Coral
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${(progress * 100).toStringAsFixed(1)}%',
+                              const SizedBox(height: 4),
+                              Text(
+                                _formatDate(batch.createdAt),
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFFFFFFFF), // Blanco
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF6B5E55),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: theme.colorScheme.surface,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              _getProgressColor(context, progress),
-                            ),
-                            minHeight: 10,
+                            ],
                           ),
                         ),
-                      ],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAFB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.pets_outlined,
+                                    size: 14,
+                                    color: Color(0xFFF07281),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Animales',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF6B5E55),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${batch.animals.length}/${batch.headcountStart}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF6B5E55),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Progreso del Lote
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Progreso del Lote',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6B5E55),
+                        ),
+                      ),
+                      Text(
+                        '${progress.toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF6B5E55),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress / 100,
+                      minHeight: 8,
+                      backgroundColor: const Color(0xFFE9E9E9),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFF4CAF50), // Verde Material (mismo de corrales)
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            // Botones de acción
-            if (onEdit != null || onDelete != null)
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          ),
+          // Botones de Acción
+          Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Color(0xFFF0E0E0), width: 1),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: onEdit,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(14),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          right: BorderSide(color: Color(0xFFF0E0E0), width: 1),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: Color(0xFFF07281),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Editar',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFF07281),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (onEdit != null)
-                      IconButton(
-                        icon: Icon(
-                          Icons.edit_rounded,
-                          color: theme.colorScheme.primary,
-                        ),
-                        onPressed: onEdit,
-                        tooltip: 'Editar lote',
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primaryContainer
-                              .withOpacity(0.3),
-                        ),
+                Expanded(
+                  child: InkWell(
+                    onTap: onDelete,
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(14),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            size: 16,
+                            color: Color(0xFF6B5E55),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Eliminar',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF6B5E55),
+                            ),
+                          ),
+                        ],
                       ),
-                    if (onDelete != null)
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_rounded,
-                          color: theme.colorScheme.error,
-                        ),
-                        onPressed: onDelete,
-                        tooltip: 'Eliminar lote',
-                        style: IconButton.styleFrom(
-                          backgroundColor:
-                              theme.colorScheme.errorContainer.withOpacity(0.3),
-                        ),
-                      ),
-                  ],
+                    ),
+                  ),
                 ),
-              ),
-          ],
-        ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  double _calculateProgress() {
+    if (batch.headcountStart == 0) return 0.0;
+    final progress = (batch.animals.length / batch.headcountStart) * 100;
+    return progress.clamp(0.0, 100.0);
   }
 
   String _formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
-  Color _getStatusColor(BuildContext context, String status) {
+  Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'activo':
-        return const Color(0xFF44C13C); // Verde más vivo
+      case 'active':
+        return const Color(0xFFF07281); // Rosa Cerdito
       case 'finalizado':
-        return const Color(0xFFE94C5D); // Coral
+      case 'finished':
+        return const Color(0xFF5DA271); // Verde Agro
+      case 'pendiente':
+      case 'pending':
+        return const Color(0xFFF9C851); // Amarillo Suave
+      case 'cancelado':
+      case 'cancelled':
       case 'suspendido':
-        return const Color(0xFF7E1946); // Burdeos más vivo
+        return const Color(0xFFE45B5B); // Rojo Suave
       default:
-        return const Color(0xFF3B1D2D); // Burdeos por defecto
-    }
-  }
-
-  IconData _getStatusIcon(String status) {
-    switch (status.toLowerCase()) {
-      case 'activo':
-        return Icons.play_circle_outline_rounded;
-      case 'finalizado':
-        return Icons.check_circle_outline_rounded;
-      case 'suspendido':
-        return Icons.pause_circle_outline_rounded;
-      default:
-        return Icons.help_outline_rounded;
+        return const Color(0xFFC7C7C7); // Gris Neutro
     }
   }
 
   String _getStatusText(String status) {
-    return status[0].toUpperCase() + status.substring(1).toLowerCase();
-  }
-
-  Color _getProgressColor(BuildContext context, double progress) {
-    if (progress < 0.3) return const Color(0xFFE94C5D); // Coral
-    if (progress < 0.7) return const Color(0xFF3B1D2D); // Burdeos
-    return const Color(0xFF5CB85C); // Verde campo
-  }
-}
-
-class _InfoItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _InfoItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFCD8D4).withOpacity(0.3), // Rosa cerdito
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: const Color(0xFFE94C5D), // Coral
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 11,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
-              fontSize: 14,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
+    switch (status.toLowerCase()) {
+      case 'activo':
+      case 'active':
+        return 'Activo';
+      case 'finalizado':
+      case 'finished':
+        return 'Finalizado';
+      case 'pendiente':
+      case 'pending':
+        return 'Pendiente';
+      case 'cancelado':
+      case 'cancelled':
+      case 'suspendido':
+        return 'Cancelado';
+      default:
+        return 'Desconocido';
+    }
   }
 }

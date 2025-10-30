@@ -125,8 +125,8 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: const StandardAppBar(
-        title: 'Crear Lote',
+      appBar: StandardAppBar(
+        title: isEditing ? 'Editar Lote' : 'Crear Lote',
       ),
       body: Form(
         key: _formKey,

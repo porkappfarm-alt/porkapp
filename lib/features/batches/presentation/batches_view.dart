@@ -275,20 +275,12 @@ class BatchesView extends ConsumerWidget {
               ),
             ],
           ),
-          child: FloatingActionButton.extended(
+          child: FloatingActionButton(
             heroTag: 'batches_fab',
             onPressed: () => _showCreateBatchDialog(context, ref),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
-              'Nuevo Lote',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
+            child: const Icon(Icons.add, color: Colors.white),
           ),
         ),
       ),

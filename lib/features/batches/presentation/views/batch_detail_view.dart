@@ -277,95 +277,95 @@ class _BatchHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFF07281).withOpacity(0.15),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF1EAEA), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  batch.name,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5D4037),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF4CAF50).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+          Container(
+            height: 8,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF07281),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        batch.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF3E3E3E),
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF4FAF6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(
+                            Icons.check_circle,
+                            size: 16,
+                            color: Color(0xFF5DA271),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'Activo',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF5DA271),
+                              fontFamily: 'Nunito Sans',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-                child: const Text(
-                  'Activo',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFAFAFA),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _InfoItem(
-                    icon: Icons.calendar_today_rounded,
-                    label: 'Fecha inicio',
-                    value: _formatDate(batch.createdAt),
-                    iconColor: const Color(0xFFF07281),
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 40,
-                  color: Colors.grey[300],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _InfoItem(
-                    icon: Icons.pets_rounded,
-                    label: 'Cantidad inicial',
-                    value: '${batch.headcountStart} cerdos',
-                    iconColor: const Color(0xFF4CAF50),
-                  ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    _InfoItem(
+                      icon: Icons.calendar_today_outlined,
+                      label: 'Fecha de creación',
+                      value: _formatDate(batch.createdAt),
+                      iconColor: const Color(0xFFF07281),
+                    ),
+                    const SizedBox(width: 12),
+                    _InfoItem(
+                      icon: Icons.pets_outlined,
+                      label: 'Animales iniciales',
+                      value: '${batch.headcountStart} cerdos',
+                      iconColor: const Color(0xFF5DA271),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -395,46 +395,57 @@ class _InfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: iconColor,
-          ),
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(12),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 18,
+                    color: iconColor,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF5D4037),
-                  fontWeight: FontWeight.w600,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF6B5E55),
+                      fontFamily: 'Nunito Sans',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Color(0xFF3E3E3E),
+                fontFamily: 'Nunito Sans',
+                fontWeight: FontWeight.w700,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

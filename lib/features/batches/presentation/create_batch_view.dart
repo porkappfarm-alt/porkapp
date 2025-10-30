@@ -400,11 +400,13 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEC407A),
+                      backgroundColor: const Color(0xFFFF4D6D),
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
                     ),
                     child: _isLoading
                         ? const SizedBox.square(

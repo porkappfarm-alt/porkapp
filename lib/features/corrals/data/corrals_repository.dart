@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/domain/corral.dart';
+import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/supabase/supabase.dart';
 
 class CorralsRepository {
@@ -46,6 +47,8 @@ class CorralsRepository {
       'active_batch_name': json['active_batch_name'],
       'active_batch_entry_date': json['active_batch_entry_date'],
       'last_biometry_avg_weight': json['last_biometry_avg_weight'],
+      'batches': json['batches'],
+      'active_batch_id': json['active_batch_id'],
       'status': status.name,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -61,6 +64,11 @@ class CorralsRepository {
             id,
             name,
             status,
+            created_at,
+            headcount_start,
+            corral_id,
+            initial_avg_weight,
+            notes,
             animal_count,
             entry_date,
             batch_biometrics(
@@ -75,10 +83,17 @@ class CorralsRepository {
       final corrals = response.map<Corral>((json) {
         // Buscar lote activo asociado al corral
         final batches = json['batches'] as List<dynamic>?;
-        final activeBatch = batches?.firstWhere(
-          (b) => b['status'] == 'active',
-          orElse: () => null,
-        );
+
+        // Buscar el lote activo sin usar orElse
+        dynamic activeBatch;
+        if (batches != null && batches.isNotEmpty) {
+          try {
+            activeBatch = batches.firstWhere((b) => b['status'] == 'active');
+          } catch (e) {
+            activeBatch = null;
+          }
+        }
+
         final animalCount =
             activeBatch != null ? (activeBatch['animal_count'] ?? 0) : 0;
         final batchName =
@@ -106,14 +121,45 @@ class CorralsRepository {
           }
         }
 
+        // DEBUG: Verificar batches antes de convertir
+        print('[REPO] Corral ${json['name']}: batches raw = $batches');
+        print('[REPO] Batches count: ${batches?.length ?? 0}');
+
+        // Convertir batches a objetos Batch
+        final batchObjects = batches
+            ?.map((b) {
+              print(
+                  '[REPO] Intentando convertir batch: ${b['id']} - ${b['name']}');
+              try {
+                final batch = Batch.fromJson(b as Map<String, dynamic>);
+                print('[REPO] Batch convertido exitosamente: ${batch.id}');
+                return batch;
+              } catch (e) {
+                print('[REPO] Error converting batch: $e');
+                print('[REPO] Batch data: $b');
+                return null;
+              }
+            })
+            .whereType<Batch>()
+            .toList();
+
         final mappedJson = _processCorralJson({
           ...json,
           'active_batch_count': animalCount,
           'active_batch_name': batchName,
           'active_batch_entry_date': entryDate?.toIso8601String(),
           'last_biometry_avg_weight': lastBiometryAvgWeight,
+          'active_batch_id': activeBatch != null ? activeBatch['id'] : null,
         });
-        return Corral.fromJson(mappedJson);
+
+        print(
+            '[REPO] Corral ${json['name']}: batches count = ${batches?.length}, activeBatchId = ${activeBatch != null ? activeBatch['id'] : null}');
+
+        // Crear el Corral con los batches ya convertidos
+        final corral = Corral.fromJson(mappedJson);
+
+        // Agregar los batches usando copyWith (si Freezed lo soporta) o reconstruir
+        return corral.copyWith(batches: batchObjects);
       }).toList();
       return corrals;
     } catch (e, stack) {

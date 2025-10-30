@@ -25,6 +25,10 @@ _$CorralImpl _$$CorralImplFromJson(Map<String, dynamic> json) => _$CorralImpl(
           : DateTime.parse(json['active_batch_entry_date'] as String),
       lastBiometryAvgWeight:
           (json['last_biometry_avg_weight'] as num?)?.toDouble(),
+      batches: (json['batches'] as List<dynamic>?)
+          ?.map((e) => Batch.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      activeBatchId: json['active_batch_id'] as String?,
     );
 
 Map<String, dynamic> _$$CorralImplToJson(_$CorralImpl instance) =>
@@ -44,6 +48,8 @@ Map<String, dynamic> _$$CorralImplToJson(_$CorralImpl instance) =>
       'active_batch_entry_date':
           instance.activeBatchEntryDate?.toIso8601String(),
       'last_biometry_avg_weight': instance.lastBiometryAvgWeight,
+      'batches': instance.batches?.map((e) => e.toJson()).toList(),
+      'active_batch_id': instance.activeBatchId,
     };
 
 const _$CorralStatusEnumMap = {

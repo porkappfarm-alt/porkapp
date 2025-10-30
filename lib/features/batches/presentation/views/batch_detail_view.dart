@@ -9,6 +9,7 @@ import 'package:porkapp/features/batches/providers/batch_provider.dart'
     as single_batch;
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/batches/presentation/widgets/error_view.dart';
+import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
 class BatchDetailView extends ConsumerWidget {
   final String batchId;
@@ -18,6 +19,8 @@ class BatchDetailView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final batchAsync = ref.watch(single_batch.batchProvider(batchId));
+    // Eliminado: lógica incorrecta y referencias a Corral/corralProvider
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
@@ -103,7 +106,8 @@ class BatchDetailView extends ConsumerWidget {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: const Color(0xFFF07281).withOpacity(0.15),
+                                  color:
+                                      const Color(0xFFF07281).withOpacity(0.15),
                                   width: 1,
                                 ),
                                 boxShadow: [
@@ -194,40 +198,48 @@ class BatchDetailView extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color(0xFFFF5A6E),
-                Color(0xFFFF7F8F),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFF5A6E).withOpacity(0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: FloatingActionButton.extended(
-            onPressed: () => _showAddAnimalDialog(context),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
-              'Agregar Animal',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ),
+      floatingActionButton: batchAsync.when(
+        data: (batch) {
+          final corralId = batch.corralId;
+          if (corralId == null) {
+            return FloatingActionButton(
+              onPressed: null,
+              backgroundColor: Colors.grey,
+              child: const Icon(Icons.add, color: Colors.white),
+              tooltip: 'No se encontró corral',
+            );
+          }
+          final corralAsync = ref.watch(corralByIdProvider(corralId));
+          return corralAsync.when(
+            data: (corral) {
+              final corralCapacity = corral?.capacity ?? 0;
+              return ref.watch(batchAnimalsProvider(batchId)).when(
+                    data: (animals) {
+                      final isFull = corralCapacity > 0 &&
+                          animals.length >= corralCapacity;
+                      return FloatingActionButton(
+                        onPressed: isFull
+                            ? () => _showMaxCapacityDialog(context)
+                            : () => _showAddAnimalDialog(context),
+                        backgroundColor:
+                            isFull ? Colors.grey : const Color(0xFFFF5A6E),
+                        elevation: 4,
+                        child: const Icon(Icons.add, color: Colors.white),
+                        tooltip: isFull
+                            ? 'Capacidad máxima alcanzada'
+                            : 'Agregar animal',
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (e, s) => const SizedBox.shrink(),
+                  );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (e, s) => const SizedBox.shrink(),
+          );
+        },
+        loading: () => const SizedBox.shrink(),
+        error: (e, s) => const SizedBox.shrink(),
       ),
     );
   }
@@ -236,6 +248,23 @@ class BatchDetailView extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AnimalFormDialog(preselectedBatchId: batchId),
+    );
+  }
+
+  void _showMaxCapacityDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Capacidad máxima alcanzada'),
+        content: const Text(
+            'No se pueden agregar más animales, el corral está lleno.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Aceptar'),
+          ),
+        ],
+      ),
     );
   }
 }

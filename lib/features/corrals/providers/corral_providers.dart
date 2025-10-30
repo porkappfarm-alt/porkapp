@@ -2,6 +2,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/corrals/data/corrals_repository.dart';
 import 'package:porkapp/features/corrals/domain/corral.dart';
 
+/// Provider para obtener un corral por ID
+final corralByIdProvider =
+    FutureProvider.family<Corral?, String>((ref, corralId) async {
+  final repository = ref.watch(corralsRepositoryProvider);
+  try {
+    return await repository.getCorral(corralId);
+  } catch (e) {
+    return null;
+  }
+});
+
 final corralsRepositoryProvider = Provider((ref) => CorralsRepository());
 
 /// StateNotifier para manejar la lista de corrales con actualizaciones optimistas

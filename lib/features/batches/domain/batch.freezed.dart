@@ -24,6 +24,8 @@ mixin _$Batch {
   String get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'entry_date')
+  DateTime? get entryDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'headcount_start')
   int get headcountStart => throw _privateConstructorUsedError;
   @JsonKey(name: 'corral_id')
@@ -51,6 +53,7 @@ abstract class $BatchCopyWith<$Res> {
       {String id,
       String name,
       @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'entry_date') DateTime? entryDate,
       @JsonKey(name: 'headcount_start') int headcountStart,
       @JsonKey(name: 'corral_id') String? corralId,
       @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
@@ -78,6 +81,7 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
     Object? id = null,
     Object? name = null,
     Object? createdAt = null,
+    Object? entryDate = freezed,
     Object? headcountStart = null,
     Object? corralId = freezed,
     Object? initialAvgWeight = freezed,
@@ -99,6 +103,10 @@ class _$BatchCopyWithImpl<$Res, $Val extends Batch>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      entryDate: freezed == entryDate
+          ? _value.entryDate
+          : entryDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       headcountStart: null == headcountStart
           ? _value.headcountStart
           : headcountStart // ignore: cast_nullable_to_non_nullable
@@ -142,6 +150,7 @@ abstract class _$$BatchImplCopyWith<$Res> implements $BatchCopyWith<$Res> {
       {String id,
       String name,
       @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'entry_date') DateTime? entryDate,
       @JsonKey(name: 'headcount_start') int headcountStart,
       @JsonKey(name: 'corral_id') String? corralId,
       @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,
@@ -167,6 +176,7 @@ class __$$BatchImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? createdAt = null,
+    Object? entryDate = freezed,
     Object? headcountStart = null,
     Object? corralId = freezed,
     Object? initialAvgWeight = freezed,
@@ -188,6 +198,10 @@ class __$$BatchImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      entryDate: freezed == entryDate
+          ? _value.entryDate
+          : entryDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       headcountStart: null == headcountStart
           ? _value.headcountStart
           : headcountStart // ignore: cast_nullable_to_non_nullable
@@ -227,6 +241,7 @@ class _$BatchImpl implements _Batch {
       {required this.id,
       required this.name,
       @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'entry_date') this.entryDate,
       @JsonKey(name: 'headcount_start') this.headcountStart = 0,
       @JsonKey(name: 'corral_id') this.corralId,
       @JsonKey(name: 'initial_avg_weight') this.initialAvgWeight,
@@ -248,6 +263,9 @@ class _$BatchImpl implements _Batch {
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  @override
+  @JsonKey(name: 'entry_date')
+  final DateTime? entryDate;
   @override
   @JsonKey(name: 'headcount_start')
   final int headcountStart;
@@ -276,7 +294,7 @@ class _$BatchImpl implements _Batch {
 
   @override
   String toString() {
-    return 'Batch(id: $id, name: $name, createdAt: $createdAt, headcountStart: $headcountStart, corralId: $corralId, initialAvgWeight: $initialAvgWeight, status: $status, notes: $notes, imageUrl: $imageUrl, animals: $animals)';
+    return 'Batch(id: $id, name: $name, createdAt: $createdAt, entryDate: $entryDate, headcountStart: $headcountStart, corralId: $corralId, initialAvgWeight: $initialAvgWeight, status: $status, notes: $notes, imageUrl: $imageUrl, animals: $animals)';
   }
 
   @override
@@ -288,6 +306,8 @@ class _$BatchImpl implements _Batch {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.entryDate, entryDate) ||
+                other.entryDate == entryDate) &&
             (identical(other.headcountStart, headcountStart) ||
                 other.headcountStart == headcountStart) &&
             (identical(other.corralId, corralId) ||
@@ -308,6 +328,7 @@ class _$BatchImpl implements _Batch {
       id,
       name,
       createdAt,
+      entryDate,
       headcountStart,
       corralId,
       initialAvgWeight,
@@ -335,6 +356,7 @@ abstract class _Batch implements Batch {
       {required final String id,
       required final String name,
       @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'entry_date') final DateTime? entryDate,
       @JsonKey(name: 'headcount_start') final int headcountStart,
       @JsonKey(name: 'corral_id') final String? corralId,
       @JsonKey(name: 'initial_avg_weight') final double? initialAvgWeight,
@@ -354,6 +376,9 @@ abstract class _Batch implements Batch {
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
+  @override
+  @JsonKey(name: 'entry_date')
+  DateTime? get entryDate;
   @override
   @JsonKey(name: 'headcount_start')
   int get headcountStart;

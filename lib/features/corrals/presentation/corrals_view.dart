@@ -53,6 +53,8 @@ class CorralsView extends ConsumerWidget {
           },
           child: corralsState.when(
             data: (corrals) {
+              // Ordenar por nombre alfabéticamente
+              corrals.sort((a, b) => a.name.compareTo(b.name));
               if (corrals.isEmpty) {
                 return Center(
                   child: Padding(

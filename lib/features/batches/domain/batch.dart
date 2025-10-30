@@ -30,6 +30,7 @@ class Batch with _$Batch {
     required String id,
     required String name,
     @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'entry_date') DateTime? entryDate,
     @JsonKey(name: 'headcount_start') @Default(0) int headcountStart,
     @JsonKey(name: 'corral_id') String? corralId,
     @JsonKey(name: 'initial_avg_weight') double? initialAvgWeight,

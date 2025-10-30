@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
+import 'package:porkapp/features/biometrics/providers/batch_biometrics_provider.dart';
 
-class BatchCard extends StatelessWidget {
+class BatchCard extends ConsumerWidget {
   final Batch batch;
   final VoidCallback onTap;
   final VoidCallback? onEdit;
@@ -17,21 +19,32 @@ class BatchCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final progress = batch.headcountStart > 0
         ? batch.animals.length / batch.headcountStart
         : 0.0;
 
+    // Consultar la última biometría
+    final biometricsAsync = ref.watch(batchBiometricsProvider(batch.id));
+    double? lastAvgWeight;
+    biometricsAsync.whenData((measurements) {
+      if (measurements.isNotEmpty) {
+        lastAvgWeight = measurements.last.averageWeight;
+      }
+    });
+
+    final entryDate = batch.entryDate ?? batch.createdAt;
+    final daysElapsed = DateTime.now().difference(entryDate).inDays;
+
     return Card(
       elevation: 2,
-      color: const Color(0xFFFFFFFF), // Blanco
-      margin:
-          EdgeInsets.zero, // Removido el margen ya que está en el SliverPadding
+      color: const Color(0xFFFFFFFF),
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: const Color(0xFFE94C5D).withOpacity(0.15), // Coral suave
+          color: const Color(0xFFE94C5D).withOpacity(0.15),
           width: 1.5,
         ),
       ),
@@ -89,7 +102,7 @@ class BatchCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF3B1D2D), // Burdeos
+                      color: Color(0xFF3B1D2D),
                       fontFamily: 'Poppins',
                     ),
                   ),
@@ -100,17 +113,43 @@ class BatchCard extends StatelessWidget {
                       Expanded(
                         child: _InfoItem(
                           icon: Icons.calendar_today,
-                          label: 'Inicio',
-                          value: _formatDate(batch.createdAt),
+                          label: 'Ingreso',
+                          value: _formatDate(entryDate),
                         ),
                       ),
                       const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoItem(
+                          icon: Icons.monitor_weight,
+                          label: 'Peso Prom. Última Biom.',
+                          value: biometricsAsync.when(
+                            data: (measurements) => measurements.isNotEmpty
+                                ? '${measurements.last.averageWeight.toStringAsFixed(1)} kg'
+                                : '--',
+                            loading: () => '...',
+                            error: (e, _) => '--',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
                       Expanded(
                         child: _InfoItem(
                           icon: Icons.group,
                           label: 'Animales',
                           value:
                               '${batch.animals.length}/${batch.headcountStart}',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoItem(
+                          icon: Icons.timer,
+                          label: 'Días desde ingreso',
+                          value: '$daysElapsed',
                         ),
                       ),
                     ],

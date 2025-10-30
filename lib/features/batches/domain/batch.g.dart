@@ -10,6 +10,9 @@ _$BatchImpl _$$BatchImplFromJson(Map<String, dynamic> json) => _$BatchImpl(
       id: json['id'] as String,
       name: json['name'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
+      entryDate: json['entry_date'] == null
+          ? null
+          : DateTime.parse(json['entry_date'] as String),
       headcountStart: (json['headcount_start'] as num?)?.toInt() ?? 0,
       corralId: json['corral_id'] as String?,
       initialAvgWeight: (json['initial_avg_weight'] as num?)?.toDouble(),
@@ -26,6 +29,7 @@ Map<String, dynamic> _$$BatchImplToJson(_$BatchImpl instance) =>
       'id': instance.id,
       'name': instance.name,
       'created_at': instance.createdAt.toIso8601String(),
+      'entry_date': instance.entryDate?.toIso8601String(),
       'headcount_start': instance.headcountStart,
       'corral_id': instance.corralId,
       'initial_avg_weight': instance.initialAvgWeight,

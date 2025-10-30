@@ -7,6 +7,7 @@ import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_provider.dart'
     as single_batch;
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
+import 'package:porkapp/features/biometrics/providers/biometric_providers.dart';
 import 'package:porkapp/features/batches/presentation/widgets/error_view.dart';
 import 'package:porkapp/features/corrals/providers/corral_providers.dart';
 
@@ -77,156 +78,46 @@ class BatchDetailView extends ConsumerWidget {
                 ),
           ),
 
-          // Lista de animales del lote
-          Expanded(
-            child: ref.watch(batchAnimalsProvider(batchId)).when(
-                  data: (animals) {
-                    print(
-                        'Cantidad de animales: ${animals.length}'); // Debug log
-
-                    if (animals.isEmpty) {
-                      print(
-                          'No se encontraron animales en el lote'); // Debug log
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.pets,
-                              size: 64,
-                              color: theme.colorScheme.primary.withOpacity(0.5),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No hay animales en este lote',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withOpacity(0.7),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                print(
-                                    'Intentando agregar animal...'); // Debug log
-                                _showAddAnimalDialog(context);
-                              },
-                              icon: const Icon(Icons.add),
-                              label: const Text('Agregar Animal'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        ref.invalidate(batchListProvider);
-                      },
-                      child: ListView.builder(
-                        itemCount: animals.length,
-                        padding: const EdgeInsets.all(16),
-                        itemBuilder: (context, index) {
-                          final animal = animals[index];
-                          return GestureDetector(
-                            onTap: () => context
-                                .push('/batches/$batchId/animals/${animal.id}'),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color:
-                                      const Color(0xFFF07281).withOpacity(0.15),
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.03),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Image.asset(
-                                      'assets/images/3800591.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          animal.identifier,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF5D4037),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${animal.breed} - ${animal.weight != null ? "${animal.weight!.toStringAsFixed(1)} kg" : "Sin peso"}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: animal.status == 'active'
-                                          ? const Color(0xFF4CAF50)
-                                          : const Color(0xFFE57373),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Text(
-                                      animal.status == 'active'
-                                          ? 'Activo'
-                                          : 'Inactivo',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => BatchErrorView(
-                    error: error.toString(),
-                    onRetry: () =>
-                        ref.invalidate(batchAnimalsProvider(batchId)),
+          // Botones para gestión de animales y biometría
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.push('/batches/$batchId/animals');
+                    },
+                    icon: const Icon(Icons.pets),
+                    label: const Text('Gestionar animales'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFF07281),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.push('/biometrics/batch/$batchId');
+                    },
+                    icon: const Icon(Icons.monitor_weight),
+                    label: const Text('Gestionar biometría'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF4CAF50),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -301,13 +192,22 @@ class BatchDetailView extends ConsumerWidget {
   }
 }
 
-class _BatchHeader extends StatelessWidget {
+class _BatchHeader extends ConsumerWidget {
   final Batch batch;
 
   const _BatchHeader({required this.batch});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final entryDate = batch.entryDate ?? batch.createdAt;
+    final daysElapsed = DateTime.now().difference(entryDate).inDays;
+    final weekElapsed = (daysElapsed / 7).ceil();
+    final animalsVivos =
+        batch.animals.where((a) => a.status == 'active').length;
+    final animalsMuertos =
+        batch.animals.where((a) => a.status == 'deceased').length;
+    final biometricsAsync = ref.watch(batchBiometricsProvider(batch.id));
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -375,29 +275,121 @@ class _BatchHeader extends StatelessWidget {
               color: const Color(0xFFFAFAFA),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: _InfoItem(
-                    icon: Icons.calendar_today_rounded,
-                    label: 'Fecha inicio',
-                    value: _formatDate(batch.createdAt),
-                    iconColor: const Color(0xFFF07281),
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.calendar_today_rounded,
+                        label: 'Ingreso',
+                        value: _formatDate(entryDate),
+                        iconColor: const Color(0xFFF07281),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: Colors.grey[300],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.monitor_weight,
+                        label: 'Peso Prom. Última Biom.',
+                        value: biometricsAsync.when(
+                          data: (measurements) => measurements.isNotEmpty
+                              ? '${measurements.last.averageWeight.toStringAsFixed(1)} kg'
+                              : '--',
+                          loading: () => '...',
+                          error: (e, _) => '--',
+                        ),
+                        iconColor: const Color(0xFF4CAF50),
+                      ),
+                    ),
+                  ],
                 ),
-                Container(
-                  width: 1,
-                  height: 40,
-                  color: Colors.grey[300],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.group,
+                        label: 'Animales',
+                        value: '$animalsVivos/${batch.headcountStart}',
+                        iconColor: const Color(0xFF3B1D2D),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: Colors.grey[300],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.timer,
+                        label: 'Días desde ingreso',
+                        value: '$daysElapsed',
+                        iconColor: const Color(0xFFF07281),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _InfoItem(
-                    icon: Icons.pets_rounded,
-                    label: 'Cantidad inicial',
-                    value: '${batch.headcountStart} cerdos',
-                    iconColor: const Color(0xFF4CAF50),
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.calendar_view_week,
+                        label: 'Semana actual',
+                        value: '$weekElapsed',
+                        iconColor: const Color(0xFF4CAF50),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: Colors.grey[300],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.food_bank,
+                        label: 'Tipo de alimento',
+                        value: 'Balanceado Premium', // mock
+                        iconColor: const Color(0xFFE94C5D),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.scale,
+                        label: 'Cantidad alimento diario',
+                        value: '2.5 kg', // mock
+                        iconColor: const Color(0xFF3B1D2D),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: Colors.grey[300],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _InfoItem(
+                        icon: Icons.sentiment_very_dissatisfied,
+                        label: 'Animales muertos',
+                        value: '$animalsMuertos',
+                        iconColor: const Color(0xFFE94C5D),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

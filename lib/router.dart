@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/auth/presentation/login_view.dart';
-import 'package:porkapp/features/dashboard/screens/dashboard_screen.dart';
+import 'package:porkapp/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
 import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
@@ -159,7 +159,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/dashboard',
-                builder: (context, state) => const DashboardScreen(),
+                builder: (context, state) => const DashboardView(),
               ),
               // Root path redirects to dashboard
               GoRoute(path: '/', redirect: (_, __) => '/dashboard'),

@@ -1,140 +1,319 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:porkapp/features/dashboard/providers/dashboard_alerts_provider.dart';
+import 'package:porkapp/features/dashboard/providers/dashboard_charts_provider.dart';
+import 'package:porkapp/features/dashboard/providers/dashboard_kpis_provider.dart';
+import 'package:porkapp/features/dashboard/presentation/widgets/alert_section.dart';
+import 'package:porkapp/features/dashboard/presentation/widgets/batch_summary_card.dart';
+import 'package:porkapp/features/dashboard/presentation/widgets/kpi_card_v2.dart';
 import '../widgets/welcome_card.dart';
-import '../widgets/kpi_card.dart';
-import '../widgets/quick_access_grid.dart';
-import '../widgets/offline_indicator.dart';
 
-class DashboardView extends ConsumerStatefulWidget {
+class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
 
   @override
-  ConsumerState<DashboardView> createState() => _DashboardViewState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final kpisAsync = ref.watch(dashboardKPIsProvider);
+    final alertsAsync = ref.watch(dashboardAlertsProvider);
+    final batchSummariesAsync = ref.watch(batchSummariesProvider);
 
-class _DashboardViewState extends ConsumerState<DashboardView> {
-  final _refreshKey = GlobalKey<RefreshIndicatorState>();
-
-  Future<void> _onRefresh() async {
-    // TODO: Implementar actualización de datos
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Text(
-              'Dashboard',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.share_outlined),
-              onPressed: () {},
-            ),
-          ],
+        title: const Text(
+          'Dashboard',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.black87),
+            onPressed: () {
+              ref.invalidate(dashboardKPIsProvider);
+              ref.invalidate(dashboardAlertsProvider);
+              ref.invalidate(batchSummariesProvider);
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
-        key: _refreshKey,
-        onRefresh: _onRefresh,
+        onRefresh: () async {
+          ref.invalidate(dashboardKPIsProvider);
+          ref.invalidate(dashboardAlertsProvider);
+          ref.invalidate(batchSummariesProvider);
+        },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
               const WelcomeCard(),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  Container(
-                    width: 4,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6B0338),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Resumen',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B0338),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: 'Indicadores Clave',
+                icon: Icons.dashboard,
               ),
-              const SizedBox(height: 16),
-              const KPISection(),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6B0338),
-                          borderRadius: BorderRadius.circular(2),
+              const SizedBox(height: 12),
+              kpisAsync.when(
+                data: (kpis) => KpiGrid(
+                  totalAnimals: kpis.totalActiveAnimals,
+                  corralsStatus:
+                      '${kpis.corralOccupancy.occupiedCorrals}/${kpis.corralOccupancy.totalCorrals}',
+                  avgWeight: kpis.currentAvgWeight,
+                  avgADG: kpis.avgADG,
+                ),
+                loading: () => const _LoadingKpis(),
+                error: (error, stack) => _ErrorCard(
+                  message: 'Error al cargar KPIs',
+                  error: error.toString(),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: 'Alertas',
+                icon: Icons.notifications_active,
+              ),
+              const SizedBox(height: 12),
+              alertsAsync.when(
+                data: (alerts) => AlertSection(alerts: alerts),
+                loading: () => const _LoadingCard(),
+                error: (error, stack) => _ErrorCard(
+                  message: 'Error al cargar alertas',
+                  error: error.toString(),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: 'Lotes Activos',
+                icon: Icons.inventory_2,
+                actionLabel: 'Ver todos',
+                onActionTap: () => context.go('/batches'),
+              ),
+              const SizedBox(height: 12),
+              batchSummariesAsync.when(
+                data: (batches) {
+                  if (batches.isEmpty) {
+                    return Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 48,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'No hay lotes activos',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Accesos Rápidos',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF6B0338),
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.edit_outlined,
-                      size: 16,
-                      color: Color(0xFF6B0338),
-                    ),
-                    label: const Text(
-                      'Personalizar',
-                      style: TextStyle(
-                        color: Color(0xFF6B0338),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
+                    );
+                  }
+                  return Column(
+                    children: batches
+                        .map((batch) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: BatchSummaryCard(
+                                batch: batch,
+                                onTap: () => context.go('/batches/${batch.id}'),
+                              ),
+                            ))
+                        .toList(),
+                  );
+                },
+                loading: () => const _LoadingCard(),
+                error: (error, stack) => _ErrorCard(
+                  message: 'Error al cargar lotes',
+                  error: error.toString(),
+                ),
               ),
-              const SizedBox(height: 16),
-              const QuickAccessGrid(),
-              const SizedBox(height: 80),
+              const SizedBox(height: 24),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFF6B0338),
-        onPressed: () {
-          // TODO: Implementar acción de registro rápido
-        },
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Agregar'),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onActionTap;
+
+  const _SectionHeader({
+    required this.title,
+    required this.icon,
+    this.actionLabel,
+    this.onActionTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 24,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B0338),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Icon(
+              icon,
+              color: const Color(0xFF6B0338),
+              size: 22,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF6B0338),
+              ),
+            ),
+          ],
+        ),
+        if (actionLabel != null && onActionTap != null)
+          TextButton(
+            onPressed: onActionTap,
+            child: Text(
+              actionLabel!,
+              style: const TextStyle(
+                color: Color(0xFF6B0338),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LoadingKpis extends StatelessWidget {
+  const _LoadingKpis();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.3,
+      children: List.generate(
+        4,
+        (index) => Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingCard extends StatelessWidget {
+  const _LoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(32.0),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorCard extends StatelessWidget {
+  final String message;
+  final String error;
+
+  const _ErrorCard({
+    required this.message,
+    required this.error,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 48,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -72,7 +72,7 @@ class BatchesRepository {
     required String id,
     required String name,
     required String corralId,
-    required DateTime createdAt,
+    required DateTime entryDate,
     required int headcountStart,
     double? initialAvgWeight,
     String? notes,
@@ -87,7 +87,7 @@ class BatchesRepository {
         .update({
           'name': name,
           'corral_id': corralId,
-          'created_at': createdAt.toIso8601String(),
+          'entry_date': entryDate.toIso8601String().split('T')[0],
           'headcount_start': headcountStart,
           'initial_avg_weight': initialAvgWeight,
           'notes': notes,

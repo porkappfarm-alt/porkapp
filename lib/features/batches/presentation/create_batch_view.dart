@@ -55,7 +55,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
               id: widget.batchId!,
               name: _batchName!, // Mantener el nombre original
               corralId: _selectedCorralId!,
-              createdAt: _selectedDate,
+              entryDate: _selectedDate,
               headcountStart: int.parse(_animalCountController.text),
             );
       } else {
@@ -104,7 +104,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
             if (mounted && !_isInitialized) {
               setState(() {
                 _batchName = batch.name;
-                _selectedDate = batch.createdAt;
+                _selectedDate = batch.entryDate ?? batch.createdAt;
                 _selectedCorralId = batch.corralId;
                 _animalCountController.text = batch.headcountStart.toString();
                 _isInitialized = true;

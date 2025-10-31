@@ -60,6 +60,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
     super.initState();
     _biometricId = widget.biometricId;
     _loadBiometricData();
+    _loadPreviousWeights();
   }
 
   Future<void> _loadBiometricData() async {
@@ -89,6 +90,56 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
       }
     } catch (e) {
       print('Error loading biometric data: $e');
+    }
+  }
+
+  Future<void> _loadPreviousWeights() async {
+    try {
+      // Obtener la biometría actual
+      final currentBiometric = await Supabase.instance.client
+          .from('batch_biometrics')
+          .select('batch_id, measurement_date')
+          .eq('id', _biometricId!)
+          .single();
+
+      final batchId = currentBiometric['batch_id'];
+      final currentDate = DateTime.parse(currentBiometric['measurement_date']);
+
+      // Buscar la biometría anterior del mismo lote
+      final previousBiometrics = await Supabase.instance.client
+          .from('batch_biometrics')
+          .select('id, measurement_date')
+          .eq('batch_id', batchId)
+          .eq('status', 'active')
+          .lt('measurement_date', currentDate.toIso8601String())
+          .order('measurement_date', ascending: false)
+          .limit(1);
+
+      if (previousBiometrics.isEmpty) {
+        print('No previous biometric found for this batch');
+        return;
+      }
+
+      final previousBiometricId = previousBiometrics.first['id'];
+
+      // Cargar los pesos de la biometría anterior
+      final previousMeasurements = await Supabase.instance.client
+          .from('biometric_measurements')
+          .select('animal_id, weight')
+          .eq('biometric_id', previousBiometricId);
+
+      // Guardar los pesos anteriores en el mapa
+      for (final measurement in previousMeasurements) {
+        final animalId = measurement['animal_id'];
+        final weight = measurement['weight'];
+        if (weight != null) {
+          _previousWeights[animalId] = double.parse(weight.toString());
+        }
+      }
+
+      print('Loaded ${_previousWeights.length} previous weights');
+    } catch (e) {
+      print('Error loading previous weights: $e');
     }
   }
 
@@ -156,20 +207,28 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
       }
 
       // Paso 3: Insertar todos los pesos en lote
-      final measurementsToInsert = weightsToSave.map((data) {
-        return {
+      final measurementsToInsert = <Map<String, dynamic>>[];
+
+      for (final data in weightsToSave) {
+        final measurement = <String, dynamic>{
           'biometric_id': _biometricId,
-          'animal_id': data['animal_id'],
-          'weight': data['weight'],
-          'previous_weight': data['previous_weight'],
+          'animal_id': data['animal_id'] as String,
+          'weight': data['weight'] as double,
+          'previous_weight': data['previous_weight'] as double? ?? 0.0,
         };
-      }).toList();
+
+        measurementsToInsert.add(measurement);
+      }
+
+      print('Inserting ${measurementsToInsert.length} measurements');
+      print(
+          'First measurement sample: ${measurementsToInsert.isNotEmpty ? measurementsToInsert.first : "none"}');
 
       await Supabase.instance.client
           .from('biometric_measurements')
           .insert(measurementsToInsert);
 
-      // Paso 4: Calcular estadísticas
+      // Paso 4: Calcular estadísticas básicas
       final avgWeight = weights.reduce((a, b) => a + b) / weights.length;
       final minWeight = weights.reduce((a, b) => a < b ? a : b);
       final maxWeight = weights.reduce((a, b) => a > b ? a : b);
@@ -181,17 +240,42 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
               weights.length;
       final stdDev = sqrt(variance);
 
-      // Paso 5: Marcar biometría anterior como inactiva si no estamos en modo edición
+      // Paso 5: Calcular ADG promedio desde las mediciones individuales
+      double avgAdg = 0.0;
+      final adgValues = <double>[];
+
+      // Obtener las mediciones recién insertadas para calcular el ADG promedio
+      final insertedMeasurements = await Supabase.instance.client
+          .from('biometric_measurements')
+          .select('adg')
+          .eq('biometric_id', _biometricId!);
+
+      for (final measurement in insertedMeasurements) {
+        final adg = measurement['adg'];
+        if (adg != null) {
+          final adgValue = double.parse(adg.toString());
+          // Solo incluir valores mayores a 0 en el promedio
+          if (adgValue > 0) {
+            adgValues.add(adgValue);
+          }
+        }
+      }
+
+      if (adgValues.isNotEmpty) {
+        avgAdg = adgValues.reduce((a, b) => a + b) / adgValues.length;
+      }
+
+      // Paso 6: Obtener el batch_id de la biometría actual (lo usaremos varias veces)
+      final currentBiometric = await Supabase.instance.client
+          .from('batch_biometrics')
+          .select('batch_id')
+          .eq('id', _biometricId!)
+          .single();
+
+      final batchId = currentBiometric['batch_id'] as String;
+
+      // Paso 7: Marcar biometría anterior como inactiva si no estamos en modo edición
       if (!isEditMode) {
-        // Obtener el batch_id de la biometría actual
-        final currentBiometric = await Supabase.instance.client
-            .from('batch_biometrics')
-            .select('batch_id')
-            .eq('id', _biometricId!)
-            .single();
-
-        final batchId = currentBiometric['batch_id'];
-
         // Marcar todas las biometrías activas anteriores como inactivas
         await Supabase.instance.client
             .from('batch_biometrics')
@@ -201,29 +285,22 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
             .neq('id', _biometricId!);
       }
 
-      // Paso 6: Actualizar la biometría actual como activa
-      await Supabase.instance.client
-          .from('batch_biometrics')
-          .update({
-            'animals_measured': weights.length,
-            'avg_weight': avgWeight,
-            'min_weight': minWeight,
-            'max_weight': maxWeight,
-            'weight_std_dev': stdDev,
-            'status': 'active',
-          })
-          .eq('id', _biometricId!)
-          .single();
+      // Paso 8: Actualizar la biometría actual como activa con todas las estadísticas
+      await Supabase.instance.client.from('batch_biometrics').update({
+        'animals_measured': weights.length,
+        'avg_weight': avgWeight,
+        'min_weight': minWeight,
+        'max_weight': maxWeight,
+        'weight_std_dev': stdDev,
+        'avg_adg': avgAdg,
+        'status': 'active',
+      }).eq('id', _biometricId!);
+
+      print('Biometric updated successfully');
 
       if (mounted) {
-        // Refrescar el listado de biometrías
-        final currentBiometric = await Supabase.instance.client
-            .from('batch_biometrics')
-            .select('batch_id')
-            .eq('id', _biometricId!)
-            .single();
-
-        ref.invalidate(batchBiometricsProvider(currentBiometric['batch_id']));
+        // Refrescar el listado de biometrías usando el batchId que ya tenemos
+        ref.invalidate(batchBiometricsProvider(batchId));
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -272,11 +349,6 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
               final liveAnimals = batch.animals
                   .where((animal) => animal.status == 'active')
                   .toList();
-
-              // Store previous weights for ADG calculation
-              for (final animal in liveAnimals) {
-                _previousWeights[animal.id] = animal.weight;
-              }
 
               // Update button state after build
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -369,11 +441,13 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           const Icon(Icons.calendar_today,
-                                              size: 14, color: Color(0xFF757575)),
+                                              size: 14,
+                                              color: Color(0xFF757575)),
                                           const SizedBox(width: 6),
                                           Text(
                                             dateFormat.format(
-                                                _measurementDate ?? DateTime.now()),
+                                                _measurementDate ??
+                                                    DateTime.now()),
                                             style: const TextStyle(
                                               fontSize: 13,
                                               color: Color(0xFF757575),
@@ -397,7 +471,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           const Icon(Icons.pets,
-                                              size: 14, color: Color(0xFF4CAF50)),
+                                              size: 14,
+                                              color: Color(0xFF4CAF50)),
                                           const SizedBox(width: 6),
                                           Text(
                                             '${liveAnimals.length} animales',
@@ -472,7 +547,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                               padding: const EdgeInsets.all(6),
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFFE8F5E9),
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: const Icon(
                                                 Icons.pets,
@@ -530,27 +606,31 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         filled: true,
                                         fillColor: const Color(0xFFFAFAFA),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Color(0xFFE0E0E0),
                                             width: 2,
                                           ),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Color(0xFFE0E0E0),
                                             width: 2,
                                           ),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Color(0xFFFF4D6D),
                                             width: 2,
                                           ),
                                         ),
-                                        contentPadding: const EdgeInsets.symmetric(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
                                           horizontal: 16,
                                           vertical: 14,
                                         ),
@@ -606,14 +686,18 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                           ? 'Actualizar'
                                           : 'Finalizar'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFFF4D6D),
+                                        backgroundColor:
+                                            const Color(0xFFFF4D6D),
                                         foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 18),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 18),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         elevation: 0,
-                                        disabledBackgroundColor: Colors.grey[300],
+                                        disabledBackgroundColor:
+                                            Colors.grey[300],
                                       ),
                                     ),
                                   ),

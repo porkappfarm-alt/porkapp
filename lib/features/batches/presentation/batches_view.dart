@@ -163,6 +163,8 @@ class BatchesView extends ConsumerWidget {
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             final batch = batches[index];
+                            // Solo permitir eliminar si no tiene animales
+                            final canDelete = batch.animals.isEmpty;
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: BatchCard(
@@ -170,7 +172,9 @@ class BatchesView extends ConsumerWidget {
                                 onTap: () =>
                                     context.push('/batches/${batch.id}'),
                                 onEdit: () => _onBatchEdit(context, batch),
-                                onDelete: () => _onBatchDelete(context, batch),
+                                onDelete: canDelete
+                                    ? () => _onBatchDelete(context, batch)
+                                    : null,
                               ),
                             );
                           },

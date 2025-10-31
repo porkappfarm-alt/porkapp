@@ -74,7 +74,7 @@ class BatchDetailView extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        context.push('/biometrics/batch/$batchId');
+                        context.push('/batches/$batchId/biometrics');
                       },
                       icon: const Icon(Icons.monitor_weight, size: 20),
                       label: const Text('Gestionar biometría'),

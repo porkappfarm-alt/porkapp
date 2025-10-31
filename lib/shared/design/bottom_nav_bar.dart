@@ -30,7 +30,6 @@ class BottomNavBar extends StatelessWidget {
             label: 'Corrales',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.group_work), label: 'Lotes'),
-          BottomNavigationBarItem(icon: Icon(Icons.scale), label: 'Biometría'),
         ],
       ),
     );

@@ -9,8 +9,6 @@ import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_animals_view.dart';
 import 'package:porkapp/features/animals/presentation/views/animal_detail_view.dart';
-import 'package:porkapp/features/biometrics/presentation/views/simple_biometric_view.dart';
-import 'package:porkapp/features/biometrics/presentation/views/biometric_history_view.dart';
 import 'package:porkapp/features/biometrics/presentation/views/batch_biometric_detail_view.dart';
 import 'package:porkapp/features/biometrics/presentation/views/new_biometric_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
@@ -26,7 +24,6 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _dashboardNavigatorKey = GlobalKey<NavigatorState>();
 final _corralsNavigatorKey = GlobalKey<NavigatorState>();
 final _batchesNavigatorKey = GlobalKey<NavigatorState>();
-final _biometricsNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -208,6 +205,44 @@ final routerProvider = Provider<GoRouter>((ref) {
                       final batchId = state.pathParameters['batchId'] ?? '';
                       return BatchDetailView(batchId: batchId);
                     },
+                    routes: [
+                      // Rutas de biometrías del lote
+                      GoRoute(
+                        path: 'biometrics',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) {
+                          final batchId = state.pathParameters['batchId'] ?? '';
+                          return BatchBiometricDetailView(batchId: batchId);
+                        },
+                        routes: [
+                          GoRoute(
+                            path: 'new',
+                            parentNavigatorKey: _rootNavigatorKey,
+                            builder: (context, state) {
+                              final batchId =
+                                  state.pathParameters['batchId'] ?? '';
+                              return NewBiometricView(
+                                initialBatchId: batchId,
+                              );
+                            },
+                          ),
+                          GoRoute(
+                            path: ':biometricId/weights',
+                            parentNavigatorKey: _rootNavigatorKey,
+                            builder: (context, state) {
+                              final batchId =
+                                  state.pathParameters['batchId'] ?? '';
+                              final biometricId =
+                                  state.pathParameters['biometricId'] ?? '';
+                              return NewBiometricView(
+                                initialBatchId: batchId,
+                                biometricId: biometricId,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   // Vista de lista de animales del lote - MOVIDA FUERA DEL ANIDAMIENTO
                   GoRoute(
@@ -234,80 +269,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                 ],
-              ),
-            ],
-          ),
-
-          // 4. Biometrics Branch
-          StatefulShellBranch(
-            initialLocation: '/biometrics',
-            navigatorKey: _biometricsNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/biometrics',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: SimpleBiometricView(),
-                ),
-                routes: [
-                  GoRoute(
-                    path: 'history',
-                    builder: (context, state) => const BiometricHistoryView(),
-                  ),
-                  // Nested routes for batch-specific biometrics
-                  GoRoute(
-                    path: 'batch/:batchId',
-                    parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, state) {
-                      final batchId = state.pathParameters['batchId'] ?? '';
-                      return BatchBiometricDetailView(batchId: batchId);
-                    },
-                    routes: [
-                      GoRoute(
-                        path: 'new',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        builder: (context, state) {
-                          final batchId = state.pathParameters['batchId'] ?? '';
-                          return NewBiometricView(
-                            initialBatchId: batchId,
-                          );
-                        },
-                      ),
-                      GoRoute(
-                        path: ':biometricId/weights',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        builder: (context, state) {
-                          final batchId = state.pathParameters['batchId'] ?? '';
-                          final biometricId =
-                              state.pathParameters['biometricId'] ?? '';
-                          return NewBiometricView(
-                            initialBatchId: batchId,
-                            biometricId: biometricId,
-                          );
-                        },
-                      ),
-                      GoRoute(
-                        path: 'evolution',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        builder: (context, state) {
-                          final batchId = state.pathParameters['batchId'] ?? '';
-                          return BatchBiometricDetailView(batchId: batchId);
-                        },
-                      ),
-                      GoRoute(
-                        path: 'detail/:measurementId',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        builder: (context, state) {
-                          final batchId = state.pathParameters['batchId'] ?? '';
-                          return BatchBiometricDetailView(batchId: batchId);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              GoRoute(
-                path: '/biometrics/history',
-                builder: (context, state) => const BiometricHistoryView(),
               ),
             ],
           ),

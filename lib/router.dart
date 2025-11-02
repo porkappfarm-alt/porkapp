@@ -15,6 +15,7 @@ import 'package:porkapp/shared/design/bottom_nav_bar.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 import 'package:porkapp/features/admin/presentation/views/admin_view.dart';
 import 'package:porkapp/features/auth/providers/user_role_provider.dart';
+import 'package:porkapp/features/feeding/presentation/views/feeding_management_view.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
@@ -293,6 +294,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/admin',
                 builder: (context, state) => const AdminView(),
+                routes: [
+                  GoRoute(
+                    path: 'feeding',
+                    builder: (context, state) => const FeedingManagementView(),
+                  ),
+                ],
               ),
             ],
           ),

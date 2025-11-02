@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/features/auth/providers/user_role_provider.dart';
 import 'package:porkapp/supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 
@@ -56,6 +57,8 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> signIn({required String email, required String password}) async {
     await supabase.auth.signInWithPassword(email: email, password: password);
+    // Invalidate the user role provider to force a refetch
+    ref.invalidate(userRoleProvider);
   }
 
   Future<void> signUp({required String email, required String password}) async {

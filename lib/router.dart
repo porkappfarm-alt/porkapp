@@ -13,6 +13,8 @@ import 'package:porkapp/features/biometrics/presentation/views/batch_biometric_d
 import 'package:porkapp/features/biometrics/presentation/views/new_biometric_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
+import 'package:porkapp/features/admin/presentation/views/admin_view.dart';
+import 'package:porkapp/features/auth/providers/user_role_provider.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
@@ -24,6 +26,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _dashboardNavigatorKey = GlobalKey<NavigatorState>();
 final _corralsNavigatorKey = GlobalKey<NavigatorState>();
 final _batchesNavigatorKey = GlobalKey<NavigatorState>();
+final _adminNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -107,6 +110,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       );
     },
     redirect: (context, state) {
+      final userRoleAsync = ref.watch(userRoleProvider);
+
+      // Espera a que el provider de rol esté resuelto antes de redirigir
+      if (userRoleAsync.isLoading) {
+        print('[router] userRoleProvider is loading...');
+        return null;
+      }
+      final userRole = userRoleAsync.asData?.value ?? 'guest';
+      print('[router] userRole: \x1B[35m$userRole\x1B[0m');
+
       _printRouteInfo('Current auth state: $authState');
       _printRouteInfo('Current path: ${state.uri.path}');
       _printRouteInfo('Full URI: ${state.uri}');
@@ -117,18 +130,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Handle authentication states
       switch (authState) {
         case AuthState.initial:
-          // Always redirect to login in initial state
           return '/login';
         case AuthState.unauthenticated:
-          // Always redirect to login if unauthenticated
           return goingToLogin ? null : '/login';
         case AuthState.authenticated:
-          // If at root path, redirect to dashboard
+          // Restricción por rol para /admin
+          if (state.uri.path.startsWith('/admin') && userRole != 'admin') {
+            print('[router] Redirigiendo a dashboard por rol: $userRole');
+            return '/dashboard';
+          }
           if (currentLocation == '/') {
             return '/dashboard';
           }
-          // Allow access to other routes if authenticated
-          // But redirect from login to dashboard
           if (goingToLogin) {
             return '/dashboard';
           }
@@ -269,6 +282,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                 ],
+              ),
+            ],
+          ),
+
+          // 4. Admin Branch
+          StatefulShellBranch(
+            navigatorKey: _adminNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/admin',
+                builder: (context, state) => const AdminView(),
               ),
             ],
           ),

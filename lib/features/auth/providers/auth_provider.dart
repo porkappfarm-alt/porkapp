@@ -67,6 +67,8 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> signOut() async {
     await supabase.auth.signOut();
+    // Invalidate the user role provider to reset it
+    ref.invalidate(userRoleProvider);
   }
 
   @override

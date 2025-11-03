@@ -82,33 +82,49 @@ class AuthRepository {
         throw 'No hay sesión activa';
       }
 
-      // Actualizar la contraseña
-      await supabase.auth.updateUser(
-        UserAttributes(password: newPassword),
+      // Obtener el token de sesión
+      final session = supabase.auth.currentSession;
+      if (session == null) {
+        throw 'No hay sesión válida';
+      }
+
+      // Llamar a la Edge Function change-password que usa admin.updateUserById
+      // Esto es necesario porque usuarios creados con admin.createUser()
+      // no pueden cambiar su contraseña usando updateUser() directamente
+      print('AuthRepository: Llamando a Edge Function change-password...');
+
+      final response = await supabase.functions.invoke(
+        'change-password',
+        body: {
+          'newPassword': newPassword,
+        },
+        headers: {
+          'Authorization': 'Bearer ${session.accessToken}',
+        },
       );
 
-      print('AuthRepository: Contraseña actualizada exitosamente');
+      print(
+          'AuthRepository: Respuesta de Edge Function: status=${response.status}');
 
-      // Actualizar el metadata para marcar que ya no necesita cambiar contraseña
-      await supabase.auth.updateUser(
-        UserAttributes(
-          data: {
-            'needs_password_change': false,
-          },
-        ),
-      );
+      if (response.status != 200) {
+        final errorData = response.data;
+        final errorMessage = errorData is Map
+            ? (errorData['error'] ?? 'Error desconocido')
+            : 'Error desconocido';
+        print('AuthRepository: Error en Edge Function: $errorMessage');
+        throw errorMessage;
+      }
 
-      print('AuthRepository: Metadata actualizado');
-
-      // Actualizar el estado del perfil a "active"
-      await supabase.from('profiles').update({
-        'status': 'active',
-        'temporary_password': null, // Limpiar contraseña temporal
-      }).eq('id', user.id);
-
-      print('AuthRepository: Estado del perfil actualizado a active');
+      print(
+          'AuthRepository: Contraseña actualizada exitosamente via Edge Function');
+    } on FunctionException catch (e) {
+      print('AuthRepository: FunctionException - ${e.details}');
+      throw 'Error al cambiar la contraseña: ${e.details ?? e.toString()}';
+    } on AuthException catch (e) {
+      print('AuthRepository: AuthException - ${e.message}');
+      throw 'Error de autenticación: ${e.message}';
     } catch (e) {
-      print('AuthRepository: Error cambiando contraseña - $e');
+      print('AuthRepository: Error - $e');
       throw 'Error al cambiar la contraseña: ${e.toString()}';
     }
   }

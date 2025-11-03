@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:porkapp/features/auth/data/auth_repository.dart';
 import 'package:porkapp/router.dart';
 
@@ -40,20 +41,56 @@ class _ChangePasswordViewState extends ConsumerState<ChangePasswordView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Contraseña actualizada exitosamente'),
+            content: Text(
+                'Contraseña actualizada exitosamente. Inicia sesión con tu nueva contraseña.'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
           ),
         );
 
-        // Navegar al home después de cambiar la contraseña
-        ref.read(routerProvider).go('/');
+        // Esperar un momento para que el usuario vea el mensaje
+        await Future.delayed(const Duration(seconds: 1));
+
+        // Cerrar sesión para forzar re-autenticación con la nueva contraseña
+        await Supabase.instance.client.auth.signOut();
+
+        // Navegar al login
+        if (mounted) {
+          ref.read(routerProvider).go('/login');
+        }
+      }
+    } on AuthException catch (e) {
+      if (mounted) {
+        String errorMessage = 'Error al cambiar la contraseña';
+
+        // Mapear errores comunes de Supabase
+        if (e.message.contains('password')) {
+          errorMessage =
+              'La nueva contraseña no cumple con los requisitos de seguridad. Debe tener al menos 6 caracteres.';
+        } else if (e.message.contains('same')) {
+          errorMessage = 'La nueva contraseña no puede ser igual a la anterior';
+        } else if (e.message.contains('weak')) {
+          errorMessage =
+              'La contraseña es muy débil. Usa una combinación de letras y números.';
+        } else {
+          errorMessage = 'Error: ${e.message}';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('Error inesperado: ${e.toString()}'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
           ),
         );
       }
@@ -106,6 +143,32 @@ class _ChangePasswordViewState extends ConsumerState<ChangePasswordView> {
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blue.shade200),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Requisitos de la contraseña:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue.shade900,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            _buildRequirement('• Mínimo 8 caracteres'),
+                            _buildRequirement('• Al menos una letra'),
+                            _buildRequirement('• Al menos un número'),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 32),
                       TextFormField(
                         controller: _newPasswordController,
@@ -131,8 +194,15 @@ class _ChangePasswordViewState extends ConsumerState<ChangePasswordView> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor ingresa una contraseña';
                           }
-                          if (value.length < 6) {
-                            return 'La contraseña debe tener al menos 6 caracteres';
+                          if (value.length < 8) {
+                            return 'La contraseña debe tener al menos 8 caracteres';
+                          }
+                          // Verificar que contenga al menos una letra y un número
+                          if (!RegExp(r'[a-zA-Z]').hasMatch(value)) {
+                            return 'Debe contener al menos una letra';
+                          }
+                          if (!RegExp(r'[0-9]').hasMatch(value)) {
+                            return 'Debe contener al menos un número';
                           }
                           return null;
                         },
@@ -191,6 +261,19 @@ class _ChangePasswordViewState extends ConsumerState<ChangePasswordView> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequirement(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.blue.shade700,
         ),
       ),
     );

@@ -20,6 +20,7 @@ import 'package:porkapp/features/admin/presentation/views/admin_view.dart';
 import 'package:porkapp/features/auth/providers/user_role_provider.dart';
 import 'package:porkapp/features/feeding/presentation/views/feeding_management_view.dart';
 import 'package:porkapp/features/users/presentation/views/user_management_view.dart';
+import 'package:porkapp/features/profile/presentation/views/profile_view.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
@@ -32,6 +33,7 @@ final _dashboardNavigatorKey = GlobalKey<NavigatorState>();
 final _corralsNavigatorKey = GlobalKey<NavigatorState>();
 final _batchesNavigatorKey = GlobalKey<NavigatorState>();
 final _adminNavigatorKey = GlobalKey<NavigatorState>();
+final _profileNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -328,7 +330,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // 4. Admin Branch
+          // 4. Profile Branch (siempre disponible para todos los usuarios)
+          StatefulShellBranch(
+            navigatorKey: _profileNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileView(),
+              ),
+            ],
+          ),
+
+          // 5. Admin Branch (solo para administradores)
           StatefulShellBranch(
             navigatorKey: _adminNavigatorKey,
             routes: [

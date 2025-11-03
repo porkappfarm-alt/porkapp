@@ -42,7 +42,26 @@ class AdminView extends StatelessWidget {
               icon: Icons.restaurant_menu,
               title: 'Tabla de Alimentación',
               subtitle: 'Gestionar plan nutricional',
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF5A6E), Color(0xFFFF7F8F)],
+              ),
+              shadowColor: const Color(0xFFFF5A6E),
               onTap: () => context.go('/admin/feeding'),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Card de Gestión de Usuarios
+            _buildAdminCard(
+              context: context,
+              icon: Icons.people,
+              title: 'Gestión de Usuarios',
+              subtitle: 'Invitar, editar y administrar usuarios',
+              gradient: const LinearGradient(
+                colors: [Colors.purple, Colors.deepPurple],
+              ),
+              shadowColor: Colors.purple,
+              onTap: () => context.go('/admin/users'),
             ),
           ],
         ),
@@ -55,18 +74,18 @@ class AdminView extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
+    required Gradient gradient,
+    required Color shadowColor,
     required VoidCallback onTap,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFF5A6E), Color(0xFFFF7F8F)],
-        ),
+        gradient: gradient,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF5A6E).withOpacity(0.4),
+            color: shadowColor.withOpacity(0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

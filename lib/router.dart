@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/auth/providers/auth_provider.dart';
+import 'package:porkapp/features/auth/data/auth_repository.dart';
 import 'package:porkapp/features/auth/presentation/login_view.dart';
+import 'package:porkapp/features/auth/presentation/views/change_password_view.dart';
+import 'package:porkapp/features/auth/presentation/views/reset_password_view.dart';
 import 'package:porkapp/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
 import 'package:porkapp/features/batches/presentation/batches_view.dart';
@@ -16,6 +19,7 @@ import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
 import 'package:porkapp/features/admin/presentation/views/admin_view.dart';
 import 'package:porkapp/features/auth/providers/user_role_provider.dart';
 import 'package:porkapp/features/feeding/presentation/views/feeding_management_view.dart';
+import 'package:porkapp/features/users/presentation/views/user_management_view.dart';
 
 // Debug helper
 void _printRouteInfo(String message) {
@@ -110,7 +114,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       );
     },
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final userRoleAsync = ref.watch(userRoleProvider);
 
       // Espera a que el provider de rol esté resuelto antes de redirigir
@@ -126,6 +130,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       _printRouteInfo('Full URI: ${state.uri}');
 
       final goingToLogin = state.uri.path == '/login';
+      final goingToChangePassword = state.uri.path == '/change-password';
       final currentLocation = state.uri.path;
 
       // Handle authentication states
@@ -135,6 +140,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         case AuthState.unauthenticated:
           return goingToLogin ? null : '/login';
         case AuthState.authenticated:
+          // Verificar si el usuario necesita cambiar la contraseña
+          try {
+            final authRepo = ref.read(authRepositoryProvider);
+            final needsChange = await authRepo.needsPasswordChange();
+
+            if (needsChange && !goingToChangePassword) {
+              print('[router] Usuario necesita cambiar contraseña');
+              return '/change-password';
+            }
+
+            // Si está en change-password pero ya no necesita cambiar, redirigir
+            if (goingToChangePassword && !needsChange) {
+              return '/dashboard';
+            }
+          } catch (e) {
+            print('[router] Error verificando needs_password_change: $e');
+          }
+
           // Restricción por rol para /admin
           if (state.uri.path.startsWith('/admin') && userRole != 'admin') {
             print('[router] Redirigiendo a dashboard por rol: $userRole');
@@ -159,6 +182,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const LoginView(),
+      ),
+
+      // Ruta: /change-password
+      // - Pantalla obligatoria de cambio de contraseña para nuevos usuarios
+      // - Se muestra fuera del shell principal
+      GoRoute(
+        path: '/change-password',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ChangePasswordView(),
+      ),
+
+      // Ruta: /reset-password
+      // - Pantalla para restablecer contraseña desde email de recuperación
+      // - Se muestra fuera del shell principal
+      GoRoute(
+        path: '/reset-password',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ResetPasswordView(),
       ),
 
       // Main shell route with bottom navigation for authenticated screens
@@ -298,6 +339,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'feeding',
                     builder: (context, state) => const FeedingManagementView(),
+                  ),
+                  GoRoute(
+                    path: 'users',
+                    builder: (context, state) => const UserManagementView(),
                   ),
                 ],
               ),

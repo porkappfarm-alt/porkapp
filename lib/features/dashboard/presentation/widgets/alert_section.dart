@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/dashboard/data/models/dashboard_alert.dart';
 
 /// Sección de alertas para el dashboard
@@ -52,6 +53,34 @@ class AlertSection extends StatelessWidget {
       );
     }
 
+    // Sort alerts by priority (critical > warning > info)
+    final sortedAlerts = List<DashboardAlert>.from(alerts)
+      ..sort((a, b) {
+        // First by severity
+        final severityOrder = {
+          AlertSeverity.critical: 0,
+          AlertSeverity.warning: 1,
+          AlertSeverity.info: 2,
+        };
+        final severityComparison = severityOrder[a.severity]!
+            .compareTo(severityOrder[b.severity]!);
+        if (severityComparison != 0) return severityComparison;
+        
+        // Then by alert type priority
+        final typeOrder = {
+          AlertType.scheduledTask: 0,
+          AlertType.belowTargetWeight: 1,
+          AlertType.missingBiometry: 2,
+          AlertType.lowPerformance: 3,
+          AlertType.corralNearCapacity: 4,
+          AlertType.highMortality: 5,
+          AlertType.aboveTargetWeight: 6,
+          AlertType.upcomingSale: 7,
+          AlertType.other: 8,
+        };
+        return (typeOrder[a.type] ?? 99).compareTo(typeOrder[b.type] ?? 99);
+      });
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -85,14 +114,14 @@ class AlertSection extends StatelessWidget {
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: alerts.length > 3 ? 3 : alerts.length,
+            itemCount: sortedAlerts.length > 3 ? 3 : sortedAlerts.length,
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
-              final alert = alerts[index];
+              final alert = sortedAlerts[index];
               return AlertTile(alert: alert);
             },
           ),
-          if (alerts.length > 3)
+          if (sortedAlerts.length > 3)
             InkWell(
               onTap: () {
                 // TODO: Navegar a vista de todas las alertas
@@ -150,13 +179,14 @@ class AlertTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _getSeverityColor();
+    final typeIcon = alert.type.icon;
 
     return InkWell(
-      onTap: alert.actionRoute != null
-          ? () {
-              // TODO: Navegar a la ruta especificada
-            }
-          : null,
+      onTap: () {
+        if (alert.actionRoute != null) {
+          context.push(alert.actionRoute!);
+        }
+      },
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -168,10 +198,20 @@ class AlertTile extends StatelessWidget {
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                _getSeverityIcon(),
-                color: color,
-                size: 20,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    typeIcon,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    _getSeverityIcon(),
+                    color: color,
+                    size: 16,
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 12),

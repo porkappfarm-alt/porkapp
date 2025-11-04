@@ -1,157 +1,200 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+/// Tipo/categoría del animal
+enum AnimalType {
+  piglet,    // Lechón
+  sow,       // Reproductora
+  boar,      // Padrillo
+  fattening; // Engorde
 
-part 'animal_filters.freezed.dart';
-part 'animal_filters.g.dart';
+  String toJson() {
+    switch (this) {
+      case AnimalType.piglet:
+        return 'piglet';
+      case AnimalType.sow:
+        return 'sow';
+      case AnimalType.boar:
+        return 'boar';
+      case AnimalType.fattening:
+        return 'fattening';
+    }
+  }
 
-@JsonSerializable(explicitToJson: true)
-class AnimalTypeConverter implements JsonConverter<AnimalType, String> {
-  const AnimalTypeConverter();
-
-  @override
-  AnimalType fromJson(String json) {
+  static AnimalType fromJson(String json) {
     switch (json) {
       case 'piglet':
-        return const AnimalType.piglet();
+        return AnimalType.piglet;
       case 'sow':
-        return const AnimalType.sow();
+        return AnimalType.sow;
       case 'boar':
-        return const AnimalType.boar();
+        return AnimalType.boar;
       case 'fattening':
-        return const AnimalType.fattening();
+        return AnimalType.fattening;
       default:
         throw Exception('Unknown AnimalType: $json');
     }
   }
-
-  @override
-  String toJson(AnimalType type) => type.when(
-    piglet: () => 'piglet',
-    sow: () => 'sow',
-    boar: () => 'boar',
-    fattening: () => 'fattening',
-  );
 }
 
-@JsonSerializable(explicitToJson: true)
-class AnimalStatusConverter implements JsonConverter<AnimalStatus, String> {
-  const AnimalStatusConverter();
+/// Estado del animal
+enum AnimalStatus {
+  active,      // Activo
+  sold,        // Vendido
+  dead,        // Muerto
+  transferred; // Transferido
 
-  @override
-  AnimalStatus fromJson(String json) {
+  String toJson() {
+    switch (this) {
+      case AnimalStatus.active:
+        return 'active';
+      case AnimalStatus.sold:
+        return 'sold';
+      case AnimalStatus.dead:
+        return 'dead';
+      case AnimalStatus.transferred:
+        return 'transferred';
+    }
+  }
+
+  static AnimalStatus fromJson(String json) {
     switch (json) {
       case 'active':
-        return const AnimalStatus.active();
+        return AnimalStatus.active;
       case 'sold':
-        return const AnimalStatus.sold();
+        return AnimalStatus.sold;
       case 'dead':
-        return const AnimalStatus.dead();
+        return AnimalStatus.dead;
       case 'transferred':
-        return const AnimalStatus.transferred();
+        return AnimalStatus.transferred;
       default:
         throw Exception('Unknown AnimalStatus: $json');
     }
   }
-
-  @override
-  String toJson(AnimalStatus status) => status.when(
-    active: () => 'active',
-    sold: () => 'sold',
-    dead: () => 'dead',
-    transferred: () => 'transferred',
-  );
 }
 
-@JsonSerializable(explicitToJson: true)
-class AnimalEventTypeConverter
-    implements JsonConverter<AnimalEventType, String> {
-  const AnimalEventTypeConverter();
+/// Tipo de evento relacionado al animal
+enum AnimalEventType {
+  weighing,    // Pesaje
+  treatment,   // Tratamiento
+  death,       // Baja/Muerte
+  sale,        // Venta
+  transfer,    // Transferencia
+  vaccination; // Vacunación
 
-  @override
-  AnimalEventType fromJson(String json) {
+  String toJson() {
+    switch (this) {
+      case AnimalEventType.weighing:
+        return 'weighing';
+      case AnimalEventType.treatment:
+        return 'treatment';
+      case AnimalEventType.death:
+        return 'death';
+      case AnimalEventType.sale:
+        return 'sale';
+      case AnimalEventType.transfer:
+        return 'transfer';
+      case AnimalEventType.vaccination:
+        return 'vaccination';
+    }
+  }
+
+  static AnimalEventType fromJson(String json) {
     switch (json) {
       case 'weighing':
-        return const AnimalEventType.weighing();
+        return AnimalEventType.weighing;
       case 'treatment':
-        return const AnimalEventType.treatment();
+        return AnimalEventType.treatment;
       case 'death':
-        return const AnimalEventType.death();
+        return AnimalEventType.death;
       case 'sale':
-        return const AnimalEventType.sale();
+        return AnimalEventType.sale;
       case 'transfer':
-        return const AnimalEventType.transfer();
+        return AnimalEventType.transfer;
       case 'vaccination':
-        return const AnimalEventType.vaccination();
+        return AnimalEventType.vaccination;
       default:
         throw Exception('Unknown AnimalEventType: $json');
     }
   }
-
-  @override
-  String toJson(AnimalEventType type) => type.when(
-    weighing: () => 'weighing',
-    treatment: () => 'treatment',
-    death: () => 'death',
-    sale: () => 'sale',
-    transfer: () => 'transfer',
-    vaccination: () => 'vaccination',
-  );
 }
 
-@freezed
-class AnimalFilters with _$AnimalFilters {
-  const factory AnimalFilters({
-    // Tipo de animal
-    @AnimalTypeConverter() AnimalType? type,
+/// Modelo de AnimalFilters - Convertido de freezed a clase plana
+class AnimalFilters {
+  final AnimalType? type;
+  final AnimalStatus? status;
+  final DateTime? dateFrom;
+  final DateTime? dateTo;
+  final String? batchId;
+  final String? corralId;
+  final double? minWeight;
+  final double? maxWeight;
+  final bool? isMale;
+  final String? searchQuery;
 
-    // Estado del animal
-    @AnimalStatusConverter() AnimalStatus? status,
+  const AnimalFilters({
+    this.type,
+    this.status,
+    this.dateFrom,
+    this.dateTo,
+    this.batchId,
+    this.corralId,
+    this.minWeight,
+    this.maxWeight,
+    this.isMale,
+    this.searchQuery,
+  });
 
-    // Rango de fechas
+  factory AnimalFilters.fromJson(Map<String, dynamic> json) {
+    return AnimalFilters(
+      type: json['type'] != null ? AnimalType.fromJson(json['type'] as String) : null,
+      status: json['status'] != null ? AnimalStatus.fromJson(json['status'] as String) : null,
+      dateFrom: json['date_from'] != null ? DateTime.parse(json['date_from'] as String) : null,
+      dateTo: json['date_to'] != null ? DateTime.parse(json['date_to'] as String) : null,
+      batchId: json['batch_id'] as String?,
+      corralId: json['corral_id'] as String?,
+      minWeight: (json['min_weight'] as num?)?.toDouble(),
+      maxWeight: (json['max_weight'] as num?)?.toDouble(),
+      isMale: json['is_male'] as bool?,
+      searchQuery: json['search_query'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type?.toJson(),
+      'status': status?.toJson(),
+      'date_from': dateFrom?.toIso8601String(),
+      'date_to': dateTo?.toIso8601String(),
+      'batch_id': batchId,
+      'corral_id': corralId,
+      'min_weight': minWeight,
+      'max_weight': maxWeight,
+      'is_male': isMale,
+      'search_query': searchQuery,
+    };
+  }
+
+  AnimalFilters copyWith({
+    AnimalType? type,
+    AnimalStatus? status,
     DateTime? dateFrom,
     DateTime? dateTo,
-
-    // Filtros adicionales
     String? batchId,
     String? corralId,
     double? minWeight,
     double? maxWeight,
     bool? isMale,
     String? searchQuery,
-  }) = _AnimalFilters;
-
-  factory AnimalFilters.fromJson(Map<String, dynamic> json) =>
-      _$AnimalFiltersFromJson(json);
-}
-
-/// Tipo/categoría del animal
-@freezed
-sealed class AnimalType with _$AnimalType {
-  const factory AnimalType.piglet() = AnimalTypePiglet; // Lechón
-  const factory AnimalType.sow() = AnimalTypeSow; // Reproductora
-  const factory AnimalType.boar() = AnimalTypeBoar; // Padrillo
-  const factory AnimalType.fattening() = AnimalTypeFattening; // Engorde
-}
-
-/// Estado del animal
-@freezed
-sealed class AnimalStatus with _$AnimalStatus {
-  const factory AnimalStatus.active() = AnimalStatusActive; // Activo
-  const factory AnimalStatus.sold() = AnimalStatusSold; // Vendido
-  const factory AnimalStatus.dead() = AnimalStatusDead; // Muerto
-  const factory AnimalStatus.transferred() =
-      AnimalStatusTransferred; // Transferido
-}
-
-/// Tipo de evento relacionado al animal
-@freezed
-sealed class AnimalEventType with _$AnimalEventType {
-  const factory AnimalEventType.weighing() = AnimalEventTypeWeighing; // Pesaje
-  const factory AnimalEventType.treatment() =
-      AnimalEventTypeTreatment; // Tratamiento
-  const factory AnimalEventType.death() = AnimalEventTypeDeath; // Baja/Muerte
-  const factory AnimalEventType.sale() = AnimalEventTypeSale; // Venta
-  const factory AnimalEventType.transfer() =
-      AnimalEventTypeTransfer; // Transferencia
-  const factory AnimalEventType.vaccination() =
-      AnimalEventTypeVaccination; // Vacunación
+  }) {
+    return AnimalFilters(
+      type: type ?? this.type,
+      status: status ?? this.status,
+      dateFrom: dateFrom ?? this.dateFrom,
+      dateTo: dateTo ?? this.dateTo,
+      batchId: batchId ?? this.batchId,
+      corralId: corralId ?? this.corralId,
+      minWeight: minWeight ?? this.minWeight,
+      maxWeight: maxWeight ?? this.maxWeight,
+      isMale: isMale ?? this.isMale,
+      searchQuery: searchQuery ?? this.searchQuery,
+    );
+  }
 }

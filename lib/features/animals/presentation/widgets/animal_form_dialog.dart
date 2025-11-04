@@ -29,7 +29,7 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
   late TextEditingController _notesController;
   late final DateTime _birthDate;
   bool _isMale = true;
-  AnimalType _selectedType = const AnimalType.piglet();
+  AnimalType _selectedType = AnimalType.piglet;
 
   @override
   void initState() {
@@ -70,12 +70,16 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
   }
 
   String _getAnimalTypeLabel(AnimalType type) {
-    return type.when(
-      piglet: () => 'Lechón',
-      sow: () => 'Reproductora',
-      boar: () => 'Padrillo',
-      fattening: () => 'Engorde',
-    );
+    switch (type) {
+      case AnimalType.piglet:
+        return 'Lechón';
+      case AnimalType.sow:
+        return 'Reproductora';
+      case AnimalType.boar:
+        return 'Padrillo';
+      case AnimalType.fattening:
+        return 'Engorde';
+    }
   }
 
   Future<void> _submit() async {
@@ -194,12 +198,12 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
                       border: OutlineInputBorder(),
                     ),
                     items: [
-                      AnimalType.piglet(),
-                      AnimalType.sow(),
-                      AnimalType.boar(),
-                      AnimalType.fattening(),
+                      AnimalType.piglet,
+                      AnimalType.sow,
+                      AnimalType.boar,
+                      AnimalType.fattening,
                     ].map((type) {
-                      return DropdownMenuItem(
+                      return DropdownMenuItem<AnimalType>(
                         value: type,
                         child: Text(_getAnimalTypeLabel(type)),
                       );

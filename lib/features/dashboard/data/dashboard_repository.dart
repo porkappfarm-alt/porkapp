@@ -418,7 +418,7 @@ class DashboardRepository {
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes, image_url')
+              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 

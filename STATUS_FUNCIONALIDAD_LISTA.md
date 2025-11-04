@@ -3,12 +3,14 @@
 ## 🎉 Resumen del Estado Actual
 
 ### ✅ Base de Datos Actualizada
+
 - Columna `birth_date` agregada a la tabla `batches`
 - Lotes actualizados con fechas de nacimiento de ejemplo:
   - **L0003**: 45 días de edad (nacido el 20/09/2025)
   - **L0004**: 30 días de edad (nacido el 05/10/2025)
 
 ### ✅ Datos de Prueba Configurados
+
 - Lote **L0003** tiene biometría con peso promedio: **19.65 kg**
 - Peso objetivo para 45 días: **~13 kg**
 - **Estado**: Por encima del peso objetivo (168% del objetivo)
@@ -19,18 +21,21 @@
 #### 1. En la Lista de Lotes (Tarjetas)
 
 **Lote L0003:**
+
 - 🎂 **Edad**: "6 semanas" o "1 mes"
 - 📊 **Barra de progreso**: Color naranja 🟠
 - **Estado**: "Por encima del objetivo"
 - **Progreso**: 168% (19.65 kg vs 13 kg objetivo)
 
 **Lote L0004:**
+
 - 🎂 **Edad**: "4 semanas"
 - Si no tiene biometrías, mostrará estado "Sin datos"
 
 #### 2. En el Detalle del Lote L0003
 
 - **Header superior**:
+
   - Nombre: "L0003"
   - Edad: "6 semanas"
   - Fecha de nacimiento: "20/09/2025"
@@ -48,10 +53,12 @@
 **Alertas que deberías ver:**
 
 1. 🟠 **"Lote L0003: Por encima del peso objetivo"**
+
    - Prioridad: Media
    - Click → navega al detalle del lote
-   
-2. 💊 **"Vitamina programada para Lote L0003"** 
+
+2. 💊 **"Vitamina programada para Lote L0003"**
+
    - Según feeding_schedule, a los 28 días hay tarea de vitamina
    - Ya pasaron 45 días, así que puede no aparecer
 
@@ -70,6 +77,7 @@ Cuando crees o edites un lote verás:
 ## 🚀 Cómo Probar la Funcionalidad Completa
 
 ### Paso 1: Ver los Lotes Existentes
+
 ```
 1. Abre la app
 2. Ve a la sección de Lotes
@@ -77,6 +85,7 @@ Cuando crees o edites un lote verás:
 ```
 
 ### Paso 2: Ver el Progreso del Lote L0003
+
 ```
 1. Click en el lote L0003
 2. En la parte superior verás:
@@ -89,6 +98,7 @@ Cuando crees o edites un lote verás:
 ```
 
 ### Paso 3: Ver las Alertas en el Dashboard
+
 ```
 1. Ve al Dashboard
 2. Busca la sección de "Alertas"
@@ -97,6 +107,7 @@ Cuando crees o edites un lote verás:
 ```
 
 ### Paso 4: Crear un Nuevo Lote con Fecha de Nacimiento
+
 ```
 1. Click en "Nuevo Lote"
 2. Llena los datos:
@@ -108,6 +119,7 @@ Cuando crees o edites un lote verás:
 ```
 
 ### Paso 5: Agregar una Biometría
+
 ```
 1. Entra al lote que acabas de crear
 2. Click en "Gestionar Biometría"
@@ -119,17 +131,18 @@ Cuando crees o edites un lote verás:
 
 ## 🎨 Colores de los Estados
 
-| Color | Emoji | Estado | Rango |
-|-------|-------|--------|-------|
-| 🟢 Verde | ✓ | On Track | 95-105% del objetivo |
-| 🟡 Amarillo | ⚠️ | Ligeramente bajo | 85-95% |
-| 🟠 Naranja | ⚠️ | Crítico bajo O Alto | <85% o >105% |
-| 🔴 Rojo | ✕ | Sin schedule | No hay datos de referencia |
-| ⚪ Gris | - | Sin datos | No hay biometrías |
+| Color       | Emoji | Estado              | Rango                      |
+| ----------- | ----- | ------------------- | -------------------------- |
+| 🟢 Verde    | ✓     | On Track            | 95-105% del objetivo       |
+| 🟡 Amarillo | ⚠️    | Ligeramente bajo    | 85-95%                     |
+| 🟠 Naranja  | ⚠️    | Crítico bajo O Alto | <85% o >105%               |
+| 🔴 Rojo     | ✕     | Sin schedule        | No hay datos de referencia |
+| ⚪ Gris     | -     | Sin datos           | No hay biometrías          |
 
 ## 📝 Datos de Ejemplo Actuales
 
 ### Lote L0003
+
 - **ID**: a2ea2264-53bc-40a8-99bb-8010a107e87c
 - **Fecha nacimiento**: 20/09/2025
 - **Días de edad**: 45
@@ -141,6 +154,7 @@ Cuando crees o edites un lote verás:
 - **Animales**: 20
 
 ### Lote L0004
+
 - **ID**: ca7a9c1b-0003-4841-bde2-ee1c30774db6
 - **Fecha nacimiento**: 05/10/2025
 - **Días de edad**: 30
@@ -155,7 +169,7 @@ Si quieres verificar los datos directamente en Supabase:
 
 ```sql
 -- Ver todos los lotes con su edad
-SELECT 
+SELECT
     name,
     birth_date,
     (CURRENT_DATE - birth_date) as days_old,
@@ -164,7 +178,7 @@ FROM batches
 WHERE birth_date IS NOT NULL;
 
 -- Ver el progreso del lote L0003
-SELECT 
+SELECT
     b.name,
     b.birth_date,
     bb.avg_weight as current_weight,
@@ -212,6 +226,7 @@ LIMIT 1;
 Ya no necesitas hacer nada más en la base de datos. Los datos están configurados y la funcionalidad está 100% operativa.
 
 Si no ves nada, verifica:
+
 1. ¿La app está conectada a la base de datos correcta?
 2. ¿Hiciste hot reload / hot restart después de los cambios?
 3. ¿Hay errores en la consola?

@@ -12,7 +12,6 @@ class Batch {
   final double? initialAvgWeight;
   final String status;
   final String? notes;
-  final String? imageUrl;
   final List<Animal> animals;
 
   const Batch({
@@ -26,7 +25,6 @@ class Batch {
     this.initialAvgWeight,
     this.status = 'active',
     this.notes,
-    this.imageUrl,
     this.animals = const [],
   });
 
@@ -46,7 +44,6 @@ class Batch {
       initialAvgWeight: (json['initial_avg_weight'] as num?)?.toDouble(),
       status: json['status'] as String? ?? 'active',
       notes: json['notes'] as String?,
-      imageUrl: json['image_url'] as String?,
       animals: _animalsFromJson(json['animals'] as List<dynamic>?),
     );
   }
@@ -63,7 +60,6 @@ class Batch {
       'initial_avg_weight': initialAvgWeight,
       'status': status,
       'notes': notes,
-      'image_url': imageUrl,
       'animals': _animalsToJson(animals),
     };
   }
@@ -100,7 +96,6 @@ class Batch {
     double? initialAvgWeight,
     String? status,
     String? notes,
-    String? imageUrl,
     List<Animal>? animals,
   }) {
     return Batch(
@@ -114,7 +109,6 @@ class Batch {
       initialAvgWeight: initialAvgWeight ?? this.initialAvgWeight,
       status: status ?? this.status,
       notes: notes ?? this.notes,
-      imageUrl: imageUrl ?? this.imageUrl,
       animals: animals ?? this.animals,
     );
   }

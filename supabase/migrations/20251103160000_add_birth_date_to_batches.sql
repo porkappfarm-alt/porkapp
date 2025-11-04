@@ -1,9 +1,9 @@
 -- Add birth_date column to batches table
-ALTER TABLE batches 
+ALTER TABLE batches
 ADD COLUMN IF NOT EXISTS birth_date DATE;
 
 -- Add entry_date column to batches table (if it doesn't exist)
-ALTER TABLE batches 
+ALTER TABLE batches
 ADD COLUMN IF NOT EXISTS entry_date TIMESTAMP WITH TIME ZONE;
 
 -- Create index for better query performance

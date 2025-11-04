@@ -1,8 +1,8 @@
 /// Tipo/categoría del animal
 enum AnimalType {
-  piglet,    // Lechón
-  sow,       // Reproductora
-  boar,      // Padrillo
+  piglet, // Lechón
+  sow, // Reproductora
+  boar, // Padrillo
   fattening; // Engorde
 
   String toJson() {
@@ -36,9 +36,9 @@ enum AnimalType {
 
 /// Estado del animal
 enum AnimalStatus {
-  active,      // Activo
-  sold,        // Vendido
-  dead,        // Muerto
+  active, // Activo
+  sold, // Vendido
+  dead, // Muerto
   transferred; // Transferido
 
   String toJson() {
@@ -72,11 +72,11 @@ enum AnimalStatus {
 
 /// Tipo de evento relacionado al animal
 enum AnimalEventType {
-  weighing,    // Pesaje
-  treatment,   // Tratamiento
-  death,       // Baja/Muerte
-  sale,        // Venta
-  transfer,    // Transferencia
+  weighing, // Pesaje
+  treatment, // Tratamiento
+  death, // Baja/Muerte
+  sale, // Venta
+  transfer, // Transferencia
   vaccination; // Vacunación
 
   String toJson() {
@@ -144,10 +144,18 @@ class AnimalFilters {
 
   factory AnimalFilters.fromJson(Map<String, dynamic> json) {
     return AnimalFilters(
-      type: json['type'] != null ? AnimalType.fromJson(json['type'] as String) : null,
-      status: json['status'] != null ? AnimalStatus.fromJson(json['status'] as String) : null,
-      dateFrom: json['date_from'] != null ? DateTime.parse(json['date_from'] as String) : null,
-      dateTo: json['date_to'] != null ? DateTime.parse(json['date_to'] as String) : null,
+      type: json['type'] != null
+          ? AnimalType.fromJson(json['type'] as String)
+          : null,
+      status: json['status'] != null
+          ? AnimalStatus.fromJson(json['status'] as String)
+          : null,
+      dateFrom: json['date_from'] != null
+          ? DateTime.parse(json['date_from'] as String)
+          : null,
+      dateTo: json['date_to'] != null
+          ? DateTime.parse(json['date_to'] as String)
+          : null,
       batchId: json['batch_id'] as String?,
       corralId: json['corral_id'] as String?,
       minWeight: (json['min_weight'] as num?)?.toDouble(),

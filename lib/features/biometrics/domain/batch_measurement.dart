@@ -48,7 +48,8 @@ class BatchMeasurement {
       batchName: json['batch_name'] as String?,
       measurementName: json['measurement_name'] as String?,
       measurements: (json['measurements'] as List<dynamic>?)
-              ?.map((e) => AnimalMeasurement.fromJson(e as Map<String, dynamic>))
+              ?.map(
+                  (e) => AnimalMeasurement.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
     );

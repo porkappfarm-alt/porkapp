@@ -30,11 +30,11 @@ supabase db push
 
 ```sql
 -- Add birth_date column to batches table
-ALTER TABLE batches 
+ALTER TABLE batches
 ADD COLUMN IF NOT EXISTS birth_date DATE;
 
 -- Add entry_date column to batches table (if it doesn't exist)
-ALTER TABLE batches 
+ALTER TABLE batches
 ADD COLUMN IF NOT EXISTS entry_date TIMESTAMP WITH TIME ZONE;
 
 -- Create index for better query performance
@@ -60,22 +60,23 @@ Una vez aplicada la migración:
 Después de guardar, verás en la tarjeta del lote:
 
 - **Icono de pastel (🎂)** con la edad en formato legible:
+
   - "1 semana" (si tiene 7-13 días)
   - "4 semanas" (si tiene 14-59 días)
   - "2 meses" (si tiene 60+ días)
-  
+
 - **Barra de progreso inteligente** (solo si hay birthDate):
   - Verde 🟢: Peso dentro del rango objetivo (95-105%)
   - Amarillo 🟡: Peso bajo (85-95% del objetivo)
   - Naranja 🟠: Peso muy bajo (<85%) o alto (>105%)
   - Rojo 🔴: Peso crítico
-  
+
 ### 4. Ver Detalles en la Vista de Detalle del Lote
 
 Al hacer clic en un lote con fecha de nacimiento:
 
 - **Header**: Muestra la edad y fecha de nacimiento formateada
-- **Sección de Progreso**: 
+- **Sección de Progreso**:
   - Días de edad actual
   - Peso promedio actual vs peso objetivo
   - Estado con icono y color
@@ -85,11 +86,13 @@ Al hacer clic en un lote con fecha de nacimiento:
 
 El dashboard ahora muestra alertas inteligentes:
 
-1. **Alertas de tareas programadas**: 
+1. **Alertas de tareas programadas**:
+
    - "Vitamina programada" si el lote tiene X días y debe recibir vitamina
    - "Desparasitación programada" según la tabla feeding_schedule
-   
+
 2. **Alertas de peso**:
+
    - "Lote X: Por debajo del peso objetivo" (si está <95% del peso esperado)
    - "Lote Y: Por encima del peso objetivo" (si está >105% del peso esperado)
 
@@ -101,17 +104,20 @@ El dashboard ahora muestra alertas inteligentes:
 
 ### Código de UI actualizado:
 
-1. **batch_form_dialog.dart**: 
+1. **batch_form_dialog.dart**:
+
    - Campo DatePicker para seleccionar fecha de nacimiento
    - Icono de calendario
    - Botón para limpiar la fecha
 
 2. **batch_card.dart**:
+
    - Muestra edad con icono de pastel si hay birthDate
    - Barra de progreso inteligente con BatchProgress
    - Estados con colores: verde/amarillo/naranja/rojo
 
 3. **batch_detail_view.dart**:
+
    - Header con edad y fecha formateada
    - Sección de progreso expandida con más detalles
    - Indicadores visuales del estado
@@ -123,7 +129,8 @@ El dashboard ahora muestra alertas inteligentes:
 
 ### Lógica de negocio:
 
-5. **batch_progress_provider.dart**: 
+5. **batch_progress_provider.dart**:
+
    - Calcula progreso comparando con feeding_schedule
    - Determina estado (onTrack, slightlyBehind, critical, etc.)
    - Provee colores e iconos para cada estado
@@ -136,6 +143,7 @@ El dashboard ahora muestra alertas inteligentes:
 ### Base de datos:
 
 7. **20251103160000_add_birth_date_to_batches.sql**:
+
    - Agrega columna birth_date a la tabla batches
    - Agrega columna entry_date
    - Crea índices para mejorar performance
@@ -165,6 +173,7 @@ El dashboard ahora muestra alertas inteligentes:
 Para ver toda la funcionalidad:
 
 1. Crea un lote nuevo con:
+
    - Fecha de nacimiento: hace 30 días
    - 50 animales
    - Peso inicial: 6 kg
@@ -179,13 +188,13 @@ Para ver toda la funcionalidad:
 
 ## 📊 Estados Posibles del Progreso
 
-| Estado | Color | Icono | Rango |
-|--------|-------|-------|-------|
-| On Track | Verde 🟢 | ✓ | 95-105% del peso objetivo |
-| Slightly Behind | Amarillo 🟡 | ⚠️ | 85-95% del objetivo |
-| Critical | Naranja 🟠 | ⚠️ | <85% del objetivo |
-| Above Target | Naranja 🟠 | ↑ | >105% del objetivo |
-| No Data | Gris ⚪ | - | Sin biometrías |
+| Estado          | Color       | Icono | Rango                     |
+| --------------- | ----------- | ----- | ------------------------- |
+| On Track        | Verde 🟢    | ✓     | 95-105% del peso objetivo |
+| Slightly Behind | Amarillo 🟡 | ⚠️    | 85-95% del objetivo       |
+| Critical        | Naranja 🟠  | ⚠️    | <85% del objetivo         |
+| Above Target    | Naranja 🟠  | ↑     | >105% del objetivo        |
+| No Data         | Gris ⚪     | -     | Sin biometrías            |
 
 ## 🎨 Mejoras Visuales
 

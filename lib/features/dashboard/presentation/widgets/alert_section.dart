@@ -62,10 +62,10 @@ class AlertSection extends StatelessWidget {
           AlertSeverity.warning: 1,
           AlertSeverity.info: 2,
         };
-        final severityComparison = severityOrder[a.severity]!
-            .compareTo(severityOrder[b.severity]!);
+        final severityComparison =
+            severityOrder[a.severity]!.compareTo(severityOrder[b.severity]!);
         if (severityComparison != 0) return severityComparison;
-        
+
         // Then by alert type priority
         final typeOrder = {
           AlertType.scheduledTask: 0,

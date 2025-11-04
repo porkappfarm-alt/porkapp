@@ -1,4 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/features/batches/data/batch_progress_service.dart';
+import 'package:porkapp/features/batches/domain/batch.dart';
+import 'package:porkapp/features/batches/domain/batch_progress.dart';
 import 'package:porkapp/features/dashboard/data/models/batch_summary.dart';
 import 'package:porkapp/features/dashboard/data/models/chart_data.dart';
 import 'package:porkapp/features/dashboard/data/models/dashboard_alert.dart';
@@ -269,6 +272,26 @@ class DashboardRepository {
         ));
       }
 
+      // Alerta 4: Lotes por debajo del peso objetivo
+      final batchesBelowTarget = await _getBatchesBelowTargetWeight();
+      if (batchesBelowTarget.isNotEmpty) {
+        alerts.add(DashboardAlert(
+          id: 'below_target_${DateTime.now().millisecondsSinceEpoch}',
+          severity: AlertSeverity.warning,
+          type: AlertType.belowTargetWeight,
+          title: 'Lotes por debajo del peso objetivo',
+          description:
+              '${batchesBelowTarget.length} lote(s) están por debajo del peso esperado',
+          affectedCount: batchesBelowTarget.length,
+          actionRoute: '/batches',
+          createdAt: DateTime.now(),
+        ));
+      }
+
+      // Alerta 5: Tareas programadas pendientes
+      final scheduledTasks = await _getScheduledTaskAlerts();
+      alerts.addAll(scheduledTasks);
+
       return alerts;
     } catch (e) {
       throw Exception('Error al obtener alertas: $e');
@@ -384,6 +407,137 @@ class DashboardRepository {
     } catch (e) {
       return [];
     }
+  }
+
+  /// Obtiene lotes por debajo del peso objetivo según feeding_schedule
+  Future<List<Map<String, dynamic>>> _getBatchesBelowTargetWeight() async {
+    try {
+      final batchProgressService = BatchProgressService(_supabase);
+
+      // Obtener todos los lotes activos con birth_date
+      final batchesData = await _supabase
+          .from('batches')
+          .select(
+              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes, image_url')
+          .eq('status', 'active')
+          .not('birth_date', 'is', null);
+
+      final batchesBelowTarget = <Map<String, dynamic>>[];
+
+      for (final batchData in batchesData) {
+        try {
+          // Convertir a modelo Batch
+          final batch = Batch.fromJson(batchData);
+
+          // Calcular progreso
+          final progress = await batchProgressService.calculateProgress(batch);
+
+          if (progress != null &&
+              progress.status == ProgressStatus.belowTarget) {
+            batchesBelowTarget.add({
+              'id': batch.id,
+              'name': batch.name,
+              'days_old': progress.daysOld,
+              'current_weight': progress.currentWeight,
+              'reference_weight': progress.referenceWeight,
+              'progress_percentage': progress.progressPercentage,
+            });
+          }
+        } catch (e) {
+          print('Error procesando lote ${batchData['id']}: $e');
+        }
+      }
+
+      return batchesBelowTarget;
+    } catch (e) {
+      print('Error obteniendo lotes por debajo del objetivo: $e');
+      return [];
+    }
+  }
+
+  /// Obtiene alertas de tareas programadas según feeding_schedule
+  Future<List<DashboardAlert>> _getScheduledTaskAlerts() async {
+    try {
+      final alerts = <DashboardAlert>[];
+
+      // Obtener todos los lotes activos con birth_date
+      final batchesData = await _supabase
+          .from('batches')
+          .select('id, name, birth_date')
+          .eq('status', 'active')
+          .not('birth_date', 'is', null);
+
+      // Agrupar tareas por tipo
+      final tasksByType = <String, List<Map<String, dynamic>>>{};
+
+      for (final batchData in batchesData) {
+        try {
+          final birthDate = DateTime.parse(batchData['birth_date'] as String);
+          final daysOld = DateTime.now().difference(birthDate).inDays;
+
+          // Buscar tareas programadas para la edad actual (±3 días)
+          final feedingData = await _supabase
+              .from('feeding_schedule')
+              .select('days_old, tasks')
+              .gte('days_old', daysOld - 3)
+              .lte('days_old', daysOld + 3)
+              .not('tasks', 'eq', '{}');
+
+          for (final schedule in feedingData) {
+            final tasks =
+                (schedule['tasks'] as List<dynamic>?)?.cast<String>() ?? [];
+            final scheduledDays = schedule['days_old'] as int;
+
+            for (final task in tasks) {
+              if (!tasksByType.containsKey(task)) {
+                tasksByType[task] = [];
+              }
+              tasksByType[task]!.add({
+                'batch_id': batchData['id'],
+                'batch_name': batchData['name'],
+                'days_old': daysOld,
+                'scheduled_days': scheduledDays,
+              });
+            }
+          }
+        } catch (e) {
+          print('Error procesando tareas del lote ${batchData['id']}: $e');
+        }
+      }
+
+      // Crear una alerta por cada tipo de tarea
+      tasksByType.forEach((taskType, batches) {
+        if (batches.isNotEmpty) {
+          alerts.add(DashboardAlert(
+            id: 'scheduled_task_${taskType}_${DateTime.now().millisecondsSinceEpoch}',
+            severity: AlertSeverity.info,
+            type: AlertType.scheduledTask,
+            title: _getTaskTitle(taskType),
+            description: '${batches.length} lote(s) necesitan: $taskType',
+            affectedCount: batches.length,
+            actionRoute: '/batches',
+            createdAt: DateTime.now(),
+          ));
+        }
+      });
+
+      return alerts;
+    } catch (e) {
+      print('Error obteniendo alertas de tareas programadas: $e');
+      return [];
+    }
+  }
+
+  /// Obtiene el título amigable para un tipo de tarea
+  String _getTaskTitle(String taskType) {
+    final taskTitles = {
+      'vacunacion': 'Vacunación Programada',
+      'desparasitacion': 'Desparasitación Programada',
+      'vitaminas': 'Suplemento Vitamínico',
+      'cambio_alimentacion': 'Cambio de Alimentación',
+      'pesaje': 'Pesaje Programado',
+    };
+    return taskTitles[taskType.toLowerCase()] ?? 'Tarea Programada: $taskType';
   }
 
   /// Obtiene resumen de los últimos 3 lotes activos

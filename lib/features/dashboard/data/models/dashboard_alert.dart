@@ -27,6 +27,15 @@ enum AlertType {
   /// Lote próximo a fecha estimada de venta
   upcomingSale,
 
+  /// Tarea programada pendiente (vacunación, desparasitación, etc.)
+  scheduledTask,
+
+  /// Lote por debajo del peso objetivo según feeding_schedule
+  belowTargetWeight,
+
+  /// Lote por encima del peso objetivo según feeding_schedule
+  aboveTargetWeight,
+
   /// Otro tipo de alerta
   other,
 }
@@ -91,6 +100,12 @@ extension AlertTypeExtension on AlertType {
         return '💔';
       case AlertType.upcomingSale:
         return '💰';
+      case AlertType.scheduledTask:
+        return '📋';
+      case AlertType.belowTargetWeight:
+        return '⚠️';
+      case AlertType.aboveTargetWeight:
+        return '📈';
       case AlertType.other:
         return 'ℹ️';
     }

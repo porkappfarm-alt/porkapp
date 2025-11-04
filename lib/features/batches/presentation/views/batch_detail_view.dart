@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/batches/providers/batch_progress_provider.dart';

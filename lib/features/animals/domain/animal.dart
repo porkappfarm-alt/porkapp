@@ -1,55 +1,141 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+/// Modelo de Animal - Convertido de freezed a clase plana
+class Animal {
+  final String id;
+  final String batchId;
+  final String identifier;
+  final DateTime? birthDate;
+  final String? sex;
+  final double? weight;
+  final String breed;
+  final String type;
+  final DateTime? entryDate;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final String gender;
+  final String status;
+  final String? notes;
+  final double? targetWeight;
+  final int? parityNumber;
+  final int? serviceCount;
 
-part 'animal.freezed.dart';
-part 'animal.g.dart';
+  const Animal({
+    required this.id,
+    required this.batchId,
+    required this.identifier,
+    this.birthDate,
+    this.sex,
+    this.weight,
+    required this.breed,
+    required this.type,
+    this.entryDate,
+    this.createdAt,
+    this.updatedAt,
+    this.gender = 'unknown',
+    this.status = 'active',
+    this.notes,
+    this.targetWeight,
+    this.parityNumber,
+    this.serviceCount,
+  });
 
-DateTime? _nullableDateFromString(String? date) =>
-    date == null ? null : DateTime.parse(date);
-String? _nullableDateToString(DateTime? date) => date?.toIso8601String();
+  factory Animal.fromJson(Map<String, dynamic> json) {
+    return Animal(
+      id: json['id'] as String,
+      batchId: json['batch_id'] as String,
+      identifier: json['identifier'] as String,
+      birthDate: json['birth_date'] != null
+          ? DateTime.parse(json['birth_date'] as String)
+          : null,
+      sex: json['sex'] as String?,
+      weight: (json['weight_at_entry'] as num?)?.toDouble(),
+      breed: json['breed'] as String,
+      type: json['animal_type'] as String,
+      entryDate: json['entry_date'] != null
+          ? DateTime.parse(json['entry_date'] as String)
+          : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
+      gender: json['gender'] as String? ?? 'unknown',
+      status: json['status'] as String? ?? 'active',
+      notes: json['notes'] as String?,
+      targetWeight: (json['target_weight'] as num?)?.toDouble(),
+      parityNumber: json['parity_number'] as int?,
+      serviceCount: json['service_count'] as int?,
+    );
+  }
 
-@freezed
-class Animal with _$Animal {
-  const factory Animal({
-    required String id,
-    @JsonKey(name: 'batch_id') required String batchId,
-    required String identifier, // ID interno o número de arete
-    @JsonKey(
-      name: 'birth_date',
-      fromJson: _nullableDateFromString,
-      toJson: _nullableDateToString,
-    )
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'batch_id': batchId,
+      'identifier': identifier,
+      'birth_date': birthDate?.toIso8601String(),
+      'sex': sex,
+      'weight_at_entry': weight,
+      'breed': breed,
+      'animal_type': type,
+      'entry_date': entryDate?.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+      'gender': gender,
+      'status': status,
+      'notes': notes,
+      'target_weight': targetWeight,
+      'parity_number': parityNumber,
+      'service_count': serviceCount,
+    };
+  }
+
+  Animal copyWith({
+    String? id,
+    String? batchId,
+    String? identifier,
     DateTime? birthDate,
     String? sex,
-    @JsonKey(name: 'weight_at_entry') double? weight, // Peso inicial
-    required String breed,
-    @JsonKey(name: 'animal_type')
-    required String
-        type, // Tipo de animal (ej: cerdo de engorde, reproductor, etc)
-    @JsonKey(
-      name: 'entry_date',
-      fromJson: _nullableDateFromString,
-      toJson: _nullableDateToString,
-    )
-    DateTime? entryDate, // Fecha de ingreso al lote
-    @JsonKey(
-      name: 'created_at',
-      fromJson: _nullableDateFromString,
-      toJson: _nullableDateToString,
-    )
+    double? weight,
+    String? breed,
+    String? type,
+    DateTime? entryDate,
     DateTime? createdAt,
-    @JsonKey(
-      name: 'updated_at',
-      fromJson: _nullableDateFromString,
-      toJson: _nullableDateToString,
-    )
     DateTime? updatedAt,
-    @Default('unknown') String gender,
-    @Default('active') String status, // active, sold, deceased, removed
+    String? gender,
+    String? status,
     String? notes,
-    @JsonKey(name: 'target_weight') double? targetWeight,
-    @JsonKey(name: 'parity_number') int? parityNumber,
-    @JsonKey(name: 'service_count') int? serviceCount,
-  }) = _Animal;
+    double? targetWeight,
+    int? parityNumber,
+    int? serviceCount,
+  }) {
+    return Animal(
+      id: id ?? this.id,
+      batchId: batchId ?? this.batchId,
+      identifier: identifier ?? this.identifier,
+      birthDate: birthDate ?? this.birthDate,
+      sex: sex ?? this.sex,
+      weight: weight ?? this.weight,
+      breed: breed ?? this.breed,
+      type: type ?? this.type,
+      entryDate: entryDate ?? this.entryDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      gender: gender ?? this.gender,
+      status: status ?? this.status,
+      notes: notes ?? this.notes,
+      targetWeight: targetWeight ?? this.targetWeight,
+      parityNumber: parityNumber ?? this.parityNumber,
+      serviceCount: serviceCount ?? this.serviceCount,
+    );
+  }
 
-  factory Animal.fromJson(Map<String, dynamic> json) => _$AnimalFromJson(json);
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Animal && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

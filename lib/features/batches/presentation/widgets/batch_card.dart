@@ -28,12 +28,6 @@ class BatchCard extends ConsumerWidget {
 
     // Consultar la última biometría
     final biometricsAsync = ref.watch(batchBiometricsProvider(batch.id));
-    double? lastAvgWeight;
-    biometricsAsync.whenData((measurements) {
-      if (measurements.isNotEmpty) {
-        lastAvgWeight = measurements.last.averageWeight;
-      }
-    });
 
     final entryDate = batch.entryDate ?? batch.createdAt;
     final daysElapsed = DateTime.now().difference(entryDate).inDays;

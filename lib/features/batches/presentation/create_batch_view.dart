@@ -21,6 +21,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
   final _animalCountController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
+  DateTime? _birthDate; // Fecha de nacimiento del lote
   String? _selectedCorralId;
   int? _selectedCorralCapacity;
   String? _batchName; // Para edición
@@ -45,8 +46,32 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
     if (picked != null) setState(() => _selectedDate = picked);
   }
 
+  Future<void> _selectBirthDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      helpText: 'Seleccionar fecha de nacimiento',
+      cancelText: 'Cancelar',
+      confirmText: 'Aceptar',
+    );
+    if (picked != null) setState(() => _birthDate = picked);
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() || _selectedCorralId == null) return;
+
+    // Validar que se haya seleccionado una fecha de nacimiento
+    if (_birthDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debe seleccionar una fecha de nacimiento'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -57,12 +82,14 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
               corralId: _selectedCorralId!,
               entryDate: _selectedDate,
               headcountStart: int.parse(_animalCountController.text),
+              birthDate: _birthDate,
             );
       } else {
         await ref.read(batchesControllerProvider.notifier).createBatch(
               corralId: _selectedCorralId!,
               entryDate: _selectedDate,
               animalCount: int.parse(_animalCountController.text),
+              birthDate: _birthDate!, // Ya validamos que no sea null
             );
       }
 
@@ -107,6 +134,7 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                 _selectedDate = batch.entryDate ?? batch.createdAt;
                 _selectedCorralId = batch.corralId;
                 _animalCountController.text = batch.headcountStart.toString();
+                _birthDate = batch.birthDate;
                 _isInitialized = true;
               });
             }
@@ -299,6 +327,104 @@ class _CreateBatchViewState extends ConsumerState<CreateBatchView> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+
+                  // Section: Fecha de Nacimiento (obligatorio)
+                  _buildSectionLabel('Fecha de Nacimiento *', Icons.cake),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: _selectBirthDate,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.cake,
+                                  color: Color(0xFF4CAF50), size: 20),
+                              const SizedBox(width: 12),
+                              Text(
+                                _birthDate != null
+                                    ? '${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}'
+                                    : 'Seleccionar fecha',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: _birthDate != null
+                                      ? Colors.black87
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (_birthDate != null)
+                                IconButton(
+                                  icon: const Icon(Icons.clear, size: 20),
+                                  onPressed: () {
+                                    setState(() => _birthDate = null);
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  color: Colors.grey[600],
+                                ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.arrow_drop_down,
+                                  color: Colors.grey[600]),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Texto de ayuda indicando que es obligatorio
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, left: 4),
+                    child: Text(
+                      '* Campo obligatorio para calcular el progreso del lote',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[700],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  // Mostrar edad calculada si hay fecha de nacimiento
+                  if (_birthDate != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE3F2FD),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.info_outline,
+                                size: 16, color: Color(0xFF1976D2)),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Edad actual: ${DateTime.now().difference(_birthDate!).inDays} días',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF1976D2),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   const SizedBox(height: 24),
 
                   // Section: Cantidad de Animales

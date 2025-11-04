@@ -5,7 +5,30 @@ import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_form_dialog.dart';
+import 'package:porkapp/supabase/providers/supabase_providers.dart';
 import 'package:intl/intl.dart';
+
+// Provider para obtener la última biometría de un animal
+final animalLastWeightProvider =
+    FutureProvider.family<double?, String>((ref, animalId) async {
+  final supabase = ref.watch(supabaseProvider);
+
+  try {
+    final result = await supabase
+        .from('biometric_measurements')
+        .select('weight')
+        .eq('animal_id', animalId)
+        .not('weight', 'is', null)
+        .order('created_at', ascending: false)
+        .limit(1);
+
+    if (result.isEmpty) return null;
+    return (result.first['weight'] as num?)?.toDouble();
+  } catch (e) {
+    print('Error obteniendo última biometría: $e');
+    return null;
+  }
+});
 
 class BatchAnimalsView extends ConsumerWidget {
   final String batchId;
@@ -39,8 +62,10 @@ class BatchAnimalsView extends ConsumerWidget {
           ),
           child: FloatingActionButton.extended(
             onPressed: () {
-              showDialog(
+              showModalBottomSheet(
                 context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
                 builder: (context) =>
                     AnimalFormDialog(preselectedBatchId: batchId),
               );
@@ -334,14 +359,14 @@ class _InfoItem extends StatelessWidget {
   }
 }
 
-class _AnimalCard extends StatelessWidget {
+class _AnimalCard extends ConsumerWidget {
   final Animal animal;
   final String batchId;
 
   const _AnimalCard({required this.animal, required this.batchId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -403,12 +428,43 @@ class _AnimalCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${animal.breed} • ${animal.weight != null ? "${animal.weight!.toStringAsFixed(1)} kg" : "Sin peso"}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final lastWeightAsync =
+                            ref.watch(animalLastWeightProvider(animal.id));
+
+                        return lastWeightAsync.when(
+                          data: (lastWeight) {
+                            final weightText = lastWeight != null
+                                ? "${lastWeight.toStringAsFixed(1)} kg"
+                                : (animal.weight != null
+                                    ? "${animal.weight!.toStringAsFixed(1)} kg"
+                                    : "Sin peso");
+
+                            return Text(
+                              '${animal.breed} • $weightText',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            );
+                          },
+                          loading: () => Text(
+                            '${animal.breed} • Cargando...',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                          error: (_, __) => Text(
+                            '${animal.breed} • ${animal.weight != null ? "${animal.weight!.toStringAsFixed(1)} kg" : "Sin peso"}',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

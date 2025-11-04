@@ -158,42 +158,7 @@ class _BatchFormDialogState extends ConsumerState<BatchFormDialog> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _headcountController,
-                    decoration: const InputDecoration(
-                      labelText: 'Cantidad inicial de animales',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'La cantidad es requerida';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return 'Ingrese un número válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _avgWeightController,
-                    decoration: const InputDecoration(
-                      labelText: 'Peso promedio inicial (kg)',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        if (double.tryParse(value) == null) {
-                          return 'Ingrese un número válido';
-                        }
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Birth Date Picker
+                  // Birth Date Picker (movido más arriba para mayor visibilidad)
                   InkWell(
                     onTap: () async {
                       final DateTime? picked = await showDatePicker(
@@ -237,6 +202,41 @@ class _BatchFormDialogState extends ConsumerState<BatchFormDialog> {
                         ),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _headcountController,
+                    decoration: const InputDecoration(
+                      labelText: 'Cantidad inicial de animales',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'La cantidad es requerida';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'Ingrese un número válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _avgWeightController,
+                    decoration: const InputDecoration(
+                      labelText: 'Peso promedio inicial (kg)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        if (double.tryParse(value) == null) {
+                          return 'Ingrese un número válido';
+                        }
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   Consumer(

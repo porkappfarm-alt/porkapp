@@ -226,31 +226,32 @@ class DashboardRepository {
 
       // Alerta 1: Lotes sin biometría reciente (>14 días)
       final batchesWithoutBiometry = await _getBatchesWithoutRecentBiometry();
-      if (batchesWithoutBiometry.isNotEmpty) {
+      for (final batch in batchesWithoutBiometry) {
         alerts.add(DashboardAlert(
-          id: 'missing_biometry_${DateTime.now().millisecondsSinceEpoch}',
+          id: 'missing_biometry_${batch['id']}_${DateTime.now().millisecondsSinceEpoch}',
           severity: AlertSeverity.critical,
           type: AlertType.missingBiometry,
-          title: 'Lotes sin biometría reciente',
-          description:
-              '${batchesWithoutBiometry.length} lote(s) no tienen biometría en más de 14 días',
-          affectedCount: batchesWithoutBiometry.length,
-          actionRoute: '/batches',
+          title: 'Lote ${batch['name']}: Sin biometría reciente',
+          description: 'No tiene registro de biometría en más de 14 días',
+          affectedCount: 1,
+          actionRoute: '/batches/${batch['id']}',
           createdAt: DateTime.now(),
         ));
       }
 
       // Alerta 2: Corrales cerca de capacidad máxima (>90%)
       final corralsNearCapacity = await _getCorralsNearCapacity();
-      if (corralsNearCapacity.isNotEmpty) {
+      for (final corral in corralsNearCapacity) {
+        final corralName = corral['name'] as String? ?? 'Desconocido';
+        final occupancy = (corral['occupancy_pct'] as num?)?.toDouble() ?? 0.0;
+
         alerts.add(DashboardAlert(
-          id: 'corral_capacity_${DateTime.now().millisecondsSinceEpoch}',
+          id: 'corral_capacity_${corral['id']}_${DateTime.now().millisecondsSinceEpoch}',
           severity: AlertSeverity.warning,
           type: AlertType.corralNearCapacity,
-          title: 'Corrales cerca de capacidad',
-          description:
-              '${corralsNearCapacity.length} corral(es) están sobre el 90% de ocupación',
-          affectedCount: corralsNearCapacity.length,
+          title: 'Corral $corralName: Cerca de capacidad',
+          description: 'Ocupación del ${occupancy.toStringAsFixed(0)}%',
+          affectedCount: 1,
           actionRoute: '/corrals',
           createdAt: DateTime.now(),
         ));
@@ -258,32 +259,56 @@ class DashboardRepository {
 
       // Alerta 3: Animales con bajo ADG (<0.5 kg/día)
       final lowPerformanceAnimals = await _getAnimalsWithLowADG();
-      if (lowPerformanceAnimals.isNotEmpty) {
-        alerts.add(DashboardAlert(
-          id: 'low_adg_${DateTime.now().millisecondsSinceEpoch}',
-          severity: AlertSeverity.warning,
-          type: AlertType.lowPerformance,
-          title: 'Animales con bajo rendimiento',
-          description:
-              '${lowPerformanceAnimals.length} animal(es) tienen ADG menor a 0.5 kg/día',
-          affectedCount: lowPerformanceAnimals.length,
-          actionRoute: '/batches',
-          createdAt: DateTime.now(),
-        ));
+      for (final animal in lowPerformanceAnimals) {
+        final animalData = animal['animals'] as Map<String, dynamic>?;
+        final batchId = animalData?['batch_id'] as String?;
+        final identifier =
+            animalData?['identifier'] as String? ?? 'Desconocido';
+        final adg = (animal['adg'] as num?)?.toDouble() ?? 0.0;
+
+        if (batchId != null) {
+          alerts.add(DashboardAlert(
+            id: 'low_adg_${animal['animal_id']}_${DateTime.now().millisecondsSinceEpoch}',
+            severity: AlertSeverity.warning,
+            type: AlertType.lowPerformance,
+            title: 'Animal $identifier: Bajo rendimiento',
+            description:
+                'ADG de ${adg.toStringAsFixed(2)} kg/día (menor a 0.5 kg/día)',
+            affectedCount: 1,
+            actionRoute: '/batches/$batchId',
+            createdAt: DateTime.now(),
+          ));
+        }
       }
 
       // Alerta 4: Lotes por debajo del peso objetivo
       final batchesBelowTarget = await _getBatchesBelowTargetWeight();
-      if (batchesBelowTarget.isNotEmpty) {
+      for (final batch in batchesBelowTarget) {
         alerts.add(DashboardAlert(
-          id: 'below_target_${DateTime.now().millisecondsSinceEpoch}',
+          id: 'below_target_${batch['id']}_${DateTime.now().millisecondsSinceEpoch}',
           severity: AlertSeverity.warning,
           type: AlertType.belowTargetWeight,
-          title: 'Lotes por debajo del peso objetivo',
+          title: 'Lote ${batch['name']}: Por debajo del peso objetivo',
           description:
-              '${batchesBelowTarget.length} lote(s) están por debajo del peso esperado',
-          affectedCount: batchesBelowTarget.length,
-          actionRoute: '/batches',
+              'Peso actual: ${batch['current_weight']}kg vs ${batch['reference_weight']}kg esperado (${batch['progress_percentage']}%)',
+          affectedCount: 1,
+          actionRoute: '/batches/${batch['id']}',
+          createdAt: DateTime.now(),
+        ));
+      }
+
+      // Alerta 4b: Lotes por encima del peso objetivo
+      final batchesAboveTarget = await _getBatchesAboveTargetWeight();
+      for (final batch in batchesAboveTarget) {
+        alerts.add(DashboardAlert(
+          id: 'above_target_${batch['id']}_${DateTime.now().millisecondsSinceEpoch}',
+          severity: AlertSeverity.info,
+          type: AlertType.aboveTargetWeight,
+          title: 'Lote ${batch['name']}: Por encima del peso objetivo',
+          description:
+              'Peso actual: ${batch['current_weight']}kg vs ${batch['reference_weight']}kg esperado (${batch['progress_percentage']}%)',
+          affectedCount: 1,
+          actionRoute: '/batches/${batch['id']}',
           createdAt: DateTime.now(),
         ));
       }
@@ -455,6 +480,52 @@ class DashboardRepository {
     }
   }
 
+  /// Obtiene lotes por encima del peso objetivo según feeding_schedule
+  Future<List<Map<String, dynamic>>> _getBatchesAboveTargetWeight() async {
+    try {
+      final batchProgressService = BatchProgressService(_supabase);
+
+      // Obtener todos los lotes activos con birth_date
+      final batchesData = await _supabase
+          .from('batches')
+          .select(
+              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+          .eq('status', 'active')
+          .not('birth_date', 'is', null);
+
+      final batchesAboveTarget = <Map<String, dynamic>>[];
+
+      for (final batchData in batchesData) {
+        try {
+          // Convertir a modelo Batch
+          final batch = Batch.fromJson(batchData);
+
+          // Calcular progreso
+          final progress = await batchProgressService.calculateProgress(batch);
+
+          if (progress != null &&
+              progress.status == ProgressStatus.aboveTarget) {
+            batchesAboveTarget.add({
+              'id': batch.id,
+              'name': batch.name,
+              'days_old': progress.daysOld,
+              'current_weight': progress.currentWeight,
+              'reference_weight': progress.referenceWeight,
+              'progress_percentage': progress.progressPercentage,
+            });
+          }
+        } catch (e) {
+          print('Error procesando lote ${batchData['id']}: $e');
+        }
+      }
+
+      return batchesAboveTarget;
+    } catch (e) {
+      print('Error obteniendo lotes por encima del objetivo: $e');
+      return [];
+    }
+  }
+
   /// Obtiene alertas de tareas programadas según feeding_schedule
   Future<List<DashboardAlert>> _getScheduledTaskAlerts() async {
     try {
@@ -466,9 +537,6 @@ class DashboardRepository {
           .select('id, name, birth_date')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
-
-      // Agrupar tareas por tipo
-      final tasksByType = <String, List<Map<String, dynamic>>>{};
 
       for (final batchData in batchesData) {
         try {
@@ -489,37 +557,24 @@ class DashboardRepository {
             final scheduledDays = schedule['days_old'] as int;
 
             for (final task in tasks) {
-              if (!tasksByType.containsKey(task)) {
-                tasksByType[task] = [];
-              }
-              tasksByType[task]!.add({
-                'batch_id': batchData['id'],
-                'batch_name': batchData['name'],
-                'days_old': daysOld,
-                'scheduled_days': scheduledDays,
-              });
+              // Crear una alerta individual por cada lote y tarea
+              alerts.add(DashboardAlert(
+                id: 'scheduled_task_${task}_${batchData['id']}_${DateTime.now().millisecondsSinceEpoch}',
+                severity: AlertSeverity.info,
+                type: AlertType.scheduledTask,
+                title: '${_getTaskTitle(task)} - ${batchData['name']}',
+                description:
+                    'Lote con $daysOld días de edad. Tarea programada para los $scheduledDays días',
+                affectedCount: 1,
+                actionRoute: '/batches/${batchData['id']}',
+                createdAt: DateTime.now(),
+              ));
             }
           }
         } catch (e) {
           print('Error procesando tareas del lote ${batchData['id']}: $e');
         }
       }
-
-      // Crear una alerta por cada tipo de tarea
-      tasksByType.forEach((taskType, batches) {
-        if (batches.isNotEmpty) {
-          alerts.add(DashboardAlert(
-            id: 'scheduled_task_${taskType}_${DateTime.now().millisecondsSinceEpoch}',
-            severity: AlertSeverity.info,
-            type: AlertType.scheduledTask,
-            title: _getTaskTitle(taskType),
-            description: '${batches.length} lote(s) necesitan: $taskType',
-            affectedCount: batches.length,
-            actionRoute: '/batches',
-            createdAt: DateTime.now(),
-          ));
-        }
-      });
 
       return alerts;
     } catch (e) {

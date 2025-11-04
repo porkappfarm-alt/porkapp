@@ -233,197 +233,220 @@ class _BatchBiometricDetailViewState
               children: [
                 // Mostrar la última biometría en una sección aparte destacada
                 if (biometrics.isNotEmpty)
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFFF07281).withOpacity(0.1),
-                          Colors.white,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: const Color(0xFFF07281),
-                        width: 2.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFF07281).withOpacity(0.15),
-                          blurRadius: 24,
-                          offset: const Offset(0, 6),
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Badge "Última Medición"
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF07281),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.access_time,
-                                    size: 14,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'ÚLTIMA MEDICIÓN',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 0.8,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                  GestureDetector(
+                    onTap: () {
+                      // Navegar al detalle de pesos de la última biometría
+                      context.push(
+                        '/batches/${widget.batchId}/biometrics/${biometrics.first.id}/weights',
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFFF07281).withOpacity(0.1),
+                            Colors.white,
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        const SizedBox(height: 20),
-                        // Fecha
-                        Text(
-                          _formatDate(biometrics.first.measurementDate),
-                          style: const TextStyle(
-                            color: Color(0xFF5D4037),
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: const Color(0xFFF07281),
+                          width: 2.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFF07281).withOpacity(0.15),
+                            blurRadius: 24,
+                            offset: const Offset(0, 6),
+                            spreadRadius: 2,
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        // Información principal
-                        Row(
-                          children: [
-                            // Peso Promedio
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFFF07281).withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: const Color(0xFFF07281)
-                                        .withOpacity(0.2),
-                                    width: 1,
-                                  ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Badge "Última Medición"
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF07281),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Text(
-                                      'PESO PROMEDIO',
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'ÚLTIMA MEDICIÓN',
                                       style: TextStyle(
-                                        color: Color(0xFF9E9E9E),
+                                        color: Colors.white,
                                         fontSize: 11,
-                                        fontWeight: FontWeight.w700,
+                                        fontWeight: FontWeight.w800,
                                         letterSpacing: 0.8,
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.baseline,
-                                      textBaseline: TextBaseline.alphabetic,
-                                      children: [
-                                        Text(
-                                          biometrics.first.averageWeight
-                                              .toStringAsFixed(1),
-                                          style: const TextStyle(
-                                            color: Color(0xFF5D4037),
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.w900,
-                                            height: 1.0,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        const Text(
-                                          'kg',
-                                          style: TextStyle(
-                                            color: Color(0xFF9E9E9E),
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                   ],
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Animales medidos
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFF07281),
-                                    Color(0xFFE94C5D)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                              const Spacer(),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFFF07281).withOpacity(0.1),
+                                  shape: BoxShape.circle,
                                 ),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
+                                child: const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  size: 20,
+                                  color: Color(0xFFF07281),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          // Fecha
+                          Text(
+                            _formatDate(biometrics.first.measurementDate),
+                            style: const TextStyle(
+                              color: Color(0xFF5D4037),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Información principal
+                          Row(
+                            children: [
+                              // Peso Promedio
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
                                     color: const Color(0xFFF07281)
-                                        .withOpacity(0.4),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  const Icon(
-                                    Icons.pets,
-                                    size: 32,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    '${biometrics.first.animalCount}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w900,
-                                      height: 1.0,
+                                        .withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: const Color(0xFFF07281)
+                                          .withOpacity(0.2),
+                                      width: 1,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'animales',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'PESO PROMEDIO',
+                                        style: TextStyle(
+                                          color: Color(0xFF9E9E9E),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.baseline,
+                                        textBaseline: TextBaseline.alphabetic,
+                                        children: [
+                                          Text(
+                                            biometrics.first.averageWeight
+                                                .toStringAsFixed(1),
+                                            style: const TextStyle(
+                                              color: Color(0xFF5D4037),
+                                              fontSize: 36,
+                                              fontWeight: FontWeight.w900,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Text(
+                                            'kg',
+                                            style: TextStyle(
+                                              color: Color(0xFF9E9E9E),
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 16),
+                              // Animales medidos
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFF07281),
+                                      Color(0xFFE94C5D)
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFF07281)
+                                          .withOpacity(0.4),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.pets,
+                                      size: 32,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      '${biometrics.first.animalCount}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1.0,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'animales',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 Expanded(
@@ -525,16 +548,39 @@ class _BatchBiometricDetailViewState
                                 // Empezamos desde el índice 1 para omitir la primera (ya mostrada arriba)
                                 final measurement = biometrics[index + 1];
 
-                                return _buildMeasurementTile(
-                                  date:
-                                      _formatDate(measurement.measurementDate),
-                                  weight: measurement.averageWeight,
-                                  animalCount: measurement.animalCount,
-                                  note: measurement.measurementName ?? 'Pesaje',
-                                  onTap: () {
-                                    print(
-                                        'Tap on biometric: ${measurement.id}');
-                                  },
+                                return Opacity(
+                                  opacity: 0.6,
+                                  child: Stack(
+                                    children: [
+                                      _buildMeasurementTile(
+                                        date: _formatDate(
+                                            measurement.measurementDate),
+                                        weight: measurement.averageWeight,
+                                        animalCount: measurement.animalCount,
+                                        note: measurement.measurementName ??
+                                            'Pesaje',
+                                        onTap:
+                                            null, // Sin acción, deshabilitado
+                                      ),
+                                      Positioned.fill(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.grey.withOpacity(0.05),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.lock_outline,
+                                              size: 32,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
                             ),

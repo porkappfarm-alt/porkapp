@@ -17,8 +17,10 @@ class AnimalDetailView extends ConsumerStatefulWidget {
 
 class _AnimalDetailViewState extends ConsumerState<AnimalDetailView> {
   void _showEditDialog(BuildContext context, Animal animal) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => AnimalFormDialog(animal: animal),
     ).then((_) {
       // Refrescar los datos después de editar
@@ -86,7 +88,8 @@ class _AnimalDetailViewState extends ConsumerState<AnimalDetailView> {
               onPressed: () => _showEditDialog(context, animal),
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFFF4D6D)),
+              icon: const Icon(Icons.delete_outline_rounded,
+                  color: Color(0xFFFF4D6D)),
               onPressed: () => _confirmDelete(context, animal),
             ),
           ],

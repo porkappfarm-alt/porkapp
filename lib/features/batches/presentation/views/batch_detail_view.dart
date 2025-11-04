@@ -107,7 +107,7 @@ class BatchDetailView extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        context.push('/biometrics/batch/$batchId');
+                        context.push('/batches/$batchId/biometrics');
                       },
                       icon: const Icon(Icons.monitor_weight, size: 20),
                       label: const Text('Gestionar biometría'),
@@ -140,8 +140,13 @@ class _BatchHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final entryDate = batch.entryDate ?? batch.createdAt;
-    final daysElapsed = DateTime.now().difference(entryDate).inDays;
-    final weekElapsed = (daysElapsed / 7).ceil();
+
+    // Calcular días y semanas desde la fecha de nacimiento
+    final daysElapsed = batch.birthDate != null
+        ? batch.daysOld
+        : DateTime.now().difference(entryDate).inDays;
+    final weekElapsed =
+        (daysElapsed / 7).floor(); // Usar floor para semanas completas
 
     final animalsMuertos =
         batch.animals.where((a) => a.status == 'deceased').length;
@@ -299,6 +304,7 @@ class _BatchHeader extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Título con ícono
                             Row(
                               children: [
                                 Text(
@@ -314,65 +320,110 @@ class _BatchHeader extends ConsumerWidget {
                                     color: Colors.grey[800],
                                   ),
                                 ),
-                                const Spacer(),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Badge de estado en una línea separada
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                progress.statusDescription,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Peso actual
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.monitor_weight_outlined,
+                                  size: 16,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Peso actual:',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: statusColor,
-                                    borderRadius: BorderRadius.circular(12),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${progress.currentWeight.toStringAsFixed(1)} kg',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[800],
                                   ),
-                                  child: Text(
-                                    progress.statusDescription,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+
+                            // Peso de referencia
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.straighten,
+                                  size: 16,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Peso referencia:',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${progress.referenceWeight.toStringAsFixed(1)} kg',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[800],
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Peso actual: ${progress.currentWeight.toStringAsFixed(1)} kg',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                                Text(
-                                  'Referencia: ${progress.referenceWeight.toStringAsFixed(1)} kg',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
+
+                            // Barra de progreso
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: LinearProgressIndicator(
                                 value: progress.progressPercentage / 100,
-                                minHeight: 8,
+                                minHeight: 10,
                                 backgroundColor: Colors.grey[300],
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   statusColor,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
+
+                            // Porcentaje
                             Text(
-                              '${progress.progressPercentage.toStringAsFixed(1)}% del objetivo',
+                              '${progress.progressPercentage.toStringAsFixed(1)}% del peso objetivo',
                               style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
                               ),
                             ),
                             if (progress.hasPendingTasks) ...[
@@ -523,23 +574,86 @@ class _BatchHeader extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Tipo de Alimento
-                  _InfoCard(
-                    icon: Icons.restaurant_rounded,
-                    label: 'Tipo de Alimento',
-                    value: 'Balanceado Premium',
-                    color: const Color(0xFF795548),
-                  ),
+                  // Tipo de Alimento - desde BatchProgress
+                  ref.watch(batchProgressProvider(batch)).when(
+                        data: (progress) {
+                          if (progress == null ||
+                              progress.currentFeedType == null) {
+                            return _InfoCard(
+                              icon: Icons.restaurant_rounded,
+                              label: 'Tipo de Alimento',
+                              value: 'No disponible',
+                              color: Colors.grey[400]!,
+                            );
+                          }
+
+                          // Convertir el tipo de alimento a un nombre legible
+                          String feedTypeName =
+                              _getFeedTypeName(progress.currentFeedType!);
+
+                          return _InfoCard(
+                            icon: Icons.restaurant_rounded,
+                            label: 'Tipo de Alimento',
+                            value: feedTypeName,
+                            color: const Color(0xFF795548),
+                          );
+                        },
+                        loading: () => _InfoCard(
+                          icon: Icons.restaurant_rounded,
+                          label: 'Tipo de Alimento',
+                          value: 'Cargando...',
+                          color: Colors.grey[400]!,
+                        ),
+                        error: (_, __) => _InfoCard(
+                          icon: Icons.restaurant_rounded,
+                          label: 'Tipo de Alimento',
+                          value: 'No disponible',
+                          color: Colors.grey[400]!,
+                        ),
+                      ),
                   const SizedBox(height: 12),
 
-                  // Consumo Diario
-                  _InfoCard(
-                    icon: Icons.inventory_rounded,
-                    label: 'Consumo Diario Estimado',
-                    value:
-                        '${(batch.animals.length * 2.5).toStringAsFixed(1)} kg/día',
-                    color: const Color(0xFF607D8B),
-                  ),
+                  // Consumo Diario - desde BatchProgress
+                  ref.watch(batchProgressProvider(batch)).when(
+                        data: (progress) {
+                          if (progress == null ||
+                              progress.dailyFeedKg == null) {
+                            return _InfoCard(
+                              icon: Icons.inventory_rounded,
+                              label: 'Consumo Diario Estimado',
+                              value: 'No disponible',
+                              color: Colors.grey[400]!,
+                            );
+                          }
+
+                          // Calcular consumo total del lote (consumo diario por animal * cantidad de animales)
+                          final animalCount = batch.animals
+                              .where((a) => a.status != 'deceased')
+                              .length;
+                          final totalDailyFeed =
+                              progress.dailyFeedKg! * animalCount;
+
+                          return _InfoCard(
+                            icon: Icons.inventory_rounded,
+                            label: 'Consumo Diario Estimado',
+                            value:
+                                '${totalDailyFeed.toStringAsFixed(1)} kg/día (${animalCount} animales)',
+                            color: const Color(0xFF607D8B),
+                          );
+                        },
+                        loading: () => _InfoCard(
+                          icon: Icons.inventory_rounded,
+                          label: 'Consumo Diario Estimado',
+                          value: 'Cargando...',
+                          color: Colors.grey[400]!,
+                        ),
+                        error: (_, __) => _InfoCard(
+                          icon: Icons.inventory_rounded,
+                          label: 'Consumo Diario Estimado',
+                          value: 'No disponible',
+                          color: Colors.grey[400]!,
+                        ),
+                      ),
                 ],
               ),
             ),
@@ -597,7 +711,18 @@ class _BatchHeader extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Segunda fila: Fecha Ingreso
+                  // Segunda fila: Fecha de Nacimiento (si existe)
+                  if (batch.birthDate != null) ...[
+                    _InfoCard(
+                      icon: Icons.cake_rounded,
+                      label: 'Fecha de Nacimiento',
+                      value: _formatDate(batch.birthDate!),
+                      color: const Color(0xFFE91E63),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // Fecha de Ingreso
                   _InfoCard(
                     icon: Icons.calendar_today_rounded,
                     label: 'Fecha de Ingreso',
@@ -606,13 +731,15 @@ class _BatchHeader extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Tercera fila: Días y Semana
+                  // Días y Semana (calculados desde fecha de nacimiento)
                   Row(
                     children: [
                       Expanded(
                         child: _InfoCard(
                           icon: Icons.timer_rounded,
-                          label: 'Días Transcurridos',
+                          label: batch.birthDate != null
+                              ? 'Edad (días)'
+                              : 'Días Transcurridos',
                           value: '$daysElapsed días',
                           color: const Color(0xFFFF9800),
                         ),
@@ -621,7 +748,9 @@ class _BatchHeader extends ConsumerWidget {
                       Expanded(
                         child: _InfoCard(
                           icon: Icons.event_note_rounded,
-                          label: 'Semana Actual',
+                          label: batch.birthDate != null
+                              ? 'Edad (semanas)'
+                              : 'Semana Actual',
                           value: 'Sem. $weekElapsed',
                           color: const Color(0xFF9C27B0),
                         ),
@@ -731,5 +860,23 @@ class _InfoCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Convierte el tipo de alimento del código de la BD a un nombre legible
+String _getFeedTypeName(String feedType) {
+  switch (feedType) {
+    case 'pre_starter':
+      return 'Pre-Iniciador';
+    case 'starter':
+      return 'Iniciador';
+    case 'grower':
+      return 'Crecimiento';
+    case 'fattening':
+      return 'Engorde';
+    case 'finisher':
+      return 'Finalización';
+    default:
+      return feedType;
   }
 }

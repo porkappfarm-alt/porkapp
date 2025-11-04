@@ -22,8 +22,10 @@ class AnimalDetailsPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              showDialog(
+              showModalBottomSheet(
                 context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
                 builder: (context) => AnimalFormDialog(animal: animal),
               );
             },

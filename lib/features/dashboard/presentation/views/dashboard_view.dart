@@ -21,13 +21,14 @@ class DashboardView extends ConsumerWidget {
         title: const Text(
           'Dashboard',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
           ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        toolbarHeight: 56,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.black87),
@@ -45,17 +46,17 @@ class DashboardView extends ConsumerWidget {
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const WelcomeCard(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               _SectionHeader(
                 title: 'Alertas',
                 icon: Icons.notifications_active,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               alertsAsync.when(
                 data: (alerts) => AlertSection(alerts: alerts),
                 loading: () => const _LoadingCard(),
@@ -64,14 +65,14 @@ class DashboardView extends ConsumerWidget {
                   error: error.toString(),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               _SectionHeader(
                 title: 'Lotes Activos',
                 icon: Icons.inventory_2,
                 actionLabel: 'Ver todos',
                 onActionTap: () => context.go('/batches'),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               batchSummariesAsync.when(
                 data: (batches) {
                   if (batches.isEmpty) {

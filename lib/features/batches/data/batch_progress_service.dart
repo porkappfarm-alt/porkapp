@@ -57,6 +57,18 @@ class BatchProgressService {
       // Verificar tareas pendientes (tareas no ejecutadas)
       final pendingTasks = await _getPendingTasks(batch.id, daysOld);
 
+      // Obtener consumo diario estimado del feeding schedule
+      double? dailyFeedKg;
+      final rawDailyFeed = feedingData['daily_feed_kg'];
+
+      if (rawDailyFeed != null) {
+        if (rawDailyFeed is num) {
+          dailyFeedKg = rawDailyFeed.toDouble();
+        } else if (rawDailyFeed is String) {
+          dailyFeedKg = double.tryParse(rawDailyFeed);
+        }
+      }
+
       return BatchProgress(
         batchId: batch.id,
         daysOld: daysOld,
@@ -67,6 +79,7 @@ class BatchProgressService {
         status: status,
         lastBiometryDate: lastBiometryDate,
         currentFeedType: currentFeedType,
+        dailyFeedKg: dailyFeedKg,
         pendingTasks: pendingTasks,
         lastUpdated: DateTime.now(),
       );
@@ -82,7 +95,8 @@ class BatchProgressService {
       // Buscar el registro con days_old más cercano (puede ser exacto o el más próximo)
       final feedingData = await _supabase
           .from('feeding_schedule')
-          .select('days_old, average_weight_kg, feed_type, tasks')
+          .select(
+              'days_old, average_weight_kg, daily_feed_kg, feed_type, tasks')
           .order('days_old', ascending: true);
 
       if (feedingData.isEmpty) {

@@ -163,255 +163,275 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Dialog(
-      child: PopScope(
-        canPop: !_formController.isDirty,
-        onPopInvoked: (didPop) async {
-          if (didPop) return;
-          final shouldPop = await _formController.shouldPop(context);
-          if (shouldPop && mounted) {
-            Navigator.of(context).pop();
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    widget.animal != null ? 'Editar Animal' : 'Nuevo Animal',
-                    style: theme.textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Tipo de animal
-                  DropdownButtonFormField<AnimalType>(
-                    value: _selectedType,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipo de animal',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: [
-                      AnimalType.piglet,
-                      AnimalType.sow,
-                      AnimalType.boar,
-                      AnimalType.fattening,
-                    ].map((type) {
-                      return DropdownMenuItem<AnimalType>(
-                        value: type,
-                        child: Text(_getAnimalTypeLabel(type)),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedType = value;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Campos específicos por tipo
-                  AnimalTypeFields(
-                    type: _getAnimalTypeLabel(_selectedType),
-                    animal: widget.animal,
-                    onFieldChanged: (field, value) {
-                      // Los valores se manejarán en _submit
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Identificador
-                  Consumer(
-                    builder: (context, ref, child) {
-                      return TextFormField(
-                        controller: _identifierController,
-                        decoration: const InputDecoration(
-                          labelText: 'Identificador/Arete',
-                          border: OutlineInputBorder(),
-                          helperText: 'Este identificador debe ser único',
+    return PopScope(
+      canPop: !_formController.isDirty,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldPop = await _formController.shouldPop(context);
+        if (shouldPop && mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Barra superior (handle)
+                    Center(
+                      child: Container(
+                        width: 50,
+                        height: 5,
+                        margin: const EdgeInsets.only(bottom: 24),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(3),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'El identificador es requerido';
-                          }
-                          return null;
-                        },
-                        onChanged: (value) async {
-                          if (value.isNotEmpty && widget.animal == null) {
-                            final repository =
-                                ref.read(animalsRepositoryProvider);
-                            final isUnique =
-                                await repository.isIdentifierUnique(value);
-                            if (!isUnique) {
-                              _formController.setError(
-                                  'Este identificador ya está en uso');
-                            } else {
-                              _formController.clearError();
-                            }
-                          }
-                        },
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Peso
-                  TextFormField(
-                    controller: _weightController,
-                    decoration: const InputDecoration(
-                      labelText: 'Peso inicial (kg)',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'El peso es requerido';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Ingrese un número válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Fecha de nacimiento
-                  InkWell(
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: _birthDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime.now(),
-                      );
-                      if (date != null) {
-                        setState(() {
-                          _birthDate = date;
-                        });
-                      }
-                    },
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Fecha de nacimiento',
-                        border: OutlineInputBorder(),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${_birthDate.day}/${_birthDate.month}/${_birthDate.year}',
-                          ),
-                          const Icon(Icons.calendar_today),
-                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Raza/Genética
-                  TextFormField(
-                    controller: _breedController,
-                    decoration: const InputDecoration(
-                      labelText: 'Raza/Línea genética',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'La raza es requerida';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Género
-                  Row(
-                    children: [
-                      const Text('Género:'),
-                      const SizedBox(width: 16),
-                      ChoiceChip(
-                        label: const Text('Macho'),
-                        selected: _isMale,
-                        onSelected: (selected) {
-                          setState(() {
-                            _isMale = selected;
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: const Text('Hembra'),
-                        selected: !_isMale,
-                        onSelected: (selected) {
-                          setState(() {
-                            _isMale = !selected;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Notas
-                  TextFormField(
-                    controller: _notesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Notas (opcional)',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Estado (solo para edición)
-                  if (widget.animal != null) ...[
-                    AnimalStatusChange(
-                      currentStatus: widget.animal!.status,
-                      onStatusChanged: (newStatus, notes) {
-                        setState(() {
-                          if (notes != null && notes.isNotEmpty) {
-                            _notesController.text = notes;
-                          }
-                        });
-                        // El nuevo estado se manejará en _submit
-                      },
+                    Text(
+                      widget.animal != null ? 'Editar Animal' : 'Nuevo Animal',
+                      style: theme.textTheme.titleLarge,
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
-                  ],
 
-                  // Feedback del formulario
-                  FormFeedback(
-                    isLoading: _formController.isLoading,
-                    errorMessage: _formController.errorMessage,
-                    onRetry: _submit,
-                  ),
-                  const SizedBox(height: 16),
+                    // Tipo de animal
+                    DropdownButtonFormField<AnimalType>(
+                      value: _selectedType,
+                      decoration: const InputDecoration(
+                        labelText: 'Tipo de animal',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: [
+                        AnimalType.piglet,
+                        AnimalType.sow,
+                        AnimalType.boar,
+                        AnimalType.fattening,
+                      ].map((type) {
+                        return DropdownMenuItem<AnimalType>(
+                          value: type,
+                          child: Text(_getAnimalTypeLabel(type)),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedType = value;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
 
-                  // Botones
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancelar'),
+                    // Campos específicos por tipo
+                    AnimalTypeFields(
+                      type: _getAnimalTypeLabel(_selectedType),
+                      animal: widget.animal,
+                      onFieldChanged: (field, value) {
+                        // Los valores se manejarán en _submit
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Identificador
+                    Consumer(
+                      builder: (context, ref, child) {
+                        return TextFormField(
+                          controller: _identifierController,
+                          decoration: const InputDecoration(
+                            labelText: 'Identificador/Arete',
+                            border: OutlineInputBorder(),
+                            helperText: 'Este identificador debe ser único',
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'El identificador es requerido';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) async {
+                            if (value.isNotEmpty && widget.animal == null) {
+                              final repository =
+                                  ref.read(animalsRepositoryProvider);
+                              final isUnique =
+                                  await repository.isIdentifierUnique(value);
+                              if (!isUnique) {
+                                _formController.setError(
+                                    'Este identificador ya está en uso');
+                              } else {
+                                _formController.clearError();
+                              }
+                            }
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Peso
+                    TextFormField(
+                      controller: _weightController,
+                      decoration: const InputDecoration(
+                        labelText: 'Peso inicial (kg)',
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(width: 16),
-                      FilledButton.icon(
-                        onPressed: _formController.isLoading ? null : _submit,
-                        icon: const Icon(Icons.save),
-                        label: const Text('Guardar'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'El peso es requerido';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Ingrese un número válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Fecha de nacimiento
+                    InkWell(
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _birthDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (date != null) {
+                          setState(() {
+                            _birthDate = date;
+                          });
+                        }
+                      },
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Fecha de nacimiento',
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${_birthDate.day}/${_birthDate.month}/${_birthDate.year}',
+                            ),
+                            const Icon(Icons.calendar_today),
+                          ],
+                        ),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Raza/Genética
+                    TextFormField(
+                      controller: _breedController,
+                      decoration: const InputDecoration(
+                        labelText: 'Raza/Línea genética',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'La raza es requerida';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Género
+                    Row(
+                      children: [
+                        const Text('Género:'),
+                        const SizedBox(width: 16),
+                        ChoiceChip(
+                          label: const Text('Macho'),
+                          selected: _isMale,
+                          onSelected: (selected) {
+                            setState(() {
+                              _isMale = selected;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: const Text('Hembra'),
+                          selected: !_isMale,
+                          onSelected: (selected) {
+                            setState(() {
+                              _isMale = !selected;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Notas
+                    TextFormField(
+                      controller: _notesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Notas (opcional)',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Estado (solo para edición)
+                    if (widget.animal != null) ...[
+                      AnimalStatusChange(
+                        currentStatus: widget.animal!.status,
+                        onStatusChanged: (newStatus, notes) {
+                          setState(() {
+                            if (notes != null && notes.isNotEmpty) {
+                              _notesController.text = notes;
+                            }
+                          });
+                          // El nuevo estado se manejará en _submit
+                        },
+                      ),
+                      const SizedBox(height: 24),
                     ],
-                  ),
-                ],
+
+                    // Feedback del formulario
+                    FormFeedback(
+                      isLoading: _formController.isLoading,
+                      errorMessage: _formController.errorMessage,
+                      onRetry: _submit,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Botones
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancelar'),
+                        ),
+                        const SizedBox(width: 16),
+                        FilledButton.icon(
+                          onPressed: _formController.isLoading ? null : _submit,
+                          icon: const Icon(Icons.save),
+                          label: const Text('Guardar'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

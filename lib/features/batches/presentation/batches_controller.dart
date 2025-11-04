@@ -28,11 +28,13 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
     required String corralId,
     required DateTime entryDate,
     required int animalCount,
+    required DateTime birthDate, // Ahora es obligatorio
   }) async {
     final batch = await ref.read(batchesRepositoryProvider).createBatch(
           corralId: corralId,
           entryDate: entryDate,
           animalCount: animalCount,
+          birthDate: birthDate,
         );
     await loadBatches();
     return batch;
@@ -46,6 +48,7 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
     required int headcountStart,
     double? initialAvgWeight,
     String? notes,
+    DateTime? birthDate,
   }) async {
     await ref.read(batchesRepositoryProvider).updateBatch(
           id: id,
@@ -55,6 +58,7 @@ class BatchesController extends StateNotifier<AsyncValue<List<Batch>>> {
           headcountStart: headcountStart,
           initialAvgWeight: initialAvgWeight,
           notes: notes,
+          birthDate: birthDate,
         );
     loadBatches();
   }

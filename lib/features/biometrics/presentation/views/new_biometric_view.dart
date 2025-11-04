@@ -27,6 +27,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
   final Map<String, TextEditingController> _weightControllers = {};
   final Map<String, FocusNode> _focusNodes = {};
   final Map<String, double?> _previousWeights = {}; // Store previous weights
+  final Map<String, String> _originalWeights =
+      {}; // Store original weight values for edit mode
   final ValueNotifier<bool> _buttonEnabled = ValueNotifier<bool>(false);
 
   String? _biometricId;
@@ -51,8 +53,27 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
     return animals.isNotEmpty; // Solo true si hay animales y todos tienen peso
   }
 
+  // Verificar si hubo cambios en los pesos (para modo edición)
+  bool _hasChanges() {
+    if (!isEditMode)
+      return true; // En modo creación, siempre permitir guardar si hay pesos
+
+    for (final entry in _weightControllers.entries) {
+      final animalId = entry.key;
+      final currentValue = entry.value.text.trim();
+      final originalValue = _originalWeights[animalId] ?? '';
+
+      if (currentValue != originalValue) {
+        return true; // Hubo al menos un cambio
+      }
+    }
+    return false; // No hubo cambios
+  }
+
   void _updateButtonState(List<Animal> animals) {
-    _buttonEnabled.value = _allWeightsEntered(animals);
+    final allEntered = _allWeightsEntered(animals);
+    final hasChanges = _hasChanges();
+    _buttonEnabled.value = allEntered && hasChanges;
   }
 
   @override
@@ -84,9 +105,12 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
 
       for (final measurement in savedMeasurements) {
         final animalId = measurement['animal_id'];
+        final weightText = measurement['weight']?.toString() ?? '';
         _weightControllers[animalId] = TextEditingController(
-          text: measurement['weight']?.toString() ?? '',
+          text: weightText,
         );
+        // Guardar el valor original para detectar cambios
+        _originalWeights[animalId] = weightText;
       }
     } catch (e) {
       print('Error loading biometric data: $e');
@@ -508,6 +532,12 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                             _weightControllers[animalId] =
                                 TextEditingController();
                             _focusNodes[animalId] = FocusNode();
+
+                            // Guardar valor original vacío para animales sin peso previo
+                            if (isEditMode &&
+                                !_originalWeights.containsKey(animalId)) {
+                              _originalWeights[animalId] = '';
+                            }
 
                             // Add listener to update button state when text changes
                             _weightControllers[animalId]!.addListener(() {

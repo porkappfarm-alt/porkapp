@@ -31,6 +31,7 @@ class BatchesRepository {
     required String corralId,
     required DateTime entryDate,
     required int animalCount,
+    required DateTime birthDate, // Ahora es obligatorio
   }) async {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) {
@@ -44,17 +45,17 @@ class BatchesRepository {
     }
 
     // Crear el lote (name se genera automáticamente)
-    final response = await supabase
-        .from('batches')
-        .insert({
-          'corral_id': corralId,
-          'entry_date': entryDate.toIso8601String().split('T')[0],
-          'animal_count': animalCount,
-          'headcount_start': animalCount, // Inicializar con el mismo valor
-          'status': 'active',
-        })
-        .select()
-        .single();
+    final insertData = {
+      'corral_id': corralId,
+      'entry_date': entryDate.toIso8601String().split('T')[0],
+      'birth_date': birthDate.toIso8601String().split('T')[0],
+      'animal_count': animalCount,
+      'headcount_start': animalCount, // Inicializar con el mismo valor
+      'status': 'active',
+    };
+
+    final response =
+        await supabase.from('batches').insert(insertData).select().single();
 
     final batch = Batch.fromJson(response);
 
@@ -76,23 +77,31 @@ class BatchesRepository {
     required int headcountStart,
     double? initialAvgWeight,
     String? notes,
+    DateTime? birthDate,
   }) async {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) {
       throw Exception('Usuario no autenticado');
     }
 
+    final updateData = {
+      'name': name,
+      'corral_id': corralId,
+      'entry_date': entryDate.toIso8601String().split('T')[0],
+      'headcount_start': headcountStart,
+      'initial_avg_weight': initialAvgWeight,
+      'notes': notes,
+      'status': 'active',
+    };
+
+    // Agregar birth_date solo si se proporciona
+    if (birthDate != null) {
+      updateData['birth_date'] = birthDate.toIso8601String().split('T')[0];
+    }
+
     final response = await supabase
         .from('batches')
-        .update({
-          'name': name,
-          'corral_id': corralId,
-          'entry_date': entryDate.toIso8601String().split('T')[0],
-          'headcount_start': headcountStart,
-          'initial_avg_weight': initialAvgWeight,
-          'notes': notes,
-          'status': 'active',
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

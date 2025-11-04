@@ -7,6 +7,7 @@ import 'package:porkapp/features/auth/presentation/login_view.dart';
 import 'package:porkapp/features/auth/presentation/views/change_password_view.dart';
 import 'package:porkapp/features/auth/presentation/views/reset_password_view.dart';
 import 'package:porkapp/features/dashboard/presentation/views/dashboard_view.dart';
+import 'package:porkapp/features/dashboard/presentation/views/all_alerts_view.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
 import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
@@ -217,6 +218,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/dashboard',
                 builder: (context, state) => const DashboardView(),
+                routes: [
+                  GoRoute(
+                    path: 'alerts',
+                    builder: (context, state) => const AllAlertsView(),
+                  ),
+                ],
               ),
               // Root path redirects to dashboard
               GoRoute(path: '/', redirect: (_, __) => '/dashboard'),

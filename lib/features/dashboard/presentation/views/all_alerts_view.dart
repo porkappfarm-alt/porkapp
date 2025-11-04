@@ -1,0 +1,293 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:porkapp/features/dashboard/data/models/dashboard_alert.dart';
+import 'package:porkapp/features/dashboard/providers/dashboard_alerts_provider.dart';
+
+class AllAlertsView extends ConsumerWidget {
+  const AllAlertsView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final alertsAsync = ref.watch(dashboardAlertsProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text(
+          'Todas las Alertas',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.black87),
+            onPressed: () {
+              ref.invalidate(dashboardAlertsProvider);
+            },
+          ),
+        ],
+      ),
+      body: alertsAsync.when(
+        data: (alerts) {
+          if (alerts.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 64,
+                    color: Colors.green[300],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No hay alertas',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Todo está en orden',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          // Sort alerts by priority
+          final sortedAlerts = List<DashboardAlert>.from(alerts)
+            ..sort((a, b) {
+              final severityOrder = {
+                AlertSeverity.critical: 0,
+                AlertSeverity.warning: 1,
+                AlertSeverity.info: 2,
+              };
+              final severityComparison = severityOrder[a.severity]!
+                  .compareTo(severityOrder[b.severity]!);
+              if (severityComparison != 0) return severityComparison;
+
+              final typeOrder = {
+                AlertType.scheduledTask: 0,
+                AlertType.belowTargetWeight: 1,
+                AlertType.missingBiometry: 2,
+                AlertType.lowPerformance: 3,
+                AlertType.corralNearCapacity: 4,
+                AlertType.highMortality: 5,
+                AlertType.aboveTargetWeight: 6,
+                AlertType.upcomingSale: 7,
+                AlertType.other: 8,
+              };
+              return (typeOrder[a.type] ?? 99)
+                  .compareTo(typeOrder[b.type] ?? 99);
+            });
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(dashboardAlertsProvider);
+            },
+            child: ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: sortedAlerts.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final alert = sortedAlerts[index];
+                return _AlertCard(alert: alert);
+              },
+            ),
+          );
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
+          ),
+        ),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red[300],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Error al cargar alertas',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  ref.invalidate(dashboardAlertsProvider);
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reintentar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6B0338),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AlertCard extends StatelessWidget {
+  final DashboardAlert alert;
+
+  const _AlertCard({required this.alert});
+
+  Color _getSeverityColor() {
+    switch (alert.severity) {
+      case AlertSeverity.critical:
+        return Colors.red;
+      case AlertSeverity.warning:
+        return Colors.orange;
+      case AlertSeverity.info:
+        return Colors.blue;
+    }
+  }
+
+  IconData _getSeverityIcon() {
+    switch (alert.severity) {
+      case AlertSeverity.critical:
+        return Icons.error;
+      case AlertSeverity.warning:
+        return Icons.warning;
+      case AlertSeverity.info:
+        return Icons.info;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getSeverityColor();
+    final typeIconEmoji = alert.type.icon;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: alert.actionRoute != null
+            ? () => context.push(alert.actionRoute!)
+            : null,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      _getSeverityIcon(),
+                      color: color,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          alert.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          alert.description,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      typeIconEmoji,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ],
+              ),
+              if (alert.actionRoute != null) ...[
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => context.push(alert.actionRoute!),
+                      icon: const Icon(Icons.arrow_forward, size: 16),
+                      label: const Text('Ver detalle'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF6B0338),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

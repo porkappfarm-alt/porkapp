@@ -124,7 +124,7 @@ class AlertSection extends StatelessWidget {
           if (sortedAlerts.length > 3)
             InkWell(
               onTap: () {
-                // TODO: Navegar a vista de todas las alertas
+                context.push('/dashboard/alerts');
               },
               child: Container(
                 padding: const EdgeInsets.all(16),

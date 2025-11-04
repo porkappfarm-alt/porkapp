@@ -24,6 +24,7 @@ class BatchProgress {
   final ProgressStatus status;
   final DateTime? lastBiometryDate;
   final String? currentFeedType;
+  final double? dailyFeedKg; // Consumo diario estimado
   final List<String> pendingTasks;
   final DateTime lastUpdated;
 
@@ -37,6 +38,7 @@ class BatchProgress {
     required this.status,
     this.lastBiometryDate,
     this.currentFeedType,
+    this.dailyFeedKg,
     this.pendingTasks = const [],
     required this.lastUpdated,
   });
@@ -57,6 +59,7 @@ class BatchProgress {
           ? DateTime.parse(json['last_biometry_date'] as String)
           : null,
       currentFeedType: json['current_feed_type'] as String?,
+      dailyFeedKg: (json['daily_feed_kg'] as num?)?.toDouble(),
       pendingTasks: (json['pending_tasks'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -76,6 +79,7 @@ class BatchProgress {
       'status': status.name,
       'last_biometry_date': lastBiometryDate?.toIso8601String(),
       'current_feed_type': currentFeedType,
+      'daily_feed_kg': dailyFeedKg,
       'pending_tasks': pendingTasks,
       'last_updated': lastUpdated.toIso8601String(),
     };
@@ -91,6 +95,7 @@ class BatchProgress {
     ProgressStatus? status,
     DateTime? lastBiometryDate,
     String? currentFeedType,
+    double? dailyFeedKg,
     List<String>? pendingTasks,
     DateTime? lastUpdated,
   }) {
@@ -104,6 +109,7 @@ class BatchProgress {
       status: status ?? this.status,
       lastBiometryDate: lastBiometryDate ?? this.lastBiometryDate,
       currentFeedType: currentFeedType ?? this.currentFeedType,
+      dailyFeedKg: dailyFeedKg ?? this.dailyFeedKg,
       pendingTasks: pendingTasks ?? this.pendingTasks,
       lastUpdated: lastUpdated ?? this.lastUpdated,
     );

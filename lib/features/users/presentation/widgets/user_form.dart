@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:porkapp/core/widgets/standard_app_bar.dart';
-import 'package:porkapp/shared/design/colors.dart';
 import 'package:porkapp/features/users/domain/user_profile.dart';
 import 'package:porkapp/features/users/providers/user_provider.dart';
 
@@ -16,31 +14,21 @@ void showUserFormBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) => Scaffold(
-          backgroundColor: PorkAppColors.background,
-          appBar: StandardAppBar(
-            title: userToEdit != null ? 'Editar Usuario' : 'Invitar Usuario',
-            automaticallyImplyLeading: false,
-            centerTitle: false,
-            backgroundColor: PorkAppColors.background,
-            surfaceTintColor: PorkAppColors.background,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
+    builder: (context) => DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      minChildSize: 0.5,
+      maxChildSize: 0.9,
+      builder: (context, scrollController) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
-          body: UserForm(
-            scrollController: scrollController,
-            userToEdit: userToEdit,
-          ),
+        ),
+        child: UserForm(
+          scrollController: scrollController,
+          userToEdit: userToEdit,
         ),
       ),
     ),
@@ -107,15 +95,27 @@ class _UserFormState extends ConsumerState<UserForm> {
     return Column(
       children: [
         // Handle del bottom sheet
+        Container(
+          margin: const EdgeInsets.only(top: 12),
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+
+        // Header
+        _buildHeader(),
+
+        // Contenido del formulario
         Expanded(
           child: Form(
             key: _formKey,
             child: ListView(
               controller: widget.scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.all(24),
               children: [
-                _buildHeaderCard(),
-                const SizedBox(height: 24),
                 _buildEmailSection(),
                 const SizedBox(height: 20),
                 _buildFullNameSection(),
@@ -133,7 +133,7 @@ class _UserFormState extends ConsumerState<UserForm> {
                 ],
                 const SizedBox(height: 32),
                 _buildActionButtons(),
-                const SizedBox(height: 32),
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -142,47 +142,29 @@ class _UserFormState extends ConsumerState<UserForm> {
     );
   }
 
-  Widget _buildHeaderCard() {
-    final primaryColor = _isEditMode ? PorkAppColors.primary : PorkAppColors.secondary;
-    final icon = _isEditMode ? Icons.edit_note_rounded : Icons.person_add_alt_1_rounded;
-    final subtitle = _isEditMode
-        ? 'Actualiza la información del usuario'
-        : 'Completa los datos para enviar la invitación';
-
+  Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [primaryColor.withOpacity(0.18), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey[200]!, width: 1),
         ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: primaryColor.withOpacity(0.25), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withOpacity(0.35),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              color:
+                  (_isEditMode ? const Color(0xFFF07281) : const Color(0xFF5DA271)).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: Icon(
+              _isEditMode ? Icons.edit : Icons.person_add,
+              color: _isEditMode ? const Color(0xFFF07281) : const Color(0xFF5DA271),
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -192,18 +174,19 @@ class _UserFormState extends ConsumerState<UserForm> {
                 Text(
                   _isEditMode ? 'Editar Usuario' : 'Invitar Usuario',
                   style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xFF2C3E50),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
-                  subtitle,
+                  _isEditMode
+                      ? 'Actualiza la información del usuario'
+                      : 'Envía una invitación por email',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
@@ -218,10 +201,19 @@ class _UserFormState extends ConsumerState<UserForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(
-          icon: Icons.email,
-          title: 'Correo Electrónico',
-          color: PorkAppColors.primary,
+        Row(
+          children: [
+            Icon(Icons.email, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            const Text(
+              'Correo Electrónico',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         TextFormField(
@@ -230,31 +222,20 @@ class _UserFormState extends ConsumerState<UserForm> {
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             hintText: 'usuario@ejemplo.com',
-            prefixIcon: Icon(Icons.alternate_email,
-                color: _isEditMode ? Colors.grey[500] : PorkAppColors.primary),
+            prefixIcon: const Icon(Icons.alternate_email),
             filled: true,
-            fillColor:
-                _isEditMode ? Colors.grey[100] : PorkAppColors.cardBackground,
+            fillColor: _isEditMode ? Colors.grey[100] : Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: _isEditMode
-                    ? Colors.grey[300]!
-                    : PorkAppColors.primary.withOpacity(0.3),
-              ),
+              borderSide: BorderSide(color: Colors.grey[300]!),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: _isEditMode
-                    ? Colors.grey[300]!
-                    : PorkAppColors.primary.withOpacity(0.3),
-              ),
+              borderSide: BorderSide(color: Colors.grey[300]!),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: PorkAppColors.primary, width: 2),
+              borderSide: const BorderSide(color: Color(0xFFF07281), width: 2),
             ),
           ),
           validator: (value) {
@@ -288,10 +269,19 @@ class _UserFormState extends ConsumerState<UserForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(
-          icon: Icons.person,
-          title: 'Nombre Completo',
-          color: PorkAppColors.secondary,
+        Row(
+          children: [
+            Icon(Icons.person, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            const Text(
+              'Nombre Completo',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         TextFormField(
@@ -299,9 +289,9 @@ class _UserFormState extends ConsumerState<UserForm> {
           textCapitalization: TextCapitalization.words,
           decoration: InputDecoration(
             hintText: 'Juan Pérez',
-            prefixIcon: const Icon(Icons.badge, color: PorkAppColors.secondary),
+            prefixIcon: const Icon(Icons.badge),
             filled: true,
-            fillColor: PorkAppColors.cardBackground,
+            fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey[300]!),
@@ -312,7 +302,7 @@ class _UserFormState extends ConsumerState<UserForm> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.purple, width: 2),
+              borderSide: const BorderSide(color: Color(0xFFF07281), width: 2),
             ),
           ),
           validator: (value) {
@@ -333,10 +323,19 @@ class _UserFormState extends ConsumerState<UserForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(
-          icon: Icons.badge,
-          title: 'Número de Identificación',
-          color: PorkAppColors.primary,
+        Row(
+          children: [
+            Icon(Icons.badge, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            const Text(
+              'Número de Identificación',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         TextFormField(
@@ -344,9 +343,9 @@ class _UserFormState extends ConsumerState<UserForm> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: '12345678',
-            prefixIcon: const Icon(Icons.credit_card, color: PorkAppColors.primary),
+            prefixIcon: const Icon(Icons.credit_card),
             filled: true,
-            fillColor: PorkAppColors.cardBackground,
+            fillColor: Colors.white,
             helperText: 'Este será usado como contraseña temporal',
             helperStyle: TextStyle(
               fontSize: 12,
@@ -363,7 +362,7 @@ class _UserFormState extends ConsumerState<UserForm> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.purple, width: 2),
+              borderSide: const BorderSide(color: Color(0xFFF07281), width: 2),
             ),
           ),
           validator: (value) {
@@ -387,10 +386,19 @@ class _UserFormState extends ConsumerState<UserForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(
-          icon: Icons.phone_android,
-          title: 'Número de WhatsApp',
-          color: PorkAppColors.secondary,
+        Row(
+          children: [
+            Icon(Icons.phone_android, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            const Text(
+              'Número de WhatsApp',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         TextFormField(
@@ -398,9 +406,9 @@ class _UserFormState extends ConsumerState<UserForm> {
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
             hintText: '3001234567',
-            prefixIcon: const Icon(Icons.phone_android, color: PorkAppColors.secondary),
+            prefixIcon: const Icon(Icons.phone_android),
             filled: true,
-            fillColor: PorkAppColors.cardBackground,
+            fillColor: Colors.white,
             helperText: 'Número para enviar las credenciales',
             helperStyle: TextStyle(
               fontSize: 12,
@@ -417,7 +425,7 @@ class _UserFormState extends ConsumerState<UserForm> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.purple, width: 2),
+              borderSide: const BorderSide(color: Color(0xFFF07281), width: 2),
             ),
           ),
           validator: (value) {
@@ -433,15 +441,30 @@ class _UserFormState extends ConsumerState<UserForm> {
       ],
     );
   }
+
+  Widget _buildRoleSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.admin_panel_settings, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            const Text(
+              'Rol del Usuario',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: PorkAppColors.primary.withOpacity(0.25)),
+            border: Border.all(color: Colors.grey[300]!),
             borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              colors: [Colors.white, Colors.grey[50]!],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
           ),
           child: Column(
             children: [
@@ -450,7 +473,7 @@ class _UserFormState extends ConsumerState<UserForm> {
                 title: 'Usuario',
                 subtitle: 'Acceso estándar al sistema',
                 icon: Icons.person,
-                color: PorkAppColors.secondary,
+                color: const Color(0xFF5DA271),
               ),
               Divider(height: 1, color: Colors.grey[300]),
               _buildRoleOption(
@@ -458,12 +481,205 @@ class _UserFormState extends ConsumerState<UserForm> {
                 title: 'Administrador',
                 subtitle: 'Acceso completo y gestión de usuarios',
                 icon: Icons.admin_panel_settings,
-                color: PorkAppColors.primary,
+                color: const Color(0xFFF07281),
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRoleOption({
+    required String value,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+  }) {
+    final isSelected = _selectedRole == value;
+    return InkWell(
+      onTap: () => setState(() => _selectedRole = value),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Radio<String>(
+              value: value,
+              groupValue: _selectedRole,
+              onChanged: (val) => setState(() => _selectedRole = val!),
+              activeColor: color,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.info_outline, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            const Text(
+              'Estado del Usuario',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (_selectedStatus == 'pending')
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.orange[50],
+              border: Border.all(color: Colors.orange[200]!),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.schedule, color: Colors.orange[700], size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'El usuario aún no ha aceptado la invitación',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.orange[900],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                _buildStatusOption(
+                  value: 'active',
+                  title: 'Activo',
+                  subtitle: 'El usuario puede acceder al sistema',
+                  icon: Icons.check_circle,
+                  color: const Color(0xFF8BC34A),
+                ),
+                Divider(height: 1, color: Colors.grey[300]),
+                _buildStatusOption(
+                  value: 'inactive',
+                  title: 'Inactivo',
+                  subtitle: 'El usuario no puede acceder al sistema',
+                  icon: Icons.block,
+                  color: const Color(0xFFE45B5B),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStatusOption({
+    required String value,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+  }) {
+    final isSelected = _selectedStatus == value;
+    return InkWell(
+      onTap: () => setState(() => _selectedStatus = value),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Radio<String>(
+              value: value,
+              groupValue: _selectedStatus,
+              onChanged: (val) => setState(() => _selectedStatus = val),
+              activeColor: color,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -476,8 +692,7 @@ class _UserFormState extends ConsumerState<UserForm> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _handleSubmit,
             style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  _isEditMode ? PorkAppColors.primary : PorkAppColors.secondary,
+              backgroundColor: _isEditMode ? const Color(0xFFF07281) : const Color(0xFF5DA271),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -490,8 +705,7 @@ class _UserFormState extends ConsumerState<UserForm> {
                     width: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 : Row(
@@ -517,8 +731,8 @@ class _UserFormState extends ConsumerState<UserForm> {
           child: OutlinedButton(
             onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
             style: OutlinedButton.styleFrom(
-              foregroundColor: PorkAppColors.primary,
-              side: BorderSide(color: PorkAppColors.primary.withOpacity(0.25)),
+              foregroundColor: Colors.grey[700],
+              side: BorderSide(color: Colors.grey[300]!),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -535,6 +749,7 @@ class _UserFormState extends ConsumerState<UserForm> {
       ],
     );
   }
+
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -767,7 +982,7 @@ class _UserFormState extends ConsumerState<UserForm> {
                     icon: const Icon(Icons.send),
                     label: const Text('Enviar por WhatsApp'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF25D366),
+                      backgroundColor: const Color(0xFF5DA271),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,

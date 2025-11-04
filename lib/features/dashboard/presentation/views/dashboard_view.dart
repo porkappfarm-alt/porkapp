@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_alerts_provider.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_charts_provider.dart';
-import 'package:porkapp/features/dashboard/providers/dashboard_kpis_provider.dart';
 import 'package:porkapp/features/dashboard/presentation/widgets/alert_section.dart';
 import 'package:porkapp/features/dashboard/presentation/widgets/batch_summary_card.dart';
-import 'package:porkapp/features/dashboard/presentation/widgets/kpi_card_v2.dart';
 import '../widgets/welcome_card.dart';
 
 class DashboardView extends ConsumerWidget {
@@ -14,7 +12,6 @@ class DashboardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final kpisAsync = ref.watch(dashboardKPIsProvider);
     final alertsAsync = ref.watch(dashboardAlertsProvider);
     final batchSummariesAsync = ref.watch(batchSummariesProvider);
 
@@ -35,7 +32,6 @@ class DashboardView extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.black87),
             onPressed: () {
-              ref.invalidate(dashboardKPIsProvider);
               ref.invalidate(dashboardAlertsProvider);
               ref.invalidate(batchSummariesProvider);
             },
@@ -44,7 +40,6 @@ class DashboardView extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(dashboardKPIsProvider);
           ref.invalidate(dashboardAlertsProvider);
           ref.invalidate(batchSummariesProvider);
         },
@@ -55,26 +50,6 @@ class DashboardView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const WelcomeCard(),
-              const SizedBox(height: 24),
-              _SectionHeader(
-                title: 'Indicadores Clave',
-                icon: Icons.dashboard,
-              ),
-              const SizedBox(height: 12),
-              kpisAsync.when(
-                data: (kpis) => KpiGrid(
-                  totalAnimals: kpis.totalActiveAnimals,
-                  corralsStatus:
-                      '${kpis.corralOccupancy.occupiedCorrals}/${kpis.corralOccupancy.totalCorrals}',
-                  avgWeight: kpis.currentAvgWeight,
-                  avgADG: kpis.avgADG,
-                ),
-                loading: () => const _LoadingKpis(),
-                error: (error, stack) => _ErrorCard(
-                  message: 'Error al cargar KPIs',
-                  error: error.toString(),
-                ),
-              ),
               const SizedBox(height: 24),
               _SectionHeader(
                 title: 'Alertas',
@@ -213,36 +188,6 @@ class _SectionHeader extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _LoadingKpis extends StatelessWidget {
-  const _LoadingKpis();
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.3,
-      children: List.generate(
-        4,
-        (index) => Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

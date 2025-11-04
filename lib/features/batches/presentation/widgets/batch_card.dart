@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
+import 'package:porkapp/features/batches/providers/batch_progress_provider.dart';
 import 'package:porkapp/features/biometrics/providers/batch_biometrics_provider.dart';
 
 class BatchCard extends ConsumerWidget {
@@ -146,74 +147,129 @@ class BatchCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _InfoItem(
-                          icon: Icons.timer,
-                          label: 'Días desde ingreso',
-                          value: '$daysElapsed',
-                        ),
+                        child: batch.birthDate != null
+                            ? _InfoItem(
+                                icon: Icons.cake,
+                                label: 'Edad',
+                                value: batch.ageDescription,
+                              )
+                            : _InfoItem(
+                                icon: Icons.timer,
+                                label: 'Días desde ingreso',
+                                value: '$daysElapsed',
+                              ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   // Barra de progreso
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE94C5D)
-                          .withOpacity(0.08), // Coral muy suave
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE94C5D).withOpacity(0.12),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Progreso del Lote',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
+                  if (batch.birthDate != null) ...[
+                    // Progress from batch_progress if birthDate is present
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final progressAsync =
+                            ref.watch(batchProgressProvider(batch));
+
+                        return progressAsync.when(
+                          data: (batchProgress) {
+                            if (batchProgress == null) {
+                              // Fallback to original progress
+                              return _buildDefaultProgressBar(
+                                  context, theme, progress);
+                            }
+
+                            // Convert hex color to Color
+                            Color getColorFromHex(String hexColor) {
+                              final hex = hexColor.replaceAll('#', '');
+                              return Color(int.parse('0xFF$hex'));
+                            }
+
+                            final statusColor =
+                                getColorFromHex(batchProgress.statusColor);
+
+                            return Container(
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE94C5D), // Coral
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${(progress * 100).toStringAsFixed(1)}%',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFFFFFFFF), // Blanco
+                                color: statusColor.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: statusColor.withOpacity(0.12),
+                                  width: 1,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: theme.colorScheme.surface,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              _getProgressColor(context, progress),
-                            ),
-                            minHeight: 10,
-                          ),
-                        ),
-                      ],
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            batchProgress.statusIcon,
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Progreso de Peso',
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: statusColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          '${batchProgress.progressPercentage.toStringAsFixed(0)}%',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: LinearProgressIndicator(
+                                      value: batchProgress.progressPercentage /
+                                          100,
+                                      backgroundColor:
+                                          theme.colorScheme.surface,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          statusColor),
+                                      minHeight: 6,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          loading: () => _buildDefaultProgressBar(
+                              context, theme, progress),
+                          error: (_, __) => _buildDefaultProgressBar(
+                              context, theme, progress),
+                        );
+                      },
                     ),
-                  ),
+                  ] else
+                    _buildDefaultProgressBar(context, theme, progress),
                 ],
               ),
             ),
@@ -262,6 +318,67 @@ class BatchCard extends ConsumerWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDefaultProgressBar(
+      BuildContext context, ThemeData theme, double progress) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE94C5D).withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE94C5D).withOpacity(0.12),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Progreso del Lote',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE94C5D),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${(progress * 100).toStringAsFixed(1)}%',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFFFFFFF),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: theme.colorScheme.surface,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                _getProgressColor(context, progress),
+              ),
+              minHeight: 10,
+            ),
+          ),
+        ],
       ),
     );
   }

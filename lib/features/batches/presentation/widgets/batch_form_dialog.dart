@@ -21,6 +21,7 @@ class _BatchFormDialogState extends ConsumerState<BatchFormDialog> {
   late TextEditingController _avgWeightController;
   late TextEditingController _notesController;
   String? _selectedCorralId;
+  DateTime? _birthDate;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _BatchFormDialogState extends ConsumerState<BatchFormDialog> {
     );
     _notesController = TextEditingController(text: widget.batch?.notes);
     _selectedCorralId = widget.corralId ?? widget.batch?.corralId;
+    _birthDate = widget.batch?.birthDate;
   }
 
   @override
@@ -73,6 +75,7 @@ class _BatchFormDialogState extends ConsumerState<BatchFormDialog> {
         notes: _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
             : null,
+        birthDate: _birthDate,
       );
 
       final repository = ref.read(batchRepositoryProvider);
@@ -188,6 +191,52 @@ class _BatchFormDialogState extends ConsumerState<BatchFormDialog> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  // Birth Date Picker
+                  InkWell(
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: _birthDate ?? DateTime.now(),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime.now(),
+                        helpText: 'Seleccionar fecha de nacimiento',
+                        cancelText: 'Cancelar',
+                        confirmText: 'Aceptar',
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          _birthDate = picked;
+                        });
+                      }
+                    },
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Fecha de nacimiento (opcional)',
+                        border: const OutlineInputBorder(),
+                        suffixIcon: _birthDate != null
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() {
+                                    _birthDate = null;
+                                  });
+                                },
+                              )
+                            : const Icon(Icons.calendar_today),
+                      ),
+                      child: Text(
+                        _birthDate != null
+                            ? '${_birthDate!.day.toString().padLeft(2, '0')}/${_birthDate!.month.toString().padLeft(2, '0')}/${_birthDate!.year}'
+                            : 'Seleccionar fecha',
+                        style: TextStyle(
+                          color: _birthDate != null
+                              ? Colors.black87
+                              : Colors.grey[600],
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Consumer(

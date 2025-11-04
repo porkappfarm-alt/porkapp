@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/batches/domain/batch.dart';
 import 'package:porkapp/features/batches/providers/batch_providers.dart';
 import 'package:porkapp/features/batches/providers/batch_progress_provider.dart';
@@ -16,38 +17,8 @@ class BatchDetailView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          color: const Color(0xFF5D4037),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'Detalle de Lote',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF5D4037),
-            fontSize: 18,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Container(
-              width: 32,
-              height: 32,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF07281),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.person_outline_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onPressed: () {},
-          ),
-        ],
+      appBar: const StandardAppBar(
+        title: 'Detalle de Lote',
         centerTitle: true,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,

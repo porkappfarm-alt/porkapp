@@ -13,18 +13,24 @@ class BatchSummaryCard extends StatelessWidget {
   });
 
   Color _getProgressColor() {
-    if (batch.progressToTarget < 30) return Colors.red;
-    if (batch.progressToTarget < 60) return Colors.orange;
-    if (batch.progressToTarget < 90) return Colors.blue;
-    return Colors.green;
+    if (batch.progressToTarget < 30) return const Color(0xFFE45B5B); // Rojo Suave - Error
+    if (batch.progressToTarget < 60) return const Color(0xFFF9C851); // Amarillo Suave - Advertencia
+    if (batch.progressToTarget < 90) return const Color(0xFF5DA271); // Verde Agro - Secundario
+    return const Color(0xFF8BC34A); // Verde Claro - Éxito/Activo
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(
+          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -47,23 +53,23 @@ class BatchSummaryCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF6B0338),
+                            color: Color(0xFF6B5E55), // Gris Taupe Moderno - Títulos
                           ),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.home_work,
                               size: 14,
-                              color: Colors.grey[600],
+                              color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
                             ),
                             const SizedBox(width: 4),
                             Text(
                               batch.corralName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[600],
+                                color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
                               ),
                             ),
                           ],
@@ -77,7 +83,7 @@ class BatchSummaryCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6B0338).withOpacity(0.1),
+                      color: const Color(0xFFF07281).withOpacity(0.1), // Rosa Cerdito Natural
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -85,7 +91,7 @@ class BatchSummaryCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF6B0338),
+                        color: Color(0xFFF07281), // Rosa Cerdito Natural - Primario
                       ),
                     ),
                   ),
@@ -132,11 +138,11 @@ class BatchSummaryCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Progreso al objetivo',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[700],
+                          color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -156,7 +162,7 @@ class BatchSummaryCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: batch.progressToTarget / 100,
                       minHeight: 8,
-                      backgroundColor: Colors.grey[200],
+                      backgroundColor: const Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
                       valueColor: AlwaysStoppedAnimation<Color>(
                         _getProgressColor(),
                       ),
@@ -174,7 +180,7 @@ class BatchSummaryCard extends StatelessWidget {
                       _AlertChip(
                         icon: Icons.trending_down,
                         label: 'ADG bajo',
-                        color: Colors.orange,
+                        color: const Color(0xFFF9C851), // Amarillo Suave - Advertencia
                       ),
                     if (batch.hasLowADG && batch.needsBiometry)
                       const SizedBox(width: 8),
@@ -182,7 +188,7 @@ class BatchSummaryCard extends StatelessWidget {
                       _AlertChip(
                         icon: Icons.warning,
                         label: 'Necesita biometría',
-                        color: Colors.red,
+                        color: const Color(0xFFE45B5B), // Rojo Suave - Error/Eliminación
                       ),
                   ],
                 ),
@@ -214,7 +220,7 @@ class _MetricItem extends StatelessWidget {
         Icon(
           icon,
           size: 20,
-          color: Colors.grey[600],
+          color: const Color(0xFF6B5E55), // Gris Taupe Moderno
         ),
         const SizedBox(height: 4),
         Text(
@@ -222,14 +228,14 @@ class _MetricItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
           ),
         ),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 11,
-            color: Colors.grey[600],
+            color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
           ),
         ),
       ],

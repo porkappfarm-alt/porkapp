@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:porkapp/features/users/domain/user_profile.dart';
+import 'package:porkapp/shared/design/colors.dart';
 
 /// Card para mostrar un usuario del sistema
 class UserCard extends StatelessWidget {
@@ -146,7 +147,7 @@ class UserCard extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Icon(Icons.email,
-                                      size: 20, color: Colors.blue),
+                                      size: 20, color: PorkAppColors.secondary),
                                   SizedBox(width: 8),
                                   Text('Reenviar Invitación'),
                                 ],
@@ -174,7 +175,7 @@ class UserCard extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Icon(Icons.check_circle,
-                                      size: 20, color: Colors.green),
+                                      size: 20, color: PorkAppColors.success),
                                   SizedBox(width: 8),
                                   Text('Activar'),
                                 ],
@@ -186,7 +187,7 @@ class UserCard extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Icon(Icons.block,
-                                      size: 20, color: Colors.orange),
+                                      size: 20, color: PorkAppColors.warning),
                                   SizedBox(width: 8),
                                   Text('Desactivar'),
                                 ],
@@ -198,7 +199,7 @@ class UserCard extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Icon(Icons.delete,
-                                      size: 20, color: Colors.red),
+                                      size: 20, color: PorkAppColors.error),
                                   SizedBox(width: 8),
                                   Text('Eliminar',
                                       style: TextStyle(color: Colors.red)),
@@ -325,10 +326,10 @@ class UserCard extends StatelessWidget {
   Color _getRoleColor(String role) {
     switch (role) {
       case 'admin':
-        return Colors.purple;
+        return PorkAppColors.primary;
       case 'user':
       default:
-        return Colors.blue;
+        return PorkAppColors.secondary;
     }
   }
 
@@ -409,7 +410,7 @@ class UserCard extends StatelessWidget {
               if (onDelete != null) onDelete!();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: PorkAppColors.error,
               foregroundColor: Colors.white,
             ),
             child: const Text('Eliminar'),
@@ -438,7 +439,7 @@ class UserCard extends StatelessWidget {
               if (onToggleStatus != null) onToggleStatus!();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
+              backgroundColor: PorkAppColors.warning,
               foregroundColor: Colors.white,
             ),
             child: const Text('Desactivar'),

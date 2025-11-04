@@ -5,6 +5,8 @@ import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_providers.dart';
 import 'package:porkapp/features/dashboard/domain/domain.dart';
 import 'package:porkapp/features/dashboard/widgets/stat_card.dart';
+import 'package:porkapp/features/auth/providers/current_user_provider.dart';
+import 'package:porkapp/shared/design/colors.dart';
 import 'package:porkapp/supabase/supabase.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -12,7 +14,8 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = supabase.auth.currentUser;
+    // Observar el usuario actual a través del provider
+    final user = ref.watch(currentUserProvider);
 
     // Observar métricas
     final corralMetrics = ref.watch(corralMetricsProvider);
@@ -21,18 +24,20 @@ class DashboardScreen extends ConsumerWidget {
     final weightMetrics = ref.watch(weightMetricsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: PorkAppColors.background,
       appBar: StandardAppBar(
         title: 'Dashboard',
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            color: const Color(0xFFFF4D6D),
-            tooltip: 'Cerrar sesión',
-            onPressed: () async {
-              await supabase.auth.signOut();
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: IconButton(
+              icon: Icon(Icons.logout_rounded, color: PorkAppColors.titleText),
+              tooltip: 'Cerrar sesión',
+              onPressed: () async {
+                await supabase.auth.signOut();
+              },
+            ),
           ),
         ],
       ),
@@ -58,22 +63,9 @@ class DashboardScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFFF5A6E),
-                              Color(0xFFFF7F8F),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          gradient: PorkAppColors.gradientPrimary,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFFF5A6E).withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: [PorkAppColors.primaryShadow],
                         ),
                         child: Row(
                           children: [
@@ -130,7 +122,7 @@ class DashboardScreen extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF5D4037),
+                            color: PorkAppColors.titleText,
                           ),
                         ),
                       ),
@@ -159,7 +151,7 @@ class DashboardScreen extends ConsumerWidget {
                                 valueFormatter: (CorralMetrics? m) =>
                                     m?.activeCount.toString() ?? 'N/A',
                                 icon: Icons.fence,
-                                color: const Color(0xFF4CAF50),
+                                color: PorkAppColors.secondary,
                               ),
                               _StatCard(
                                 title: 'Ocupación',
@@ -168,7 +160,7 @@ class DashboardScreen extends ConsumerWidget {
                                     ? '${m.occupancyRate.toStringAsFixed(1)}%'
                                     : 'N/A',
                                 icon: Icons.percent,
-                                color: const Color(0xFFF07281),
+                                color: PorkAppColors.primary,
                               ),
                               // Métricas de lotes
                               _StatCard(
@@ -177,7 +169,7 @@ class DashboardScreen extends ConsumerWidget {
                                 valueFormatter: (BatchMetrics? m) =>
                                     m?.activeCount.toString() ?? 'N/A',
                                 icon: Icons.group,
-                                color: const Color(0xFF66BB6A),
+                                color: PorkAppColors.success,
                               ),
                               _StatCard(
                                 title: 'Lotes por Terminar',
@@ -185,7 +177,7 @@ class DashboardScreen extends ConsumerWidget {
                                 valueFormatter: (BatchMetrics? m) =>
                                     m?.endingSoon.toString() ?? 'N/A',
                                 icon: Icons.timer,
-                                color: const Color(0xFFFFB74D),
+                                color: PorkAppColors.warning,
                               ),
                               // Métricas de población
                               _StatCard(
@@ -194,7 +186,8 @@ class DashboardScreen extends ConsumerWidget {
                                 valueFormatter: (PopulationMetrics? m) =>
                                     m?.totalCount.toString() ?? 'N/A',
                                 icon: Icons.pets,
-                                color: const Color(0xFFFF8A95),
+                                color: const Color(
+                                    0xFFF07281), // Rosa Cerdito Natural - Primario
                               ),
                               _StatCard(
                                 title: 'Entradas Hoy',
@@ -202,7 +195,8 @@ class DashboardScreen extends ConsumerWidget {
                                 valueFormatter: (PopulationMetrics? m) =>
                                     m?.dailyEntries.toString() ?? 'N/A',
                                 icon: Icons.add_circle_outline,
-                                color: const Color(0xFF81C784),
+                                color: const Color(
+                                    0xFF5DA271), // Verde Agro - Secundario
                               ),
                               // Métricas de peso
                               _StatCard(
@@ -212,7 +206,8 @@ class DashboardScreen extends ConsumerWidget {
                                     ? '${m.averageWeight.toStringAsFixed(1)} kg'
                                     : 'N/A',
                                 icon: Icons.monitor_weight,
-                                color: const Color(0xFF9575CD),
+                                color: const Color(
+                                    0xFF6B5E55), // Gris Taupe Moderno - Complementario
                               ),
                               _StatCard(
                                 title: 'Ganancia Diaria',
@@ -221,7 +216,8 @@ class DashboardScreen extends ConsumerWidget {
                                     ? '${m.dailyGain.toStringAsFixed(2)} kg/d'
                                     : 'N/A',
                                 icon: Icons.trending_up,
-                                color: const Color(0xFF64B5F6),
+                                color: const Color(
+                                    0xFF8BC34A), // Verde Claro - Éxito/Activo
                               ),
                             ],
                           );
@@ -260,26 +256,26 @@ class _StatCard<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withOpacity(0.2),
+            width: 1,
           ),
-        ],
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return Column(

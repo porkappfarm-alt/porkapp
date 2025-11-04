@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/users/domain/user_profile.dart';
 import 'package:porkapp/features/users/providers/user_provider.dart';
 import 'package:porkapp/features/users/presentation/widgets/user_card.dart';
 import 'package:porkapp/features/users/presentation/widgets/user_form.dart';
+import 'package:porkapp/shared/design/colors.dart';
 
 class UserManagementView extends ConsumerStatefulWidget {
   const UserManagementView({super.key});
@@ -18,34 +20,36 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
   String? _statusFilter;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Actualizar los filtros fuera del método build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(userRoleFilterProvider.notifier).state = _roleFilter;
+      ref.read(userStatusFilterProvider.notifier).state = _statusFilter;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    ref.watch(userRoleFilterProvider.notifier).state = _roleFilter;
-    ref.watch(userStatusFilterProvider.notifier).state = _statusFilter;
     final usersAsync = ref.watch(filteredUsersProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Gestión de Usuarios',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+      backgroundColor: const Color(0xFFFAFAFA),
+      appBar: StandardAppBar(
+        title: 'Gestión de Usuarios',
+        automaticallyImplyLeading: false,
         actions: [
           // Filtro por rol
           PopupMenuButton<String?>(
             icon: Icon(
               Icons.filter_alt,
-              color: _roleFilter != null ? Colors.purple : Colors.black87,
+              color:
+                  _roleFilter != null ? PorkAppColors.primary : Colors.black87,
             ),
             tooltip: 'Filtrar por rol',
             onSelected: (value) {
               setState(() => _roleFilter = value);
+              ref.read(userRoleFilterProvider.notifier).state = value;
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -57,7 +61,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                 child: Row(
                   children: [
                     Icon(Icons.admin_panel_settings,
-                        size: 18, color: Colors.purple),
+                        size: 18, color: PorkAppColors.primary),
                     SizedBox(width: 8),
                     Text('Administradores'),
                   ],
@@ -67,7 +71,8 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                 value: 'user',
                 child: Row(
                   children: [
-                    Icon(Icons.person, size: 18, color: Colors.blue),
+                    Icon(Icons.person,
+                        size: 18, color: PorkAppColors.secondary),
                     SizedBox(width: 8),
                     Text('Usuarios'),
                   ],
@@ -79,11 +84,14 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
           PopupMenuButton<String?>(
             icon: Icon(
               Icons.filter_list,
-              color: _statusFilter != null ? Colors.orange : Colors.black87,
+              color: _statusFilter != null
+                  ? PorkAppColors.warning
+                  : Colors.black87,
             ),
             tooltip: 'Filtrar por estado',
             onSelected: (value) {
               setState(() => _statusFilter = value);
+              ref.read(userStatusFilterProvider.notifier).state = value;
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -94,7 +102,8 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                 value: 'active',
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, size: 18, color: Colors.green),
+                    Icon(Icons.check_circle,
+                        size: 18, color: PorkAppColors.success),
                     SizedBox(width: 8),
                     Text('Activos'),
                   ],
@@ -104,7 +113,8 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                 value: 'pending',
                 child: Row(
                   children: [
-                    Icon(Icons.schedule, size: 18, color: Colors.orange),
+                    Icon(Icons.schedule,
+                        size: 18, color: PorkAppColors.warning),
                     SizedBox(width: 8),
                     Text('Pendientes'),
                   ],
@@ -114,7 +124,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                 value: 'inactive',
                 child: Row(
                   children: [
-                    Icon(Icons.block, size: 18, color: Colors.red),
+                    Icon(Icons.block, size: 18, color: PorkAppColors.error),
                     SizedBox(width: 8),
                     Text('Inactivos'),
                   ],
@@ -126,10 +136,15 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
           Container(
             margin: const EdgeInsets.only(right: 12, left: 4),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Colors.purple, Colors.deepPurple],
-              ),
+              color: PorkAppColors.primary,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: PorkAppColors.primary.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: IconButton(
               icon: const Icon(Icons.person_add, color: Colors.white),
@@ -176,7 +191,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
           },
           loading: () => const Center(
             child: CircularProgressIndicator(
-              color: Colors.purple,
+              color: PorkAppColors.primary,
             ),
           ),
           error: (error, stack) => Center(
@@ -186,7 +201,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                 const Icon(
                   Icons.error_outline,
                   size: 64,
-                  color: Colors.red,
+                  color: PorkAppColors.error,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -209,7 +224,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
                     ref.invalidate(usersListProvider);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
+                    backgroundColor: PorkAppColors.primary,
                   ),
                   child: const Text('Reintentar'),
                 ),
@@ -229,13 +244,13 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
+              color: PorkAppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.people_outline,
               size: 64,
-              color: Colors.purple.withOpacity(0.5),
+              color: PorkAppColors.primary.withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 24),
@@ -263,13 +278,11 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
             const SizedBox(height: 32),
             Container(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.purple, Colors.deepPurple],
-                ),
+                color: PorkAppColors.primary,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.purple.withOpacity(0.4),
+                    color: PorkAppColors.primary.withOpacity(0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),

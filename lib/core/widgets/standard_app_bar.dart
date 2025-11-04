@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:porkapp/shared/design/colors.dart';
 
 /// AppBar estandarizado para toda la aplicación
-/// 
+///
 /// Características:
 /// - Botón de retroceso automático (si hay navegación previa)
 /// - Título centrado
@@ -12,6 +13,11 @@ class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final bool automaticallyImplyLeading;
   final VoidCallback? onBackPressed;
+  final bool centerTitle;
+  final Color? backgroundColor;
+  final Color? surfaceTintColor;
+  final double? elevation;
+  final double? scrolledUnderElevation;
 
   const StandardAppBar({
     super.key,
@@ -19,18 +25,28 @@ class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.automaticallyImplyLeading = true,
     this.onBackPressed,
+    this.centerTitle = true,
+    this.backgroundColor,
+    this.surfaceTintColor,
+    this.elevation,
+    this.scrolledUnderElevation,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.white,
+      elevation: elevation ?? 0,
+      scrolledUnderElevation: scrolledUnderElevation ?? 0,
+      backgroundColor: backgroundColor ?? Colors.white,
+      surfaceTintColor: surfaceTintColor ?? Colors.white,
+      iconTheme: const IconThemeData(color: PorkAppColors.titleText),
+      centerTitle: centerTitle,
+      leadingWidth: automaticallyImplyLeading ? 56 : 0,
       leading: automaticallyImplyLeading
           ? IconButton(
               icon: const Icon(
                 Icons.arrow_back_rounded,
-                color: Color(0xFF2D3250),
+                size: 24,
               ),
               onPressed: onBackPressed ?? () => Navigator.pop(context),
             )
@@ -40,12 +56,15 @@ class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 18,
-          color: Color(0xFF2D3250),
+          color: Colors.black87,
         ),
       ),
-      centerTitle: true,
-      surfaceTintColor: Colors.transparent,
-      actions: actions,
+      actions: actions != null
+          ? [
+              ...actions!,
+              const SizedBox(width: 8), // Padding al final
+            ]
+          : null,
     );
   }
 

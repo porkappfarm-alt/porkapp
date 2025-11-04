@@ -28,18 +28,19 @@ class BatchListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = _calculateProgress();
-    
+    final statusColor = _getStatusColor(status);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFF1EAEA), width: 1),
+        border: Border.all(color: const Color(0xFFE9E9E9), width: 1), // Gris Claro - Bordes/Divisores
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -47,9 +48,16 @@ class BatchListItem extends StatelessWidget {
         children: [
           // Franja superior de color según estado
           Container(
-            height: 10,
+            height: 12,
             decoration: BoxDecoration(
-              color: _getStatusColor(status),
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  statusColor,
+                  statusColor.withOpacity(0.85),
+                ],
+              ),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(14),
               ),
@@ -85,7 +93,7 @@ class BatchListItem extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(status).withOpacity(0.15),
+                          color: statusColor.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -93,7 +101,7 @@ class BatchListItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: _getStatusColor(status),
+                            color: statusColor,
                           ),
                         ),
                       ),
@@ -107,8 +115,11 @@ class BatchListItem extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF9FAFB),
+                            color: const Color(0xFFFFF5EC), // Crema Pastel - Tarjetas
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFFE9E9E9),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,8 +159,11 @@ class BatchListItem extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF9FAFB),
+                            color: const Color(0xFFFFF5EC), // Crema Pastel - Tarjetas
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFFE9E9E9),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,9 +229,9 @@ class BatchListItem extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress / 100,
                       minHeight: 8,
-                      backgroundColor: const Color(0xFFE9E9E9),
+                      backgroundColor: const Color(0xFFFDE7EA),
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        Color(0xFF5DA271),
+                        Color(0xFF5DA271), // Verde Agro - Secundario
                       ),
                     ),
                   ),
@@ -229,7 +243,7 @@ class BatchListItem extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               border: Border(
-                top: BorderSide(color: Color(0xFFF0E0E0), width: 1),
+                top: BorderSide(color: Color(0xFFE9E9E9), width: 1), // Gris Claro
               ),
             ),
             child: Row(
@@ -244,7 +258,7 @@ class BatchListItem extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
                         border: Border(
-                          right: BorderSide(color: Color(0xFFF0E0E0), width: 1),
+                          right: BorderSide(color: Color(0xFFE9E9E9), width: 1), // Gris Claro
                         ),
                       ),
                       child: const Row(
@@ -332,18 +346,18 @@ class BatchListItem extends StatelessWidget {
     switch (status.toLowerCase()) {
       case 'activo':
       case 'active':
-        return const Color(0xFFF07281); // Rosa Cerdito
+        return const Color(0xFFF07281); // Rosa Cerdito Natural - Primario
       case 'finalizado':
       case 'finished':
-        return const Color(0xFF5DA271); // Verde Agro
+        return const Color(0xFF5DA271); // Verde Agro - Secundario
       case 'pendiente':
       case 'pending':
-        return const Color(0xFFF9C851); // Amarillo Suave
+        return const Color(0xFFF9C851); // Amarillo Suave - Advertencia
       case 'cancelado':
       case 'cancelled':
-        return const Color(0xFFE45B5B); // Rojo Suave
+        return const Color(0xFFE45B5B); // Rojo Suave - Error/Eliminación
       default:
-        return const Color(0xFFC7C7C7); // Gris Neutro
+        return const Color(0xFF6B5E55); // Gris Taupe Moderno - Títulos
     }
   }
 

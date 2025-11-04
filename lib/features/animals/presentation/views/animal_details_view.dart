@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/animals/presentation/views/animal_events_view.dart';
 import 'package:porkapp/features/animals/providers/animal_provider.dart';
@@ -31,8 +32,8 @@ class AnimalDetailsView extends ConsumerWidget {
     
     return animalAsync.when(
       data: (animal) => Scaffold(
-        appBar: AppBar(
-          title: Text('Animal ${animal.identifier}'),
+        appBar: StandardAppBar(
+          title: 'Animal ${animal.identifier}',
           actions: [
             IconButton(
               icon: const Icon(Icons.edit),

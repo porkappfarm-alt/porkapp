@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/dashboard/data/models/dashboard_alert.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_alerts_provider.dart';
 
@@ -12,34 +13,20 @@ class AllAlertsView extends ConsumerWidget {
     final alertsAsync = ref.watch(dashboardAlertsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Todas las Alertas',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => context.pop(),
-        ),
+      backgroundColor: const Color(0xFFFAFAFA), // Blanco Suave - Fondo Claro Base
+      appBar: StandardAppBar(
+        title: 'Todas las Alertas',
         actions: [
-          // Botón para marcar todas como leídas
           if (alertsAsync.hasValue && alertsAsync.value!.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.done_all, color: Colors.black87),
+              icon: const Icon(Icons.done_all, color: Color(0xFF8BC34A)),
               tooltip: 'Marcar todas como leídas',
               onPressed: () async {
                 await ref.read(alertsNotifierProvider.notifier).markAllAsRead();
               },
             ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black87),
+            icon: const Icon(Icons.refresh, color: Color(0xFFF07281)),
             onPressed: () {
               ref.invalidate(dashboardAlertsProvider);
             },
@@ -53,26 +40,26 @@ class AllAlertsView extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.check_circle_outline,
                     size: 64,
-                    color: Colors.green[300],
+                    color: Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
                   ),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'No hay alertas',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Todo está en orden',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
                     ),
                   ),
                 ],
@@ -125,7 +112,7 @@ class AllAlertsView extends ConsumerWidget {
                   background: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: const Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.centerRight,
@@ -165,25 +152,25 @@ class AllAlertsView extends ConsumerWidget {
         },
         loading: () => const Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF07281)), // Rosa Cerdito Natural
           ),
         ),
         error: (error, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.error_outline,
                 size: 64,
-                color: Colors.red[300],
+                color: Color(0xFFE45B5B), // Rojo Suave - Error/Eliminación
               ),
               const SizedBox(height: 16),
-              Text(
+              const Text(
                 'Error al cargar alertas',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
+                  color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                 ),
               ),
               const SizedBox(height: 8),
@@ -192,9 +179,9 @@ class AllAlertsView extends ConsumerWidget {
                 child: Text(
                   error.toString(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
                   ),
                 ),
               ),
@@ -206,7 +193,7 @@ class AllAlertsView extends ConsumerWidget {
                 icon: const Icon(Icons.refresh),
                 label: const Text('Reintentar'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6B0338),
+                  backgroundColor: const Color(0xFFF07281), // Rosa Cerdito Natural
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -226,11 +213,11 @@ class _AlertCard extends ConsumerWidget {
   Color _getSeverityColor() {
     switch (alert.severity) {
       case AlertSeverity.critical:
-        return Colors.red;
+        return const Color(0xFFE45B5B); // Rojo Suave - Error/Eliminación
       case AlertSeverity.warning:
-        return Colors.orange;
+        return const Color(0xFFF9C851); // Amarillo Suave - Advertencia
       case AlertSeverity.info:
-        return Colors.blue;
+        return const Color(0xFF5DA271); // Verde Agro - Secundario
     }
   }
 
@@ -251,9 +238,15 @@ class _AlertCard extends ConsumerWidget {
     final typeIconEmoji = alert.type.icon;
 
     return Card(
-      elevation: 2,
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(
+          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -289,15 +282,15 @@ class _AlertCard extends ConsumerWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             alert.description,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
                               height: 1.3,
                             ),
                           ),
@@ -311,8 +304,12 @@ class _AlertCard extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: const Color(0xFFFAFAFA), // Blanco Suave
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color(0xFFE9E9E9),
+                            width: 1,
+                          ),
                         ),
                         child: Text(
                           typeIconEmoji,
@@ -332,16 +329,16 @@ class _AlertCard extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: const Color(0xFF8BC34A).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: Colors.green.withOpacity(0.3),
+                              color: const Color(0xFF8BC34A).withOpacity(0.3),
                               width: 1,
                             ),
                           ),
                           child: const Icon(
                             Icons.check_circle_outline,
-                            color: Colors.green,
+                            color: Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
                             size: 20,
                           ),
                         ),
@@ -360,7 +357,7 @@ class _AlertCard extends ConsumerWidget {
                       icon: const Icon(Icons.arrow_forward, size: 16),
                       label: const Text('Ver detalle'),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF6B0338),
+                        foregroundColor: const Color(0xFFF07281), // Rosa Cerdito Natural
                       ),
                     ),
                   ],

@@ -12,8 +12,6 @@ class BatchesView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
@@ -54,23 +52,31 @@ class BatchesView extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.folder_open,
                         size: 64,
-                        color: theme.colorScheme.primary.withOpacity(0.5),
+                        color: Color(0xFFC7C7C7), // Gris Neutro - Inactivo
                       ),
                       const SizedBox(height: 16),
-                      Text(
+                      const Text(
                         'No hay lotes creados',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(
-                            0.7,
-                          ),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                         ),
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: () => _showCreateBatchDialog(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5DA271), // Verde Agro - Secundario
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         child: const Text('Crear Lote'),
                       ),
                     ],
@@ -99,28 +105,54 @@ class BatchesView extends ConsumerWidget {
                 ),
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF07281)), // Rosa Cerdito Natural
+              ),
+            ),
             error: (error, stack) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Color(0xFFE45B5B), // Rojo Suave - Error/Eliminación
+                  ),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Error al cargar los lotes',
-                    style: theme.textTheme.titleMedium,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    error.toString(),
-                    style: theme.textTheme.bodySmall,
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      error.toString(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       ref.invalidate(batchListProvider);
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF07281), // Rosa Cerdito Natural
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     child: const Text('Reintentar'),
                   ),
                 ],
@@ -132,21 +164,18 @@ class BatchesView extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF5DA271).withOpacity(0.3),
-              blurRadius: 10,
+              color: const Color(0xFF5DA271).withOpacity(0.3), // Verde Agro - Secundario
+              blurRadius: 8,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: FloatingActionButton(
-          heroTag: 'batches_fab',
+        child: FloatingActionButton.extended(
           onPressed: () => _showCreateBatchDialog(context),
-          backgroundColor: const Color(0xFF5DA271),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(Icons.add, color: Colors.white, size: 28),
+          backgroundColor: const Color(0xFF5DA271), // Verde Agro - Secundario
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add),
+          label: const Text('Ordenar'),
         ),
       ),
     );

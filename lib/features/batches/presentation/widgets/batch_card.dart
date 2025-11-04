@@ -25,6 +25,9 @@ class BatchCard extends ConsumerWidget {
     final progress = batch.headcountStart > 0
         ? batch.animals.length / batch.headcountStart
         : 0.0;
+    final statusColor = _getStatusColor(context, batch.status);
+    final statusBackgroundColor = _getStatusBackgroundColor(statusColor);
+    final statusForegroundColor = _getStatusForegroundColor(statusColor);
 
     // Consultar la última biometría
     final biometricsAsync = ref.watch(batchBiometricsProvider(batch.id));
@@ -33,14 +36,15 @@ class BatchCard extends ConsumerWidget {
     final daysElapsed = DateTime.now().difference(entryDate).inDays;
 
     return Card(
-      elevation: 2,
-      color: const Color(0xFFFFFFFF),
+      elevation: 3,
+      shadowColor: Colors.black.withOpacity(0.08),
+      color: Colors.white,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: const Color(0xFFE94C5D).withOpacity(0.15),
-          width: 1.5,
+        side: const BorderSide(
+          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          width: 1,
         ),
       ),
       child: InkWell(
@@ -52,18 +56,14 @@ class BatchCard extends ConsumerWidget {
             // Encabezado con estado
             Container(
               decoration: BoxDecoration(
-                color: _getStatusColor(context, batch.status),
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    _getStatusColor(context, batch.status),
-                    _getStatusColor(context, batch.status).withOpacity(0.8),
-                  ],
-                ),
+                color: statusBackgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
+                ),
+                border: Border.all(
+                  color: statusColor.withOpacity(0.2),
+                  width: 1,
                 ),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -71,14 +71,14 @@ class BatchCard extends ConsumerWidget {
                 children: [
                   Icon(
                     _getStatusIcon(batch.status),
-                    color: Colors.white,
+                    color: statusForegroundColor,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     _getStatusText(batch.status),
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
+                      color: statusForegroundColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -97,7 +97,7 @@ class BatchCard extends ConsumerWidget {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF3B1D2D),
+                      color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                       fontFamily: 'Poppins',
                     ),
                   ),
@@ -384,23 +384,41 @@ class BatchCard extends ConsumerWidget {
   Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'activo':
-        return const Color(0xFF44C13C); // Verde más vivo
+      case 'active':
+        return const Color(0xFF4CAF50); // Verde más vibrante
       case 'finalizado':
-        return const Color(0xFFE94C5D); // Coral
+      case 'finalized':
+        return const Color(0xFFFF5A6E); // Rosa coral intenso
       case 'suspendido':
-        return const Color(0xFF7E1946); // Burdeos más vivo
+      case 'suspended':
+        return const Color(0xFFFFA726); // Naranja llamativo
       default:
-        return const Color(0xFF3B1D2D); // Burdeos por defecto
+        return const Color(0xFF9C27B0); // Púrpura vibrante
     }
+  }
+
+  Color _getStatusBackgroundColor(Color color) {
+    return Color.lerp(color, Colors.white, 0.82)!;
+  }
+
+  Color _getStatusForegroundColor(Color color) {
+    final luminance = color.computeLuminance();
+    if (luminance < 0.35) {
+      return color;
+    }
+    return Color.lerp(color, Colors.black, 0.25)!;
   }
 
   IconData _getStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'activo':
+      case 'active':
         return Icons.play_circle_outline_rounded;
       case 'finalizado':
+      case 'finalized':
         return Icons.check_circle_outline_rounded;
       case 'suspendido':
+      case 'suspended':
         return Icons.pause_circle_outline_rounded;
       default:
         return Icons.help_outline_rounded;
@@ -408,7 +426,21 @@ class BatchCard extends ConsumerWidget {
   }
 
   String _getStatusText(String status) {
-    return status[0].toUpperCase() + status.substring(1).toLowerCase();
+    switch (status.toLowerCase()) {
+      case 'activo':
+      case 'active':
+        return 'Activo';
+      case 'finalizado':
+      case 'finalized':
+        return 'Finalizado';
+      case 'suspendido':
+      case 'suspended':
+        return 'Suspendido';
+      default:
+        return status.isEmpty
+            ? '--'
+            : status[0].toUpperCase() + status.substring(1).toLowerCase();
+    }
   }
 
   Color _getProgressColor(BuildContext context, double progress) {

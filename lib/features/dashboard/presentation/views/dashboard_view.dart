@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_alerts_provider.dart';
 import 'package:porkapp/features/dashboard/providers/dashboard_charts_provider.dart';
 import 'package:porkapp/features/dashboard/presentation/widgets/alert_section.dart';
@@ -16,26 +17,24 @@ class DashboardView extends ConsumerWidget {
     final batchSummariesAsync = ref.watch(batchSummariesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Dashboard',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        toolbarHeight: 56,
+      backgroundColor: const Color(0xFFF8F9FF), // Fondo con tinte azulado suave
+      appBar: StandardAppBar(
+        title: 'Dashboard',
+        automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black87),
-            onPressed: () {
-              ref.invalidate(dashboardAlertsProvider);
-              ref.invalidate(batchSummariesProvider);
-            },
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF0F1), // Fondo rosa muy suave
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.refresh, color: Color(0xFFF07281)),
+              onPressed: () {
+                ref.invalidate(dashboardAlertsProvider);
+                ref.invalidate(batchSummariesProvider);
+              },
+            ),
           ),
         ],
       ),
@@ -76,27 +75,42 @@ class DashboardView extends ConsumerWidget {
               batchSummariesAsync.when(
                 data: (batches) {
                   if (batches.isEmpty) {
-                    return Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 15,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
                         child: Center(
                           child: Column(
                             children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 48,
-                                color: Colors.grey[400],
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F9FF),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.inventory_2_outlined,
+                                  size: 48,
+                                  color: Color(0xFFBDC1C6),
+                                ),
                               ),
-                              const SizedBox(height: 12),
-                              Text(
+                              const SizedBox(height: 16),
+                              const Text(
                                 'No hay lotes activos',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF6B7280),
                                 ),
                               ),
                             ],
@@ -153,38 +167,61 @@ class _SectionHeader extends StatelessWidget {
         Row(
           children: [
             Container(
-              width: 4,
-              height: 24,
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF6B0338),
-                borderRadius: BorderRadius.circular(2),
+                color: const Color(0xFFFEF0F1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFFF07281),
+                size: 20,
               ),
             ),
             const SizedBox(width: 12),
-            Icon(
-              icon,
-              color: const Color(0xFF6B0338),
-              size: 22,
-            ),
-            const SizedBox(width: 8),
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF6B0338),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF4A4A4A),
+                letterSpacing: -0.5,
               ),
             ),
           ],
         ),
         if (actionLabel != null && onActionTap != null)
-          TextButton(
-            onPressed: onActionTap,
-            child: Text(
-              actionLabel!,
-              style: const TextStyle(
-                color: Color(0xFF6B0338),
-                fontWeight: FontWeight.w600,
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF0F1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TextButton(
+              onPressed: onActionTap,
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    actionLabel!,
+                    style: const TextStyle(
+                      color: Color(0xFFF07281),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 12,
+                    color: Color(0xFFF07281),
+                  ),
+                ],
               ),
             ),
           ),
@@ -199,15 +236,22 @@ class _LoadingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(
+          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          width: 1,
+        ),
       ),
       child: const Padding(
         padding: EdgeInsets.all(32.0),
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B0338)),
+            valueColor: AlwaysStoppedAnimation<Color>(
+                Color(0xFFF07281)), // Rosa Cerdito Natural
           ),
         ),
       ),
@@ -227,9 +271,15 @@ class _ErrorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(
+          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -237,7 +287,7 @@ class _ErrorCard extends StatelessWidget {
           children: [
             const Icon(
               Icons.error_outline,
-              color: Colors.red,
+              color: Color(0xFFE45B5B), // Rojo Suave - Error/Eliminación
               size: 48,
             ),
             const SizedBox(height: 12),
@@ -246,15 +296,15 @@ class _ErrorCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
               ),
             ),
             const SizedBox(height: 8),
             Text(
               error,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
-                color: Colors.grey[600],
+                color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
               ),
               textAlign: TextAlign.center,
             ),

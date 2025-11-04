@@ -17,9 +17,15 @@ class AlertSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (alerts.isEmpty) {
       return Card(
-        elevation: 2,
+        elevation: 3,
+        color: Colors.white,
+        shadowColor: Colors.black.withOpacity(0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(
+            color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+            width: 1,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -28,12 +34,12 @@ class AlertSection extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: const Color(0xFF8BC34A).withOpacity(0.1), // Verde Claro - Éxito/Activo
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.check_circle_outline,
-                  color: Colors.green,
+                  color: Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
                   size: 28,
                 ),
               ),
@@ -44,7 +50,7 @@ class AlertSection extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                     height: 1.4,
                   ),
                 ),
@@ -86,9 +92,15 @@ class AlertSection extends ConsumerWidget {
       });
 
     return Card(
-      elevation: 2,
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(
+          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +111,7 @@ class AlertSection extends ConsumerWidget {
               children: [
                 const Icon(
                   Icons.notifications_active,
-                  color: Color(0xFF6B0338),
+                  color: Color(0xFFF07281), // Rosa Cerdito Natural - Primario
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -108,7 +120,7 @@ class AlertSection extends ConsumerWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF6B0338),
+                    color: Color(0xFF6B5E55), // Gris Taupe Moderno - Títulos
                   ),
                 ),
               ],
@@ -126,7 +138,7 @@ class AlertSection extends ConsumerWidget {
                 key: Key(alert.id),
                 direction: DismissDirection.endToStart,
                 background: Container(
-                  color: Colors.green,
+                  color: const Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: 20),
                   child: const Icon(
@@ -156,7 +168,7 @@ class AlertSection extends ConsumerWidget {
                   child: Text(
                     'Ver todas (${alerts.length})',
                     style: const TextStyle(
-                      color: Color(0xFF6B0338),
+                      color: Color(0xFFF07281), // Rosa Cerdito Natural - Primario
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -181,11 +193,11 @@ class AlertTile extends ConsumerWidget {
   Color _getSeverityColor() {
     switch (alert.severity) {
       case AlertSeverity.critical:
-        return Colors.red;
+        return const Color(0xFFE45B5B); // Rojo Suave - Error/Eliminación
       case AlertSeverity.warning:
-        return Colors.orange;
+        return const Color(0xFFF9C851); // Amarillo Suave - Advertencia
       case AlertSeverity.info:
-        return Colors.blue;
+        return const Color(0xFF5DA271); // Verde Agro - Secundario
     }
   }
 
@@ -250,15 +262,15 @@ class AlertTile extends ConsumerWidget {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       alert.description,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
-                        color: Colors.grey[700],
+                        color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
                       ),
                     ),
                   ],
@@ -275,25 +287,25 @@ class AlertTile extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: const Color(0xFF8BC34A).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Colors.green.withOpacity(0.3),
+                      color: const Color(0xFF8BC34A).withOpacity(0.3),
                       width: 1,
                     ),
                   ),
                   child: const Icon(
                     Icons.check_circle_outline,
-                    color: Colors.green,
+                    color: Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
                     size: 18,
                   ),
                 ),
               ),
               if (alert.actionRoute != null) ...[
                 const SizedBox(width: 8),
-                Icon(
+                const Icon(
                   Icons.chevron_right,
-                  color: Colors.grey[400],
+                  color: Color(0xFFC7C7C7), // Gris Neutro - Inactivo/Neutro
                   size: 20,
                 ),
               ],

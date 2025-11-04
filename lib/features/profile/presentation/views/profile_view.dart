@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/users/domain/user_profile.dart';
 import 'package:porkapp/supabase/supabase.dart';
+
+const _primaryPink = Color(0xFFFF5A6E);
+const _primaryPinkDark = Color(0xFFE91E63);
+const _secondaryGreen = Color(0xFF4CAF50);
+const _taupe = Color(0xFF6B5E55);
+const _cream = Color(0xFFFFF5EC);
+const _borderGray = Color(0xFFE9E9E9);
+const _lightPink = Color(0xFFFFCDD2);
+const _errorRed = Color(0xFFEF5350);
 
 // Provider para obtener el perfil del usuario actual
 final currentUserProfileProvider = FutureProvider<UserProfile?>((ref) async {
@@ -129,10 +139,64 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(currentUserProfileProvider);
+    final theme = Theme.of(context);
+    final labelStyle = theme.textTheme.labelMedium?.copyWith(
+          color: _taupe.withOpacity(0.65),
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.1,
+        ) ??
+        const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: _taupe,
+        );
+    final helperStyle = theme.textTheme.bodySmall?.copyWith(
+      color: _taupe.withOpacity(0.6),
+    );
+    final saveButtonStyle = ElevatedButton.styleFrom(
+      padding: const EdgeInsets.all(16),
+      backgroundColor: _primaryPink,
+      foregroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      shadowColor: _primaryPinkDark.withOpacity(0.35),
+    ).copyWith(
+      overlayColor: MaterialStateProperty.resolveWith(
+        (states) => states.contains(MaterialState.pressed)
+            ? _primaryPinkDark.withOpacity(0.12)
+            : null,
+      ),
+    );
+    final outlinedPrimaryStyle = OutlinedButton.styleFrom(
+      padding: const EdgeInsets.all(16),
+      backgroundColor: _lightPink.withOpacity(0.35),
+      foregroundColor: _primaryPink,
+      side: const BorderSide(color: _primaryPink, width: 1.2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      textStyle: theme.textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+    );
+    final outlinedDangerStyle = OutlinedButton.styleFrom(
+      padding: const EdgeInsets.all(16),
+      foregroundColor: _errorRed,
+      side: const BorderSide(color: _errorRed, width: 1.2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      textStyle: theme.textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi Perfil'),
+      backgroundColor: Colors.white,
+      appBar: StandardAppBar(
+        title: 'Mi Perfil',
+        automaticallyImplyLeading: false,
         actions: [
           if (!_isEditing)
             IconButton(
@@ -169,7 +233,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           _loadUserData(user);
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -177,88 +241,136 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 children: [
                   // Avatar y nombre
                   Center(
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          child: Text(
-                            (user.fullName ?? user.email)
-                                .substring(0, 1)
-                                .toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            _lightPink.withOpacity(0.3),
+                            Colors.white,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(
+                          color: _primaryPink.withOpacity(0.15),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _primaryPink.withOpacity(0.08),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _primaryPink.withOpacity(0.3),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              radius: 52,
+                              backgroundColor: _primaryPink,
+                              child: Text(
+                                (user.fullName ?? user.email)
+                                    .substring(0, 1)
+                                    .toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 1,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          user.fullName ?? 'Sin nombre',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
+                          const SizedBox(height: 20),
+                          Text(
+                            user.fullName ?? 'Sin nombre',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: _taupe,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 22,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          decoration: BoxDecoration(
-                            color: user.isAdmin ? Colors.purple : Colors.blue,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            user.isAdmin ? 'Administrador' : 'Usuario',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: (user.isAdmin
+                                      ? _primaryPink
+                                      : _secondaryGreen)
+                                  .withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: user.isAdmin
+                                    ? _primaryPink
+                                    : _secondaryGreen,
+                              ),
+                            ),
+                            child: Text(
+                              user.isAdmin ? 'Administrador' : 'Usuario',
+                              style: TextStyle(
+                                color: user.isAdmin
+                                    ? _primaryPink
+                                    : _secondaryGreen,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
                   // Email (no editable)
-                  const Text(
-                    'Correo electrónico',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  Text('Correo electrónico', style: labelStyle),
                   const SizedBox(height: 8),
                   TextFormField(
                     initialValue: user.email,
                     enabled: false,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: _taupe,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: _buildInputDecoration(
+                      context,
+                      icon: Icons.email,
                       helperText: 'El correo no puede ser modificado',
+                      helperStyle: helperStyle,
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // Nombre completo
-                  const Text(
-                    'Nombre completo',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  Text('Nombre completo', style: labelStyle),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _fullNameController,
                     enabled: _isEditing,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
+                    decoration: _buildInputDecoration(
+                      context,
+                      icon: Icons.person,
                       hintText: 'Ingresa tu nombre completo',
                     ),
                     validator: (value) {
@@ -271,22 +383,15 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                   const SizedBox(height: 24),
 
                   // Número de identificación
-                  const Text(
-                    'Número de identificación',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  Text('Número de identificación', style: labelStyle),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _identificationController,
                     enabled: _isEditing,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.badge),
+                    decoration: _buildInputDecoration(
+                      context,
+                      icon: Icons.badge,
                       hintText: 'Ingresa tu número de identificación',
                     ),
                     validator: (value) {
@@ -304,22 +409,15 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                   const SizedBox(height: 24),
 
                   // WhatsApp
-                  const Text(
-                    'Número de WhatsApp',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  Text('Número de WhatsApp', style: labelStyle),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _whatsappController,
                     enabled: _isEditing,
                     keyboardType: TextInputType.phone,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.phone),
+                    decoration: _buildInputDecoration(
+                      context,
+                      icon: Icons.phone,
                       hintText: 'Ej: 3001234567',
                     ),
                     validator: (value) {
@@ -352,11 +450,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                             : const Icon(Icons.save),
                         label: Text(
                             _isLoading ? 'Guardando...' : 'Guardar cambios'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
+                        style: saveButtonStyle,
                       ),
                     ),
 
@@ -369,9 +463,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       onPressed: () => context.push('/change-password'),
                       icon: const Icon(Icons.lock),
                       label: const Text('Cambiar contraseña'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.all(16),
-                      ),
+                      style: outlinedPrimaryStyle,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -383,38 +475,48 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       onPressed: _confirmLogout,
                       icon: const Icon(Icons.logout),
                       label: const Text('Cerrar sesión'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.all(16),
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
-                      ),
+                      style: outlinedDangerStyle,
                     ),
                   ),
                   const SizedBox(height: 32),
 
                   // Información adicional
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Información de la cuenta',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          _buildInfoRow('Estado', _getStatusText(user.status)),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            'Fecha de creación',
-                            _formatDate(user.createdAt),
-                          ),
-                        ],
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: _borderGray,
+                        width: 1,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Información de la cuenta',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: _taupe,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildInfoRow('Estado', _getStatusText(user.status)),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(
+                          'Fecha de creación',
+                          _formatDate(user.createdAt),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -467,5 +569,61 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  InputDecoration _buildInputDecoration(
+    BuildContext context, {
+    required IconData icon,
+    String? hintText,
+    String? helperText,
+    TextStyle? helperStyle,
+  }) {
+    return InputDecoration(
+      filled: true,
+      fillColor: _cream.withOpacity(0.4),
+      hintText: hintText,
+      helperText: helperText,
+      helperStyle: helperStyle,
+      prefixIcon: Icon(icon, color: _primaryPink, size: 22),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: _primaryPink.withOpacity(0.2),
+          width: 1.5,
+        ),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: _borderGray.withOpacity(0.5),
+          width: 1.5,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: _primaryPink,
+          width: 2,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: _errorRed,
+          width: 1.5,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: _errorRed,
+          width: 2,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+        vertical: 18,
+      ),
+    );
   }
 }

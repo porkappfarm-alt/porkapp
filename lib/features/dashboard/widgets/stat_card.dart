@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/shared/design/colors.dart';
 
 class StatCard<T> extends StatelessWidget {
   final String title;
@@ -24,10 +25,20 @@ class StatCard<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget card = Card(
-      elevation: onTap != null ? 2 : 1,
+      elevation: onTap != null ? 3 : 2,
+      color: Colors.white,
+      surfaceTintColor: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: PorkAppColors.border,
+          width: 1,
+        ),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(12),
         overlayColor: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
             if (states.contains(MaterialState.hovered)) {
@@ -53,9 +64,10 @@ class StatCard<T> extends StatelessWidget {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     valueFormatter(data),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: PorkAppColors.mainText),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -71,9 +83,8 @@ class StatCard<T> extends StatelessWidget {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     'Error: $error',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.red,
-                        ),
+                    style: const TextStyle(
+                        fontSize: 12, color: PorkAppColors.error),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -83,9 +94,11 @@ class StatCard<T> extends StatelessWidget {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                      ),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),

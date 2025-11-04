@@ -133,7 +133,7 @@ class BatchesView extends ConsumerWidget {
                                 // TODO: Implementar ordenamiento
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4CAF50),
+                                backgroundColor: const Color(0xFFF07281),
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(

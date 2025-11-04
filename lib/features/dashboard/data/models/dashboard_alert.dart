@@ -36,6 +36,12 @@ enum AlertType {
   /// Lote por encima del peso objetivo según feeding_schedule
   aboveTargetWeight,
 
+  /// Cambio de tipo de alimento recomendado
+  feedTypeChange,
+
+  /// Lote próximo a estar listo para venta
+  readyForSale,
+
   /// Otro tipo de alerta
   other,
 }
@@ -106,6 +112,10 @@ extension AlertTypeExtension on AlertType {
         return '⚠️';
       case AlertType.aboveTargetWeight:
         return '📈';
+      case AlertType.feedTypeChange:
+        return '🌾';
+      case AlertType.readyForSale:
+        return '✅';
       case AlertType.other:
         return 'ℹ️';
     }

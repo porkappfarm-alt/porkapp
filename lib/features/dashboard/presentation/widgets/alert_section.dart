@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:porkapp/features/dashboard/data/models/dashboard_alert.dart';
+import 'package:porkapp/features/dashboard/providers/dashboard_alerts_provider.dart';
 
 /// Sección de alertas para el dashboard
-class AlertSection extends StatelessWidget {
+class AlertSection extends ConsumerWidget {
   final List<DashboardAlert> alerts;
 
   const AlertSection({
@@ -12,7 +14,7 @@ class AlertSection extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (alerts.isEmpty) {
       return Card(
         elevation: 2,
@@ -68,15 +70,17 @@ class AlertSection extends StatelessWidget {
 
         // Then by alert type priority
         final typeOrder = {
-          AlertType.scheduledTask: 0,
-          AlertType.belowTargetWeight: 1,
-          AlertType.missingBiometry: 2,
-          AlertType.lowPerformance: 3,
-          AlertType.corralNearCapacity: 4,
-          AlertType.highMortality: 5,
-          AlertType.aboveTargetWeight: 6,
-          AlertType.upcomingSale: 7,
-          AlertType.other: 8,
+          AlertType.readyForSale: 0,
+          AlertType.feedTypeChange: 1,
+          AlertType.scheduledTask: 2,
+          AlertType.belowTargetWeight: 3,
+          AlertType.missingBiometry: 4,
+          AlertType.lowPerformance: 5,
+          AlertType.corralNearCapacity: 6,
+          AlertType.highMortality: 7,
+          AlertType.aboveTargetWeight: 8,
+          AlertType.upcomingSale: 9,
+          AlertType.other: 10,
         };
         return (typeOrder[a.type] ?? 99).compareTo(typeOrder[b.type] ?? 99);
       });
@@ -118,7 +122,27 @@ class AlertSection extends StatelessWidget {
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final alert = sortedAlerts[index];
-              return AlertTile(alert: alert);
+              return Dismissible(
+                key: Key(alert.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.green,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                confirmDismiss: (direction) async {
+                  await ref
+                      .read(alertsNotifierProvider.notifier)
+                      .markAsRead(alert.id);
+                  return true;
+                },
+                child: AlertTile(alert: alert),
+              );
             },
           ),
           if (sortedAlerts.length > 3)
@@ -146,7 +170,7 @@ class AlertSection extends StatelessWidget {
 }
 
 /// Tile individual de alerta
-class AlertTile extends StatelessWidget {
+class AlertTile extends ConsumerWidget {
   final DashboardAlert alert;
 
   const AlertTile({
@@ -177,74 +201,104 @@ class AlertTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = _getSeverityColor();
     final typeIcon = alert.type.icon;
 
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         if (alert.actionRoute != null) {
           context.push(alert.actionRoute!);
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+      child: Container(
+        color: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      typeIcon,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _getSeverityIcon(),
+                      color: color,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      alert.title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      alert.description,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () async {
+                  await ref
+                      .read(alertsNotifierProvider.notifier)
+                      .markAsRead(alert.id);
+                },
                 borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    typeIcon,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    _getSeverityIcon(),
-                    color: color,
-                    size: 16,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    alert.title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.green.withOpacity(0.3),
+                      width: 1,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    alert.description,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[700],
-                    ),
+                  child: const Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.green,
+                    size: 18,
                   ),
-                ],
+                ),
               ),
-            ),
-            if (alert.actionRoute != null)
-              Icon(
-                Icons.chevron_right,
-                color: Colors.grey[400],
-                size: 20,
-              ),
-          ],
+              if (alert.actionRoute != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey[400],
+                  size: 20,
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

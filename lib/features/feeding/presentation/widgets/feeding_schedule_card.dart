@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:porkapp/features/feeding/domain/feeding_schedule.dart';
+import 'package:porkapp/shared/design/colors.dart';
 
 /// Card para mostrar un registro de alimentación
 class FeedingScheduleCard extends StatelessWidget {
@@ -304,7 +305,7 @@ class FeedingScheduleCard extends StatelessWidget {
   Color _getFeedTypeColor(FeedType type) {
     switch (type) {
       case FeedType.preStarter:
-        return const Color(0xFF6B0338);
+        return PorkAppColors.secondary;
       case FeedType.starter:
         return const Color(0xFF8B1548);
       case FeedType.grower:

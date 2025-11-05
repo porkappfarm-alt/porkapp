@@ -37,7 +37,6 @@ class _UserManagementViewState extends ConsumerState<UserManagementView> {
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: StandardAppBar(
         title: 'Gestión de Usuarios',
-        automaticallyImplyLeading: false,
         actions: [
           // Filtro por rol
           PopupMenuButton<String?>(

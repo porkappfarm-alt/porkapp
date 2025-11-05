@@ -40,40 +40,54 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
 
   // Verificar si todos los animales tienen peso ingresado
   bool _allWeightsEntered(List<Animal> animals) {
+    if (animals.isEmpty) return false;
+
+    int validWeights = 0;
     for (final animal in animals) {
       final controller = _weightControllers[animal.id];
-      if (controller == null || controller.text.trim().isEmpty) {
-        return false;
-      }
-      final weight = double.tryParse(controller.text.trim());
-      if (weight == null || weight <= 0) {
-        return false;
+      if (controller != null) {
+        final weightText = controller.text.trim();
+        if (weightText.isNotEmpty) {
+          final weight = double.tryParse(weightText);
+          if (weight != null && weight > 0) {
+            validWeights++;
+          }
+        }
       }
     }
-    return animals.isNotEmpty; // Solo true si hay animales y todos tienen peso
+
+    // Consideramos válido si al menos hay un peso ingresado
+    return validWeights > 0;
   }
 
   // Verificar si hubo cambios en los pesos (para modo edición)
   bool _hasChanges() {
-    if (!isEditMode)
+    if (!isEditMode) {
       return true; // En modo creación, siempre permitir guardar si hay pesos
+    }
 
+    // En modo edición, verificar que al menos un peso sea diferente del original
+    bool hasAnyWeight = false;
     for (final entry in _weightControllers.entries) {
       final animalId = entry.key;
       final currentValue = entry.value.text.trim();
-      final originalValue = _originalWeights[animalId] ?? '';
 
-      if (currentValue != originalValue) {
-        return true; // Hubo al menos un cambio
+      // Verificar que hay al menos un peso ingresado
+      if (currentValue.isNotEmpty) {
+        hasAnyWeight = true;
+        final weight = double.tryParse(currentValue);
+        if (weight != null && weight > 0) {
+          return true; // Hay al menos un peso válido
+        }
       }
     }
-    return false; // No hubo cambios
+    return hasAnyWeight; // Retornar true si hay al menos un peso ingresado
   }
 
   void _updateButtonState(List<Animal> animals) {
-    final allEntered = _allWeightsEntered(animals);
-    final hasChanges = _hasChanges();
-    _buttonEnabled.value = allEntered && hasChanges;
+    // En cualquier modo (edición o creación), solo necesitamos verificar que haya al menos un peso válido
+    final hasValidWeights = _allWeightsEntered(animals);
+    _buttonEnabled.value = hasValidWeights;
   }
 
   @override
@@ -230,29 +244,30 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
             .eq('biometric_id', _biometricId!);
       }
 
-      // Paso 3: Insertar todos los pesos en lote
-      final measurementsToInsert = <Map<String, dynamic>>[];
-
-      for (final data in weightsToSave) {
-        final measurement = <String, dynamic>{
-          'biometric_id': _biometricId,
-          'animal_id': data['animal_id'] as String,
-          'weight': data['weight'] as double,
-          'previous_weight': data['previous_weight'] as double? ?? 0.0,
-        };
-
-        measurementsToInsert.add(measurement);
+      // Paso 3: Asegurarnos de que tenemos un ID de biometría válido
+      if (_biometricId == null || _biometricId!.isEmpty) {
+        throw Exception('No se pudo identificar la biometría a actualizar');
       }
+      print('Using biometric ID: $_biometricId'); // Para debug
+
+      // Paso 4: Insertar todos los pesos en lote
+      final measurementsToInsert = weightsToSave.map((data) => {
+        'biometric_id': _biometricId!,
+        'animal_id': data['animal_id'] as String,
+        'weight': data['weight'] as double,
+        'previous_weight': data['previous_weight'] as double? ?? 0.0,
+      }).toList();
 
       print('Inserting ${measurementsToInsert.length} measurements');
-      print(
-          'First measurement sample: ${measurementsToInsert.isNotEmpty ? measurementsToInsert.first : "none"}');
+      if (measurementsToInsert.isNotEmpty) {
+        print('First measurement sample: ${measurementsToInsert.first}');
+      }
 
       await Supabase.instance.client
           .from('biometric_measurements')
           .insert(measurementsToInsert);
 
-      // Paso 4: Calcular estadísticas básicas
+      // Paso 5: Calcular estadísticas básicas
       final avgWeight = weights.reduce((a, b) => a + b) / weights.length;
       final minWeight = weights.reduce((a, b) => a < b ? a : b);
       final maxWeight = weights.reduce((a, b) => a > b ? a : b);
@@ -298,18 +313,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
 
       final batchId = currentBiometric['batch_id'] as String;
 
-      // Paso 7: Marcar biometría anterior como inactiva si no estamos en modo edición
-      if (!isEditMode) {
-        // Marcar todas las biometrías activas anteriores como inactivas
-        await Supabase.instance.client
-            .from('batch_biometrics')
-            .update({'status': 'inactive'})
-            .eq('batch_id', batchId)
-            .eq('status', 'active')
-            .neq('id', _biometricId!);
-      }
-
-      // Paso 8: Actualizar la biometría actual como activa con todas las estadísticas
+      // Paso 7: Actualizar la biometría actual como activa con todas las estadísticas
       await Supabase.instance.client.from('batch_biometrics').update({
         'animals_measured': weights.length,
         'avg_weight': avgWeight,
@@ -320,12 +324,23 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         'status': 'active',
       }).eq('id', _biometricId!);
 
+      // Paso 8: Marcar las otras biometrías activas como inactivas
+      await Supabase.instance.client
+          .from('batch_biometrics')
+          .update({'status': 'inactive'})
+          .eq('batch_id', batchId)
+          .eq('status', 'active')
+          .neq('id', _biometricId!);  // No actualizar la biometría que acabamos de activar
+
       print('Biometric updated successfully');
 
       if (mounted) {
         // Refrescar el listado de biometrías usando el batchId que ya tenemos
+        // Invalidar el provider y esperar que se recargue
         ref.invalidate(batchBiometricsProvider(batchId));
+        final _ = await ref.refresh(batchBiometricsProvider(batchId).future);
 
+        // Mostrar mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(isEditMode
@@ -334,7 +349,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
             backgroundColor: Colors.green,
           ),
         );
-        context.pop();
+        // Retornar true para indicar que se completó exitosamente
+        context.pop(true);
       }
     } catch (e) {
       if (mounted) {

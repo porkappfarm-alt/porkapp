@@ -5,6 +5,7 @@ import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:porkapp/shared/design/app_styles.dart' as design;
 import '../../../batches/providers/batch_providers.dart';
 import '../../../animals/domain/animal.dart';
 import '../../providers/batch_biometrics_provider.dart';
@@ -251,11 +252,18 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
       print('Using biometric ID: $_biometricId'); // Para debug
 
       // Paso 4: Insertar todos los pesos en lote
-      final measurementsToInsert = weightsToSave.map((data) => {
-        'biometric_id': _biometricId!,
-        'animal_id': data['animal_id'] as String,
-        'weight': data['weight'] as double,
-        'previous_weight': data['previous_weight'] as double? ?? 0.0,
+      // Construir mediciones con los campos mínimos necesarios
+      final measurementsToInsert = weightsToSave.map((data) {
+        // Preparar el dato de peso anterior, asegurando que sea 0.0 si es null
+        final prevWeight = data['previous_weight'] as double?;
+        final previousWeight = prevWeight ?? 0.0;
+        
+        return {
+          'biometric_id': _biometricId,  // Supabase convertirá automáticamente el string a UUID
+          'animal_id': data['animal_id'],
+          'weight': data['weight'],
+          'previous_weight': previousWeight,
+        };
       }).toList();
 
       print('Inserting ${measurementsToInsert.length} measurements');
@@ -263,9 +271,14 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         print('First measurement sample: ${measurementsToInsert.first}');
       }
 
-      await Supabase.instance.client
-          .from('biometric_measurements')
-          .insert(measurementsToInsert);
+      try {
+        await Supabase.instance.client
+            .from('biometric_measurements')
+            .insert(measurementsToInsert);
+      } catch (e) {
+        print('Error inserting measurements: $e');
+        rethrow;
+      }
 
       // Paso 5: Calcular estadísticas básicas
       final avgWeight = weights.reduce((a, b) => a + b) / weights.length;
@@ -313,24 +326,41 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
 
       final batchId = currentBiometric['batch_id'] as String;
 
+      if (_biometricId == null) {
+        throw Exception('ID de biometría no válido');
+      }
+
+      final String biometricId =
+          _biometricId!; // Forzar non-null después de la verificación
+
       // Paso 7: Actualizar la biometría actual como activa con todas las estadísticas
-      await Supabase.instance.client.from('batch_biometrics').update({
+      final updateResult =
+          await Supabase.instance.client.rpc('update_biometry_status', params: {
+        'biometry_id': biometricId,
+        'new_status': 'active',
         'animals_measured': weights.length,
         'avg_weight': avgWeight,
         'min_weight': minWeight,
         'max_weight': maxWeight,
         'weight_std_dev': stdDev,
         'avg_adg': avgAdg,
-        'status': 'active',
-      }).eq('id', _biometricId!);
+      });
 
       // Paso 8: Marcar las otras biometrías activas como inactivas
-      await Supabase.instance.client
-          .from('batch_biometrics')
-          .update({'status': 'inactive'})
-          .eq('batch_id', batchId)
-          .eq('status', 'active')
-          .neq('id', _biometricId!);  // No actualizar la biometría que acabamos de activar
+      final inactivateResult = await Supabase.instance.client
+          .rpc('deactivate_other_biometries', params: {
+        'batch_id_param': batchId,
+        'current_biometry_id': biometricId,
+      });
+
+      if (updateResult.error != null) {
+        throw Exception(
+            'Error al actualizar biometría: ${updateResult.error!.message}');
+      }
+      if (inactivateResult.error != null) {
+        throw Exception(
+            'Error al desactivar otras biometrías: ${inactivateResult.error!.message}');
+      }
 
       print('Biometric updated successfully');
 
@@ -346,7 +376,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
             content: Text(isEditMode
                 ? 'Biometría actualizada exitosamente'
                 : 'Biometría finalizada exitosamente'),
-            backgroundColor: Colors.green,
+            backgroundColor: design.AppColors.verdeField,
           ),
         );
         // Retornar true para indicar que se completó exitosamente
@@ -357,7 +387,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: design.AppColors.error,
           ),
         );
       }
@@ -368,8 +398,42 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final headerTitleStyle = textTheme.titleLarge?.copyWith(
+          color: design.AppColors.textPrimary,
+          fontWeight: FontWeight.w700,
+        ) ??
+        const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: design.AppColors.textPrimary,
+        );
+    final chipTextStyle = textTheme.labelMedium?.copyWith(
+          color: design.AppColors.textSecondary,
+          fontWeight: FontWeight.w500,
+        ) ??
+        const TextStyle(
+          fontSize: 13,
+          color: design.AppColors.textSecondary,
+          fontWeight: FontWeight.w500,
+        );
+    final successChipTextStyle = chipTextStyle.copyWith(
+      color: design.AppColors.verdeField,
+      fontWeight: FontWeight.w600,
+    );
+    final identifierStyle = textTheme.titleMedium?.copyWith(
+          color: design.AppColors.textPrimary,
+          fontWeight: FontWeight.w700,
+        ) ??
+        const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: design.AppColors.textPrimary,
+        );
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: design.AppColors.backgroundPrimary,
       appBar: const StandardAppBar(
         title: 'Nueva Biometría',
       ),
@@ -379,7 +443,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const Icon(Icons.error_outline,
+                      size: 64, color: design.AppColors.error),
                   const SizedBox(height: 16),
                   Text('Error: ${error.toString()}'),
                 ],
@@ -401,12 +466,12 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.warning_amber_rounded,
-                          size: 64, color: Colors.grey[400]),
+                          size: 64, color: design.AppColors.warning),
                       const SizedBox(height: 16),
                       Text(
                         'No hay animales vivos en este lote',
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: design.AppColors.textSecondary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -424,15 +489,15 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                       margin: const EdgeInsets.all(16),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: design.AppColors.surfacePrimary,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFFFFE5EC),
-                          width: 2,
+                          color: design.AppColors.coral.withOpacity(0.25),
+                          width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFFF4D6D).withOpacity(0.08),
+                            color: design.AppColors.coral.withOpacity(0.12),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -450,18 +515,14 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                       width: 4,
                                       height: 4,
                                       decoration: const BoxDecoration(
-                                        color: Color(0xFFFF4D6D),
+                                        color: design.AppColors.coral,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
                                       batch.name,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2D3250),
-                                      ),
+                                      style: headerTitleStyle,
                                     ),
                                   ],
                                 ),
@@ -474,7 +535,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF5F5F5),
+                                        color:
+                                            design.AppColors.backgroundPrimary,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Row(
@@ -482,17 +544,14 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         children: [
                                           const Icon(Icons.calendar_today,
                                               size: 14,
-                                              color: Color(0xFF757575)),
+                                              color: design
+                                                  .AppColors.textSecondary),
                                           const SizedBox(width: 6),
                                           Text(
                                             dateFormat.format(
                                                 _measurementDate ??
                                                     DateTime.now()),
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Color(0xFF757575),
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                            style: chipTextStyle,
                                           ),
                                         ],
                                       ),
@@ -504,7 +563,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFE8F5E9),
+                                        color: design.AppColors.successLight
+                                            .withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Row(
@@ -512,15 +572,12 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                         children: [
                                           const Icon(Icons.pets,
                                               size: 14,
-                                              color: Color(0xFF4CAF50)),
+                                              color:
+                                                  design.AppColors.verdeField),
                                           const SizedBox(width: 6),
                                           Text(
                                             '${liveAnimals.length} animales',
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Color(0xFF4CAF50),
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                            style: successChipTextStyle,
                                           ),
                                         ],
                                       ),
@@ -564,15 +621,15 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: design.AppColors.surfacePrimary,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: const Color(0xFFE0E0E0),
+                                color: design.AppColors.borderLight,
                                 width: 1.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withOpacity(0.05),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -592,24 +649,23 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                             Container(
                                               padding: const EdgeInsets.all(6),
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFFE8F5E9),
+                                                color: design
+                                                    .AppColors.successLight
+                                                    .withOpacity(0.2),
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                               ),
                                               child: const Icon(
                                                 Icons.pets,
                                                 size: 16,
-                                                color: Color(0xFF4CAF50),
+                                                color:
+                                                    design.AppColors.verdeField,
                                               ),
                                             ),
                                             const SizedBox(width: 10),
                                             Text(
                                               '#${animal.identifier}',
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xFF2D3250),
-                                              ),
+                                              style: identifierStyle,
                                             ),
                                           ],
                                         ),
@@ -617,7 +673,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                           Text(
                                             'Peso anterior: ${animal.weight!.toStringAsFixed(1)} kg',
                                             style: TextStyle(
-                                              color: Colors.grey[600],
+                                              color: design
+                                                  .AppColors.textSecondary,
                                               fontSize: 14,
                                             ),
                                           ),
@@ -641,21 +698,22 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'Peso',
-                                        hintStyle: TextStyle(
-                                          color: Colors.grey[400],
+                                        hintStyle: const TextStyle(
+                                          color: design.AppColors.textDisabled,
                                         ),
                                         suffixText: 'kg',
                                         suffixStyle: const TextStyle(
-                                          color: Color(0xFF757575),
+                                          color: design.AppColors.textSecondary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         filled: true,
-                                        fillColor: const Color(0xFFFAFAFA),
+                                        fillColor:
+                                            design.AppColors.backgroundPrimary,
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           borderSide: const BorderSide(
-                                            color: Color(0xFFE0E0E0),
+                                            color: design.AppColors.borderLight,
                                             width: 2,
                                           ),
                                         ),
@@ -663,7 +721,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           borderSide: const BorderSide(
-                                            color: Color(0xFFE0E0E0),
+                                            color: design.AppColors.borderLight,
                                             width: 2,
                                           ),
                                         ),
@@ -671,7 +729,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           borderSide: const BorderSide(
-                                            color: Color(0xFFFF4D6D),
+                                            color: design.AppColors.coral,
                                             width: 2,
                                           ),
                                         ),
@@ -732,18 +790,17 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                           ? 'Actualizar'
                                           : 'Finalizar'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFFFF4D6D),
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: design.AppColors.coral,
+                                        foregroundColor: design.AppColors.white,
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 18),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
-                                        elevation: 0,
+                                        elevation: 1,
                                         disabledBackgroundColor:
-                                            Colors.grey[300],
+                                            design.AppColors.borderLight,
                                       ),
                                     ),
                                   ),
@@ -755,7 +812,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                                             ? 'Debes ingresar todos los pesos para actualizar'
                                             : 'Debes ingresar todos los pesos para finalizar',
                                         style: TextStyle(
-                                          color: Colors.orange[700],
+                                          color: design.AppColors.warning,
                                           fontSize: 12,
                                         ),
                                       ),

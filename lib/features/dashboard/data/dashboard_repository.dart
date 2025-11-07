@@ -340,6 +340,7 @@ class DashboardRepository {
           .from('batches')
           .select('id, name, animal_count')
           .eq('status', 'active');
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
 
       final batchesWithoutRecent = <Map<String, dynamic>>[];
 
@@ -374,11 +375,18 @@ class DashboardRepository {
   /// Obtiene corrales cerca de capacidad
   Future<List<Map<String, dynamic>>> _getCorralsNearCapacity() async {
     try {
+      final userId = _supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        return [];
+      }
+
       // Esta query necesita ser optimizada con una vista o función en la BD
       final corrals = await _supabase
           .from('corrals')
           .select('id, name, capacity, status')
-          .eq('status', 'ocupado');
+          .eq('status', 'ocupado')
+          .eq('created_by', userId); // Filtrar por usuario actual
 
       final corralsNear = <Map<String, dynamic>>[];
 
@@ -393,6 +401,7 @@ class DashboardRepository {
             .select('animal_count')
             .eq('corral_id', corralId)
             .eq('status', 'active');
+        // RLS filtra automáticamente por usuario vía is_corral_owner()
 
         int totalAnimals = 0;
         for (final batch in batches) {
@@ -448,10 +457,11 @@ class DashboardRepository {
       final batchProgressService = BatchProgressService(_supabase);
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -494,10 +504,11 @@ class DashboardRepository {
       final batchProgressService = BatchProgressService(_supabase);
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -541,10 +552,11 @@ class DashboardRepository {
       final batchProgressService = BatchProgressService(_supabase);
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -621,10 +633,11 @@ class DashboardRepository {
           (finalScheduleData.first['average_weight_kg'] as num).toDouble();
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -765,6 +778,7 @@ class DashboardRepository {
   /// Obtiene resumen de los últimos 3 lotes activos
   Future<List<BatchSummary>> getBatchSummaries({int limit = 3}) async {
     try {
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batches = await _supabase
           .from('batches')
           .select('''

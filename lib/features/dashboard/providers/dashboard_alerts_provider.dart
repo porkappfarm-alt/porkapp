@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/dashboard/data/dashboard_repository.dart';
 import 'package:porkapp/features/dashboard/data/models/dashboard_alert.dart';
 import 'package:porkapp/features/dashboard/data/read_alerts_service.dart';
@@ -10,6 +11,8 @@ final readAlertsServiceProvider = Provider<ReadAlertsService>((ref) {
 
 /// Provider para obtener todas las alertas (incluyendo leídas)
 final allAlertsProvider = FutureProvider<List<DashboardAlert>>((ref) async {
+  // Observar el estado de autenticación para reiniciar cuando cambie el usuario
+  ref.watch(authStateProvider);
   final repository = ref.watch(dashboardRepositoryProvider);
   return repository.getAlerts();
 });

@@ -6,8 +6,8 @@ import 'package:porkapp/features/dashboard/providers/dashboard_providers.dart';
 import 'package:porkapp/features/dashboard/domain/domain.dart';
 import 'package:porkapp/features/dashboard/widgets/stat_card.dart';
 import 'package:porkapp/features/auth/providers/current_user_provider.dart';
+import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/shared/design/colors.dart';
-import 'package:porkapp/supabase/supabase.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -35,7 +35,7 @@ class DashboardScreen extends ConsumerWidget {
               icon: Icon(Icons.logout_rounded, color: PorkAppColors.titleText),
               tooltip: 'Cerrar sesión',
               onPressed: () async {
-                await supabase.auth.signOut();
+                await ref.read(authStateProvider.notifier).signOut();
               },
             ),
           ),

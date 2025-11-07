@@ -22,7 +22,6 @@ final batchBiometricsProvider =
     final result = measurements.map((json) {
       print(
           '🔍 BatchBiometricsProvider: Mapping measurement id: ${json['id']}');
-      print('🔍 BatchBiometricsProvider: status value: ${json['status']}');
       print(
           '🔍 BatchBiometricsProvider: avg_weight value: ${json['avg_weight']} (type: ${json['avg_weight']?.runtimeType})');
       print(
@@ -40,7 +39,7 @@ final batchBiometricsProvider =
           'created_by': json['created_by'],
           'created_at': json['created_at'],
           'updated_at': json['updated_at'] ?? json['created_at'],
-          'status': json['status'],
+          'status': json['status'] ?? 'active',
           'batch_name': json['batchName'],
           'measurement_name': json['measurement_name'] ?? 'Medición semanal',
         });

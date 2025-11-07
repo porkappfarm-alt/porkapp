@@ -257,9 +257,10 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         // Preparar el dato de peso anterior, asegurando que sea 0.0 si es null
         final prevWeight = data['previous_weight'] as double?;
         final previousWeight = prevWeight ?? 0.0;
-        
+
         return {
-          'biometric_id': _biometricId,  // Supabase convertirá automáticamente el string a UUID
+          'biometric_id':
+              _biometricId, // Supabase convertirá automáticamente el string a UUID
           'animal_id': data['animal_id'],
           'weight': data['weight'],
           'previous_weight': previousWeight,
@@ -326,49 +327,33 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
 
       final batchId = currentBiometric['batch_id'] as String;
 
-      if (_biometricId == null) {
-        throw Exception('ID de biometría no válido');
+      // Paso 7: Marcar biometría anterior como inactiva si no estamos en modo edición
+      if (!isEditMode) {
+        // Marcar todas las biometrías activas anteriores como inactivas
+        await Supabase.instance.client
+            .from('batch_biometrics')
+            .update({'status': 'inactive'})
+            .eq('batch_id', batchId)
+            .eq('status', 'active')
+            .neq('id', _biometricId!);
       }
 
-      final String biometricId =
-          _biometricId!; // Forzar non-null después de la verificación
-
-      // Paso 7: Actualizar la biometría actual como activa con todas las estadísticas
-      final updateResult =
-          await Supabase.instance.client.rpc('update_biometry_status', params: {
-        'biometry_id': biometricId,
-        'new_status': 'active',
+      // Paso 8: Actualizar la biometría actual como activa con todas las estadísticas
+      await Supabase.instance.client.from('batch_biometrics').update({
         'animals_measured': weights.length,
         'avg_weight': avgWeight,
         'min_weight': minWeight,
         'max_weight': maxWeight,
         'weight_std_dev': stdDev,
         'avg_adg': avgAdg,
-      });
-
-      // Paso 8: Marcar las otras biometrías activas como inactivas
-      final inactivateResult = await Supabase.instance.client
-          .rpc('deactivate_other_biometries', params: {
-        'batch_id_param': batchId,
-        'current_biometry_id': biometricId,
-      });
-
-      if (updateResult.error != null) {
-        throw Exception(
-            'Error al actualizar biometría: ${updateResult.error!.message}');
-      }
-      if (inactivateResult.error != null) {
-        throw Exception(
-            'Error al desactivar otras biometrías: ${inactivateResult.error!.message}');
-      }
+        'status': 'active',
+      }).eq('id', _biometricId!);
 
       print('Biometric updated successfully');
 
       if (mounted) {
         // Refrescar el listado de biometrías usando el batchId que ya tenemos
-        // Invalidar el provider y esperar que se recargue
         ref.invalidate(batchBiometricsProvider(batchId));
-        final _ = await ref.refresh(batchBiometricsProvider(batchId).future);
 
         // Mostrar mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
@@ -376,18 +361,17 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
             content: Text(isEditMode
                 ? 'Biometría actualizada exitosamente'
                 : 'Biometría finalizada exitosamente'),
-            backgroundColor: design.AppColors.verdeField,
+            backgroundColor: Colors.green,
           ),
         );
-        // Retornar true para indicar que se completó exitosamente
-        context.pop(true);
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: design.AppColors.error,
+            backgroundColor: Colors.red,
           ),
         );
       }

@@ -11,9 +11,9 @@ final biometricsRepositoryProvider = Provider<BiometricsRepository>((ref) {
 
 class BiometricsRepository {
   final SupabaseClient _supabase;
-  static const String _batchMeasurementsTable = 'biometrics.batch_measurements';
-  static const String _animalMeasurementsTable = 'biometrics.animal_measurements';
-  static const String _measurementsView = 'biometrics.measurements_view';
+  static const String _batchMeasurementsTable = 'batch_biometrics';
+  static const String _animalMeasurementsTable = 'biometric_measurements';
+  static const String _measurementsView = 'measurements_view';
 
   BiometricsRepository(this._supabase);
 
@@ -84,7 +84,6 @@ class BiometricsRepository {
   }
 
   Future<List<BatchMeasurement>> getBatchMeasurements(String batchId) async {
-    print('🔍 Getting measurements for batch: $batchId');
     final response = await _supabase
         .from(_measurementsView)
         .select()
@@ -96,20 +95,12 @@ class BiometricsRepository {
   Future<AnimalMeasurement> createAnimalMeasurement(
       AnimalMeasurement measurement) async {
     try {
-      print('📝 Creating animal measurement:');
-      print('  - Batch Measurement ID: ${measurement.batchMeasurementId}');
-      print('  - Animal ID: ${measurement.animalId}');
-      print('  - Weight: ${measurement.weight}');
-      
-      final measurementData = {
-        ...measurement.toJson(),
-        'measurement_date': DateTime(
-          measurement.createdAt.year,
-          measurement.createdAt.month,
-          measurement.createdAt.day,
-        ).toIso8601String(),
-        'batch_measurement_id': measurement.batchMeasurementId,
-      };
+      final measurementData = measurement.toJson();
+      measurementData['measurement_date'] = DateTime(
+        measurement.createdAt.year,
+        measurement.createdAt.month,
+        measurement.createdAt.day,
+      ).toIso8601String();
 
       final response = await _supabase
           .from(_animalMeasurementsTable)
@@ -199,10 +190,6 @@ class BiometricsRepository {
 
   Future<BatchMeasurement?> getBatchMeasurement(String id) async {
     try {
-      print('🔍 Getting batch measurement:');
-      print('  - ID: $id');
-      print('  - ID Type: ${id.runtimeType}');
-      
       final response = await _supabase
           .from(_measurementsView)
           .select()

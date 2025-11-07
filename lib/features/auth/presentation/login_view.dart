@@ -278,32 +278,27 @@ class _LoginViewState extends ConsumerState<LoginView>
                             children: [
                               // Logo
                               Container(
-                                width: 96,
-                                height: 96,
+                                width: 104,
+                                height: 104,
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFFF07281),
-                                      Color(0xFFFF8A95),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
                                   shape: BoxShape.circle,
+                                  color: Colors.white,
                                   boxShadow: [
                                     BoxShadow(
                                       color: const Color(0xFFF07281)
-                                          .withOpacity(0.3),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 8),
+                                          .withOpacity(0.25),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 6),
                                     ),
                                   ],
                                 ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.pets,
-                                    size: 56,
-                                    color: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      'imagenes/logo.png',
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                 ),
                               ),

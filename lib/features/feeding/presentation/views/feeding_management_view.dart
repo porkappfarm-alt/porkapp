@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/feeding/domain/feeding_schedule.dart';
 import 'package:porkapp/features/feeding/providers/feeding_schedule_provider.dart';
 import 'package:porkapp/features/feeding/presentation/widgets/feeding_schedule_card.dart';
 import 'package:porkapp/features/feeding/presentation/widgets/feeding_schedule_form.dart';
+import 'package:porkapp/shared/design/colors.dart';
 
 class FeedingManagementView extends ConsumerStatefulWidget {
   const FeedingManagementView({super.key});
@@ -23,25 +25,16 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
         : ref.watch(feedingScheduleByTypeProvider(_filterType));
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Tabla de Alimentación',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+      backgroundColor: PorkAppColors.background,
+      appBar: StandardAppBar(
+        title: 'Tabla de Alimentación',
         actions: [
           // Filtro por tipo
           PopupMenuButton<FeedType?>(
             icon: Icon(
               Icons.filter_list,
               color: _filterType != null
-                  ? const Color(0xFF6B0338)
+                  ? PorkAppColors.primary
                   : Colors.black87,
             ),
             onSelected: (value) {
@@ -62,9 +55,7 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
           Container(
             margin: const EdgeInsets.only(right: 12, left: 4),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF5A6E), Color(0xFFFF7F8F)],
-              ),
+              gradient: PorkAppColors.gradientPrimary,
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -107,7 +98,7 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
           },
           loading: () => const Center(
             child: CircularProgressIndicator(
-              color: Color(0xFF6B0338),
+              color: PorkAppColors.primary,
             ),
           ),
           error: (error, stack) => Center(
@@ -117,7 +108,7 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
                 const Icon(
                   Icons.error_outline,
                   size: 64,
-                  color: Color(0xFFE53935),
+                  color: PorkAppColors.error,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -140,7 +131,7 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
                     ref.invalidate(feedingScheduleListProvider);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B0338),
+                    backgroundColor: PorkAppColors.primary,
                   ),
                   child: const Text('Reintentar'),
                 ),
@@ -160,13 +151,13 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFFF07281).withOpacity(0.1),
+              color: PorkAppColors.buttonSecondary,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.restaurant_menu,
               size: 64,
-              color: const Color(0xFFF07281).withOpacity(0.5),
+              color: PorkAppColors.primary.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 24),
@@ -175,7 +166,7 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF5D4037),
+              color: PorkAppColors.titleText,
             ),
           ),
           const SizedBox(height: 12),
@@ -183,19 +174,17 @@ class _FeedingManagementViewState extends ConsumerState<FeedingManagementView> {
             'Crea un nuevo registro para comenzar',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[600],
+              color: PorkAppColors.secondaryText,
             ),
           ),
           const SizedBox(height: 32),
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF5A6E), Color(0xFFFF7F8F)],
-              ),
+              gradient: PorkAppColors.gradientPrimary,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF5A6E).withOpacity(0.4),
+                  color: PorkAppColors.primary.withOpacity(0.35),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),

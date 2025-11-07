@@ -247,10 +247,15 @@ class _BatchBiometricsViewState extends ConsumerState<BatchBiometricsView> {
                       if (biometrics.isNotEmpty)
                         GestureDetector(
                           onTap: () {
-                            // Navegar al detalle de pesos de la última biometría
-                            context.push(
-                              '/batches/${widget.batchId}/biometrics/${biometrics.first.id}/weights',
-                            );
+                            // Solo permitir editar si es activa o pending
+                            final firstBiometric = biometrics.first;
+                            if (firstBiometric.status == 'active' ||
+                                firstBiometric.status == 'pending') {
+                              // Navegar al formulario para agregar/editar pesos
+                              context.push(
+                                '/batches/${widget.batchId}/biometrics/${firstBiometric.id}/weights',
+                              );
+                            }
                           },
                           child: Container(
                             margin: const EdgeInsets.fromLTRB(16, 20, 16, 16),
@@ -282,7 +287,7 @@ class _BatchBiometricsViewState extends ConsumerState<BatchBiometricsView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Badge "Última Medición"
+                                // Badge con estado de la biometría
                                 Row(
                                   children: [
                                     Container(
@@ -291,21 +296,37 @@ class _BatchBiometricsViewState extends ConsumerState<BatchBiometricsView> {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF07281),
+                                        color:
+                                            biometrics.first.status == 'active'
+                                                ? const Color(0xFFF07281)
+                                                : biometrics.first.status ==
+                                                        'pending'
+                                                    ? const Color(0xFFFFA726)
+                                                    : Colors.grey,
                                         borderRadius: BorderRadius.circular(20),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
-                                            Icons.access_time,
+                                            biometrics.first.status == 'active'
+                                                ? Icons.check_circle
+                                                : biometrics.first.status ==
+                                                        'pending'
+                                                    ? Icons.pending
+                                                    : Icons.lock,
                                             size: 14,
                                             color: Colors.white,
                                           ),
-                                          SizedBox(width: 6),
+                                          const SizedBox(width: 6),
                                           Text(
-                                            'ÚLTIMA MEDICIÓN',
-                                            style: TextStyle(
+                                            biometrics.first.status == 'active'
+                                                ? 'ACTIVA'
+                                                : biometrics.first.status ==
+                                                        'pending'
+                                                    ? 'PENDIENTE'
+                                                    : 'HISTÓRICA',
+                                            style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 11,
                                               fontWeight: FontWeight.w800,
@@ -316,19 +337,23 @@ class _BatchBiometricsViewState extends ConsumerState<BatchBiometricsView> {
                                       ),
                                     ),
                                     const Spacer(),
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF07281)
-                                            .withOpacity(0.1),
-                                        shape: BoxShape.circle,
+                                    if (biometrics.first.status == 'active' ||
+                                        biometrics.first.status == 'pending')
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF07281)
+                                              .withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          biometrics.first.status == 'active'
+                                              ? Icons.edit_outlined
+                                              : Icons.add,
+                                          size: 20,
+                                          color: const Color(0xFFF07281),
+                                        ),
                                       ),
-                                      child: const Icon(
-                                        Icons.arrow_forward_rounded,
-                                        size: 20,
-                                        color: Color(0xFFF07281),
-                                      ),
-                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 20),

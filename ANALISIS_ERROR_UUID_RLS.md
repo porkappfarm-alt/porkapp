@@ -3,15 +3,17 @@
 ## 🔍 PROBLEMA IDENTIFICADO
 
 ### Error Original
+
 ```
-PostgrestException(message: operator does not exist: uuid = text, 
-code: 42883, 
-details: Not Found, 
-hint: No operator matches the given name and argument types. 
+PostgrestException(message: operator does not exist: uuid = text,
+code: 42883,
+details: Not Found,
+hint: No operator matches the given name and argument types.
 You might need to add explicit type casts.)
 ```
 
 ### Contexto
+
 El error ocurría al intentar insertar registros en la tabla `biometric_measurements` desde Flutter usando Supabase.
 
 ## 🎯 CAUSA RAÍZ
@@ -35,6 +37,7 @@ WITH CHECK (
 ```
 
 **Durante el INSERT:**
+
 1. PostgreSQL intenta evaluar el `WITH CHECK` ANTES de que la fila exista en la tabla
 2. El valor `biometric_measurements.biometric_id` es el valor que SE VA A INSERTAR (nuevo)
 3. PostgreSQL intenta hacer JOIN entre `batch_biometrics.id` (UUID existente) y `biometric_measurements.biometric_id` (valor nuevo del INSERT)
@@ -44,10 +47,12 @@ WITH CHECK (
 ### Por Qué Ocurre
 
 Según la documentación de Supabase y casos similares en GitHub:
+
 - **Issue #29836**: "Storage owner_id is typed as text instead of uuid, preventing RLS-policies"
 - **Issue #7962**: "auth.uid() policy fails when user_id is an Auth0 string id"
 
 El problema surge cuando:
+
 1. Hay políticas RLS con subqueries que referencian la tabla siendo modificada
 2. PostgreSQL no puede inferir correctamente los tipos durante la evaluación de `WITH CHECK`
 3. Especialmente cuando hay foreign keys involucradas
@@ -66,7 +71,7 @@ STABLE
 AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 
+    SELECT 1
     FROM public.batch_biometrics
     WHERE id = biometric_uuid
       AND created_by = auth.uid()
@@ -76,6 +81,7 @@ $$;
 ```
 
 **Por qué funciona:**
+
 - ✅ Recibe el UUID directamente como parámetro (tipo explícito)
 - ✅ `SECURITY DEFINER` ejecuta con privilegios del creador (bypass RLS interno)
 - ✅ `STABLE` indica que el resultado no cambia durante la transacción
@@ -94,6 +100,7 @@ WITH CHECK (
 ```
 
 **Ventajas:**
+
 - ✅ Política simple y legible
 - ✅ Sin subqueries complejos en WITH CHECK
 - ✅ PostgreSQL puede evaluar fácilmente la función
@@ -105,15 +112,18 @@ WITH CHECK (
 ### Mejores Prácticas de Supabase RLS
 
 1. **Usar funciones SECURITY DEFINER para lógica compleja**
+
    - Fuente: Guía oficial de RLS de Supabase
    - Evita overhead de evaluación por cada fila
 
 2. **Wrapping auth.uid() en SELECT**
+
    - `(select auth.uid())` en lugar de `auth.uid()`
    - Optimiza el plan de ejecución (initPlan)
    - Cachea el resultado por statement
 
 3. **Especificar roles con TO**
+
    - `TO authenticated` en lugar de verificar `auth.role()`
    - Mejor rendimiento y seguridad
 
@@ -124,15 +134,19 @@ WITH CHECK (
 ## 🔧 MIGRACIONES APLICADAS
 
 ### Migración 1: Intento de Fix con Casts Explícitos
+
 ❌ No funcionó - El problema no era el casting
 
 ### Migración 2: Cleanup de Políticas Duplicadas
+
 ✅ Parcial - Removió políticas conflictivas pero no resolvió el problema
 
 ### Migración 3: Solución Final con Función Helper
+
 ✅ **EXITOSA** - Resolvió completamente el problema
 
 **Archivos:**
+
 - `20251107040000_fix_biometric_measurements_rls_uuid_cast.sql`
 - `20251107041000_cleanup_biometric_measurements_policies.sql`
 - `20251107042000_final_fix_biometric_measurements_rls_with_helper_function.sql`
@@ -140,13 +154,16 @@ WITH CHECK (
 ## 🎓 LECCIONES APRENDIDAS
 
 1. **Los errores de tipo no siempre son lo que parecen**
+
    - El error decía "uuid = text" pero el problema era la evaluación de WITH CHECK
 
 2. **WITH CHECK es diferente a USING**
+
    - `USING` evalúa filas EXISTENTES
    - `WITH CHECK` evalúa valores NUEVOS (durante INSERT/UPDATE)
 
 3. **SECURITY DEFINER es poderoso para RLS**
+
    - Permite encapsular lógica compleja
    - Mejora rendimiento
    - Evita problemas de evaluación de tipos
@@ -159,22 +176,23 @@ WITH CHECK (
 ## ✅ VERIFICACIÓN
 
 ### Tests Realizados
+
 ```sql
 -- 1. Verificar función creada
-SELECT routine_name, security_type 
-FROM information_schema.routines 
+SELECT routine_name, security_type
+FROM information_schema.routines
 WHERE routine_name = 'is_biometric_owner';
 -- ✅ Resultado: DEFINER
 
 -- 2. Verificar políticas
-SELECT policyname, cmd 
-FROM pg_policies 
+SELECT policyname, cmd
+FROM pg_policies
 WHERE tablename = 'biometric_measurements';
 -- ✅ Resultado: 5 políticas (SELECT, INSERT, UPDATE, DELETE, ALL)
 
 -- 3. Verificar tipos de columnas
-SELECT column_name, data_type 
-FROM information_schema.columns 
+SELECT column_name, data_type
+FROM information_schema.columns
 WHERE table_name = 'biometric_measurements';
 -- ✅ Resultado: Todos los IDs son UUID
 ```
@@ -184,6 +202,7 @@ WHERE table_name = 'biometric_measurements';
 **Estado:** ✅ PROBLEMA RESUELTO COMPLETAMENTE
 
 **Cambios Implementados:**
+
 1. ✅ Función helper `is_biometric_owner(UUID)` creada
 2. ✅ Todas las políticas RLS simplificadas usando la función
 3. ✅ Permisos otorgados correctamente
@@ -191,6 +210,7 @@ WHERE table_name = 'biometric_measurements';
 5. ✅ Sin políticas duplicadas o conflictivas
 
 **Próximo Paso:**
+
 - Hot restart de la aplicación Flutter
 - Probar inserción de mediciones biométricas
 - Debería funcionar sin errores

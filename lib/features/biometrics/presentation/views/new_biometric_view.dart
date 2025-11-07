@@ -35,6 +35,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
   String? _biometricId;
   DateTime? _measurementDate;
   bool _isSaving = false;
+  bool _isLoadingData = false;
   final dateFormat = DateFormat('dd/MM/yyyy');
 
   bool get isEditMode => widget.biometricId != null;
@@ -61,30 +62,6 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
     return validWeights > 0;
   }
 
-  // Verificar si hubo cambios en los pesos (para modo edición)
-  bool _hasChanges() {
-    if (!isEditMode) {
-      return true; // En modo creación, siempre permitir guardar si hay pesos
-    }
-
-    // En modo edición, verificar que al menos un peso sea diferente del original
-    bool hasAnyWeight = false;
-    for (final entry in _weightControllers.entries) {
-      final animalId = entry.key;
-      final currentValue = entry.value.text.trim();
-
-      // Verificar que hay al menos un peso ingresado
-      if (currentValue.isNotEmpty) {
-        hasAnyWeight = true;
-        final weight = double.tryParse(currentValue);
-        if (weight != null && weight > 0) {
-          return true; // Hay al menos un peso válido
-        }
-      }
-    }
-    return hasAnyWeight; // Retornar true si hay al menos un peso ingresado
-  }
-
   void _updateButtonState(List<Animal> animals) {
     // En cualquier modo (edición o creación), solo necesitamos verificar que haya al menos un peso válido
     final hasValidWeights = _allWeightsEntered(animals);
@@ -95,8 +72,18 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
   void initState() {
     super.initState();
     _biometricId = widget.biometricId;
-    _loadBiometricData();
-    _loadPreviousWeights();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    if (_biometricId != null) {
+      setState(() => _isLoadingData = true);
+      await _loadBiometricData();
+      await _loadPreviousWeights();
+      setState(() => _isLoadingData = false);
+    } else {
+      await _loadPreviousWeights();
+    }
   }
 
   Future<void> _loadBiometricData() async {
@@ -118,6 +105,8 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
           .select()
           .eq('biometric_id', _biometricId!);
 
+      print('📊 Cargando ${savedMeasurements.length} mediciones guardadas');
+
       for (final measurement in savedMeasurements) {
         final animalId = measurement['animal_id'];
         final weightText = measurement['weight']?.toString() ?? '';
@@ -126,9 +115,11 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         );
         // Guardar el valor original para detectar cambios
         _originalWeights[animalId] = weightText;
+        print('📊 Peso cargado para animal $animalId: $weightText kg');
       }
+      print('✅ Controladores creados: ${_weightControllers.length}');
     } catch (e) {
-      print('Error loading biometric data: $e');
+      print('❌ Error loading biometric data: $e');
     }
   }
 
@@ -429,9 +420,11 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
     return Scaffold(
       backgroundColor: design.AppColors.backgroundPrimary,
       appBar: const StandardAppBar(
-        title: 'Nueva Biometría',
+        title: 'Pesos de la biometría',
       ),
-      body: ref.watch(batchProvider(widget.initialBatchId)).when(
+      body: _isLoadingData
+          ? const Center(child: CircularProgressIndicator())
+          : ref.watch(batchProvider(widget.initialBatchId)).when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stack) => Center(
               child: Column(
@@ -594,23 +587,30 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
                           final animal = liveAnimals[index];
                           final animalId = animal.id;
 
-                          // Initialize controllers and focus nodes
+                          // Initialize controllers and focus nodes if they don't exist
                           if (!_weightControllers.containsKey(animalId)) {
                             _weightControllers[animalId] =
                                 TextEditingController();
-                            _focusNodes[animalId] = FocusNode();
-
+                            
                             // Guardar valor original vacío para animales sin peso previo
                             if (isEditMode &&
                                 !_originalWeights.containsKey(animalId)) {
                               _originalWeights[animalId] = '';
                             }
-
-                            // Add listener to update button state when text changes
-                            _weightControllers[animalId]!.addListener(() {
-                              _updateButtonState(liveAnimals);
-                            });
                           }
+
+                          // Ensure focus node exists
+                          if (!_focusNodes.containsKey(animalId)) {
+                            _focusNodes[animalId] = FocusNode();
+                          }
+
+                          // Add listener to update button state when text changes
+                          // (remove existing listener first to avoid duplicates)
+                          final controller = _weightControllers[animalId]!;
+                          controller.removeListener(() => _updateButtonState(liveAnimals));
+                          controller.addListener(() {
+                            _updateButtonState(liveAnimals);
+                          });
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),

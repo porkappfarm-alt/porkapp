@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/users/data/user_repository.dart';
 import 'package:porkapp/features/users/domain/user_profile.dart';
 
 /// Provider para la lista de usuarios
 final usersListProvider = FutureProvider<List<UserProfile>>((ref) async {
+  // Observar el estado de autenticación para reiniciar cuando cambie el usuario
+  ref.watch(authStateProvider);
   final repository = ref.watch(userRepositoryProvider);
   return repository.getAllUsers();
 });

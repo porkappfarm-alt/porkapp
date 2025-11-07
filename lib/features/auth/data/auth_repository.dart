@@ -12,19 +12,7 @@ class AuthRepository {
     print('AuthRepository: Email: $email');
 
     try {
-      // Primero intentamos registrar al usuario si no existe
-      try {
-        print('AuthRepository: Intentando registrar usuario...');
-        await supabase.auth.signUp(
-          email: email,
-          password: password,
-        );
-        print('AuthRepository: Registro exitoso o usuario ya existe');
-      } catch (signUpError) {
-        print('AuthRepository: Error o usuario ya existe: $signUpError');
-      }
-
-      // Luego intentamos iniciar sesión
+      // Intentar iniciar sesión directamente
       final response = await supabase.auth.signInWithPassword(
         email: email,
         password: password,
@@ -44,11 +32,22 @@ class AuthRepository {
       print('AuthRepository: Error de login - $e');
       print('AuthRepository: Tipo de error - ${e.runtimeType}');
 
-      if (e.toString().contains('Invalid login credentials')) {
+      if (e is AuthException) {
+        // Manejo específico de errores de Supabase
+        if (e.message.contains('Invalid login credentials') ||
+            e.message.contains('invalid_credentials')) {
+          throw 'Email o contraseña incorrectos';
+        } else if (e.message.contains('Email not confirmed')) {
+          throw 'Por favor confirme su email antes de iniciar sesión';
+        } else {
+          throw 'Error de autenticación: ${e.message}';
+        }
+      } else if (e.toString().contains('Invalid login credentials')) {
         throw 'Email o contraseña incorrectos';
       } else if (e.toString().contains('Email not confirmed')) {
         throw 'Por favor confirme su email antes de iniciar sesión';
-      } else if (e.toString().contains('Network error')) {
+      } else if (e.toString().contains('Network error') ||
+          e.toString().contains('SocketException')) {
         throw 'Error de conexión. Por favor verifica tu conexión a internet.';
       } else {
         throw 'Error de autenticación: ${e.toString()}';

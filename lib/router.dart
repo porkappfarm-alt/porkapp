@@ -13,7 +13,7 @@ import 'package:porkapp/features/batches/presentation/batches_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_detail_view.dart';
 import 'package:porkapp/features/batches/presentation/views/batch_animals_view.dart';
 import 'package:porkapp/features/animals/presentation/views/animal_detail_view.dart';
-import 'package:porkapp/features/biometrics/presentation/views/batch_biometric_detail_view.dart';
+import 'package:porkapp/features/biometrics/presentation/views/batch_biometrics_view.dart';
 import 'package:porkapp/features/biometrics/presentation/views/new_biometric_view.dart';
 import 'package:porkapp/shared/design/bottom_nav_bar.dart';
 import 'package:porkapp/features/batches/presentation/create_batch_view.dart';
@@ -120,14 +120,6 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) async {
       final userRoleAsync = ref.watch(userRoleProvider);
 
-      // Espera a que el provider de rol esté resuelto antes de redirigir
-      if (userRoleAsync.isLoading) {
-        print('[router] userRoleProvider is loading...');
-        return null;
-      }
-      final userRole = userRoleAsync.asData?.value ?? 'guest';
-      print('[router] userRole: \x1B[35m$userRole\x1B[0m');
-
       _printRouteInfo('Current auth state: $authState');
       _printRouteInfo('Current path: ${state.uri.path}');
       _printRouteInfo('Full URI: ${state.uri}');
@@ -139,10 +131,35 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Handle authentication states
       switch (authState) {
         case AuthState.initial:
-          return '/login';
+          // El estado inicial ahora se resuelve sincrónicamente,
+          // pero si por alguna razón llegamos aquí, no redirigir
+          _printRouteInfo(
+              'Auth state is initial (unexpected), staying on current route');
+          return null;
+
         case AuthState.unauthenticated:
+          // Si no está autenticado, redirigir a login a menos que ya esté ahí
           return goingToLogin ? null : '/login';
+
         case AuthState.authenticated:
+          // Si está en login y autenticado, esperar un momento antes de redirigir
+          // para evitar parpadeos durante el proceso de autenticación
+          if (goingToLogin) {
+            _printRouteInfo(
+                'Authenticated at login, redirecting to dashboard...');
+            // Dar tiempo para que la UI se estabilice
+            await Future.delayed(const Duration(milliseconds: 50));
+            return '/dashboard';
+          }
+
+          // Espera a que el provider de rol esté resuelto antes de redirigir
+          if (userRoleAsync.isLoading) {
+            print('[router] userRoleProvider is loading...');
+            return null;
+          }
+          final userRole = userRoleAsync.asData?.value ?? 'guest';
+          print('[router] userRole: \x1B[35m$userRole\x1B[0m');
+
           // Verificar si el usuario necesita cambiar la contraseña
           try {
             final authRepo = ref.read(authRepositoryProvider);
@@ -166,12 +183,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             print('[router] Redirigiendo a dashboard por rol: $userRole');
             return '/dashboard';
           }
+
+          // Redirigir a dashboard si está en la raíz
           if (currentLocation == '/') {
             return '/dashboard';
           }
-          if (goingToLogin) {
-            return '/dashboard';
-          }
+
           return null;
       }
     },
@@ -276,7 +293,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                         parentNavigatorKey: _rootNavigatorKey,
                         builder: (context, state) {
                           final batchId = state.pathParameters['batchId'] ?? '';
-                          return BatchBiometricDetailView(batchId: batchId);
+                          return BatchBiometricsView(batchId: batchId);
                         },
                         routes: [
                           GoRoute(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:porkapp/features/auth/data/auth_repository.dart';
+import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/router.dart';
 
 class ChangePasswordView extends ConsumerStatefulWidget {
@@ -52,7 +53,7 @@ class _ChangePasswordViewState extends ConsumerState<ChangePasswordView> {
         await Future.delayed(const Duration(seconds: 1));
 
         // Cerrar sesión para forzar re-autenticación con la nueva contraseña
-        await Supabase.instance.client.auth.signOut();
+        await ref.read(authStateProvider.notifier).signOut();
 
         // Navegar al login
         if (mounted) {

@@ -59,6 +59,10 @@ class _LoginViewState extends ConsumerState<LoginView>
               email: _emailController.text.trim(),
               password: _passwordController.text,
             );
+
+        // Esperar un pequeño momento para que el estado de auth se actualice
+        // y evitar parpadeos en la navegación
+        await Future.delayed(const Duration(milliseconds: 100));
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -232,54 +236,74 @@ class _LoginViewState extends ConsumerState<LoginView>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginControllerProvider);
-    final authState = ref.watch(authStateProvider);
     final size = MediaQuery.of(context).size;
     final horizontalPadding = size.width > 600 ? (size.width - 600) / 2 : 16.0;
 
     // Si el usuario está autenticado, redirigir al dashboard
-    if (authState == AuthState.authenticated) {
-      print('LoginView: Usuario autenticado, redirigiendo al dashboard...');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          context.go('/dashboard');
-        }
-      });
-    }
+    // Usar ref.listen para evitar múltiples callbacks en cada build
+    ref.listen(authStateProvider, (previous, next) {
+      if (next == AuthState.authenticated) {
+        print('LoginView: Usuario autenticado, redirigiendo al dashboard...');
+        // Usar Future.microtask para asegurar que se ejecute después del build
+        Future.microtask(() {
+          if (context.mounted) {
+            context.go('/dashboard');
+          }
+        });
+      }
+    });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: FadeTransition(
-                opacity: _fadeInAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Card(
-                    elevation: 8,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 400),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final availableHeight = constraints.maxHeight;
+            final isCompact = availableHeight < 700;
+
+            // Calculate keyboard visibility inside builder to avoid unnecessary rebuilds
+            final viewInsets = MediaQuery.of(context).viewInsets;
+            final keyboardVisible = viewInsets.bottom > 0;
+
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+              physics: const ClampingScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: keyboardVisible ? 8 : (isCompact ? 10 : 14),
+                ),
+                child: FadeTransition(
+                  opacity: _fadeInAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: AutofillGroup(
                         child: Form(
                           key: _formKey,
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Logo
+                              // Espaciado superior (variable según estado)
+                              SizedBox(
+                                  height: keyboardVisible
+                                      ? 8
+                                      : (isCompact ? 30 : 50)),
+
+                              // Logo (más pequeño con teclado o pantalla compacta)
                               Container(
-                                width: 104,
-                                height: 104,
+                                width: keyboardVisible
+                                    ? 48
+                                    : (isCompact ? 56 : 70),
+                                height: keyboardVisible
+                                    ? 48
+                                    : (isCompact ? 56 : 70),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.white,
@@ -302,51 +326,66 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              SizedBox(
+                                  height: keyboardVisible
+                                      ? 6
+                                      : (isCompact ? 8 : 12)),
 
                               // Título
                               Text(
                                 'PorkApp',
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: keyboardVisible
+                                      ? 18
+                                      : (isCompact ? 22 : 28),
                                   fontWeight: FontWeight.bold,
                                   color: const Color(0xFF5D4037),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(
+                                  height: keyboardVisible
+                                      ? 1
+                                      : (isCompact ? 2 : 4)),
 
-                              Text(
-                                'Criadero San Andrés',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF4CAF50),
+                              // Subtítulo (ocultar con teclado si es compacto)
+                              if (!keyboardVisible || !isCompact)
+                                Text(
+                                  'Criadero San Andrés',
+                                  style: TextStyle(
+                                    fontSize: isCompact ? 11 : 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF4CAF50),
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 32),
+                              SizedBox(
+                                  height: keyboardVisible
+                                      ? 8
+                                      : (isCompact ? 14 : 22)),
 
-                              Text(
-                                'Bienvenido de nuevo',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF5D4037),
+                              // Mensajes de bienvenida (ocultar con teclado)
+                              if (!keyboardVisible) ...[
+                                Text(
+                                  'Bienvenido de nuevo',
+                                  style: TextStyle(
+                                    fontSize: isCompact ? 15 : 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF5D4037),
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-
-                              Text(
-                                'Ingresa tus credenciales para continuar',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
+                                SizedBox(height: isCompact ? 4 : 8),
+                                Text(
+                                  'Ingresa tus credenciales para continuar',
+                                  style: TextStyle(
+                                    fontSize: isCompact ? 11 : 13,
+                                    color: Colors.grey[600],
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 32),
+                                SizedBox(height: isCompact ? 14 : 22),
+                              ],
 
                               // Email label
                               Align(
@@ -421,7 +460,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: isCompact ? 10 : 16),
 
                               // Password label
                               Align(
@@ -511,11 +550,14 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 28),
+                              SizedBox(
+                                  height: keyboardVisible
+                                      ? 12
+                                      : (isCompact ? 16 : 28)),
 
                               // Login button
                               SizedBox(
-                                height: 56,
+                                height: isCompact ? 48 : 56,
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
@@ -570,23 +612,26 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: isCompact ? 10 : 16),
 
-                              // Forgot password button
-                              Center(
-                                child: TextButton(
-                                  onPressed: () => _showForgotPasswordDialog(),
-                                  child: Text(
-                                    '¿Olvidaste tu contraseña?',
-                                    style: TextStyle(
-                                      color: const Color(0xFF4CAF50),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                              // Forgot password button (hide on keyboard)
+                              if (!keyboardVisible)
+                                Center(
+                                  child: TextButton(
+                                    onPressed: () =>
+                                        _showForgotPasswordDialog(),
+                                    child: Text(
+                                      '¿Olvidaste tu contraseña?',
+                                      style: TextStyle(
+                                        color: const Color(0xFF4CAF50),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
+                              if (!keyboardVisible)
+                                SizedBox(height: isCompact ? 4 : 8),
 
                               // Error Message
                               if (loginState.hasError)
@@ -600,50 +645,14 @@ class _LoginViewState extends ConsumerState<LoginView>
                                     ),
                                   ),
                                 ),
-                              const SizedBox(height: 8),
+                              if (loginState.hasError)
+                                SizedBox(height: isCompact ? 4 : 8),
 
-                              // Footer links
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.help_outline,
-                                    size: 16,
-                                    color: Colors.grey[600],
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '¿Necesitas ayuda?',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
-
-                              // Footer note
-                              Container(
-                                padding: const EdgeInsets.only(top: 24),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    top: BorderSide(
-                                      color: Colors.grey[200]!,
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Gestión integral para tu criadero porcino',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[400],
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                              // Espaciado inferior (variable según estado)
+                              SizedBox(
+                                  height: keyboardVisible
+                                      ? 16
+                                      : (isCompact ? 30 : 50)),
                             ],
                           ),
                         ),
@@ -652,14 +661,14 @@ class _LoginViewState extends ConsumerState<LoginView>
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
-          padding: const EdgeInsets.all(16),
-          color: const Color(0xFFF5F5F5),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          color: Colors.white,
           child: Text(
             'Criadero San Andrés © 2025',
             style: TextStyle(

@@ -21,12 +21,13 @@ class BiometricsDataSource {
       print('🔍 BiometricsDataSource: Fetching data for batch: $batchId');
 
       // Usar inner join para asegurar que el batch existe y está activo
-      // Solo obtener biometrías activas (no pending)
+      // Obtener biometrías activas Y pendientes (para mostrar las que se están completando)
       final response = await _client
           .from('batch_biometrics')
           .select('*, batches!inner(name, status)')
           .eq('batch_id', batchId) // SIEMPRE filtrar por batch_id
-          .eq('status', 'active') // Solo biometrías activas
+          .inFilter('status',
+              ['active', 'pending']) // Biometrías activas y pendientes
           .order('measurement_date', ascending: false);
 
       print(

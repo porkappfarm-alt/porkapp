@@ -17,7 +17,7 @@ class DashboardView extends ConsumerWidget {
     final batchSummariesAsync = ref.watch(batchSummariesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FF), // Fondo con tinte azulado suave
+      backgroundColor: Colors.white,
       appBar: StandardAppBar(
         title: 'Dashboard',
         automaticallyImplyLeading: false,
@@ -25,11 +25,22 @@ class DashboardView extends ConsumerWidget {
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFFEF0F1), // Fondo rosa muy suave
+              gradient: const LinearGradient(
+                colors: [Color(0xFFF07281), Color(0xFFFF9AA2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFF07281).withOpacity(0.25),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.refresh, color: Color(0xFFF07281)),
+              icon: const Icon(Icons.refresh, color: Colors.white),
               onPressed: () {
                 ref.invalidate(dashboardAlertsProvider);
                 ref.invalidate(batchSummariesProvider);
@@ -45,17 +56,20 @@ class DashboardView extends ConsumerWidget {
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const WelcomeCard(),
-              const SizedBox(height: 16),
+              WelcomeCard(
+                onTap: () => context.go('/profile'),
+              ),
+              const SizedBox(height: 20),
               _SectionHeader(
                 title: 'Alertas',
                 icon: Icons.notifications_active,
+                accentColor: const Color(0xFFF07281),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               alertsAsync.when(
                 data: (alerts) => AlertSection(alerts: alerts),
                 loading: () => const _LoadingCard(),
@@ -64,14 +78,15 @@ class DashboardView extends ConsumerWidget {
                   error: error.toString(),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               _SectionHeader(
                 title: 'Lotes Activos',
                 icon: Icons.inventory_2,
+                accentColor: const Color(0xFFFF9AA2),
                 actionLabel: 'Ver todos',
                 onActionTap: () => context.go('/batches'),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               batchSummariesAsync.when(
                 data: (batches) {
                   if (batches.isEmpty) {
@@ -81,9 +96,9 @@ class DashboardView extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 15,
-                            offset: const Offset(0, 4),
+                            color: const Color(0xFFF07281).withOpacity(0.18),
+                            blurRadius: 20,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -94,14 +109,21 @@ class DashboardView extends ConsumerWidget {
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF8F9FF),
-                                  borderRadius: BorderRadius.circular(16),
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color(0xFFF07281),
+                                      Color(0xFFFF9AA2),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
                                   Icons.inventory_2_outlined,
                                   size: 48,
-                                  color: Color(0xFFBDC1C6),
+                                  color: Colors.white,
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -110,7 +132,7 @@ class DashboardView extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF6B7280),
+                                  color: Color(0xFF4A3F3F),
                                 ),
                               ),
                             ],
@@ -122,10 +144,12 @@ class DashboardView extends ConsumerWidget {
                   return Column(
                     children: batches
                         .map((batch) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
+                              padding:
+                                  const EdgeInsets.only(bottom: 12.0),
                               child: BatchSummaryCard(
                                 batch: batch,
-                                onTap: () => context.go('/batches/${batch.id}'),
+                                onTap: () =>
+                                    context.go('/batches/${batch.id}'),
                               ),
                             ))
                         .toList(),
@@ -151,12 +175,14 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String? actionLabel;
   final VoidCallback? onActionTap;
+  final Color accentColor;
 
   const _SectionHeader({
     required this.title,
     required this.icon,
     this.actionLabel,
     this.onActionTap,
+    this.accentColor = const Color(0xFFFF8A9D),
   });
 
   @override
@@ -169,12 +195,12 @@ class _SectionHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF0F1),
+                color: accentColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFFF07281),
+                color: accentColor,
                 size: 20,
               ),
             ),
@@ -184,7 +210,7 @@ class _SectionHeader extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF4A4A4A),
+                color: Color(0xFF5D4037),
                 letterSpacing: -0.5,
               ),
             ),
@@ -193,7 +219,11 @@ class _SectionHeader extends StatelessWidget {
         if (actionLabel != null && onActionTap != null)
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFFEF0F1),
+              gradient: LinearGradient(
+                colors: [accentColor, accentColor.withOpacity(0.6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: TextButton(
@@ -211,7 +241,7 @@ class _SectionHeader extends StatelessWidget {
                   Text(
                     actionLabel!,
                     style: const TextStyle(
-                      color: Color(0xFFF07281),
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -219,7 +249,7 @@ class _SectionHeader extends StatelessWidget {
                   const Icon(
                     Icons.arrow_forward_ios,
                     size: 12,
-                    color: Color(0xFFF07281),
+                    color: Colors.white,
                   ),
                 ],
               ),

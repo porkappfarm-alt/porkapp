@@ -17,14 +17,14 @@ class AlertSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (alerts.isEmpty) {
       return Card(
-        elevation: 3,
+        elevation: 4,
         color: Colors.white,
-        shadowColor: Colors.black.withOpacity(0.08),
+        shadowColor: const Color(0xFFF07281).withOpacity(0.12),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           side: const BorderSide(
-            color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
-            width: 1,
+            color: Color(0xFFFFE0E6),
+            width: 1.2,
           ),
         ),
         child: Padding(
@@ -34,23 +34,23 @@ class AlertSection extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8BC34A).withOpacity(0.1), // Verde Claro - Éxito/Activo
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFF4CAF50).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
                   Icons.check_circle_outline,
-                  color: Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
+                  color: Color(0xFF4CAF50),
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 18),
               const Expanded(
                 child: Text(
                   'Todo en orden\nNo hay alertas pendientes',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF5D4037),
                     height: 1.4,
                   ),
                 ),
@@ -92,13 +92,13 @@ class AlertSection extends ConsumerWidget {
       });
 
     return Card(
-      elevation: 3,
+      elevation: 4,
       color: Colors.white,
-      shadowColor: Colors.black.withOpacity(0.08),
+      shadowColor: const Color(0xFFF07281).withOpacity(0.12),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         side: const BorderSide(
-          color: Color(0xFFE9E9E9), // Gris Claro - Bordes/Divisores
+          color: Color(0xFFFFE0E6),
           width: 1,
         ),
       ),
@@ -109,18 +109,25 @@ class AlertSection extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                const Icon(
-                  Icons.notifications_active,
-                  color: Color(0xFFF07281), // Rosa Cerdito Natural - Primario
-                  size: 24,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF07281).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.notifications_active,
+                    color: Color(0xFFF07281),
+                    size: 22,
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Text(
                   'Requieren Atención (${alerts.length})',
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF6B5E55), // Gris Taupe Moderno - Títulos
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF5D4037),
                   ),
                 ),
               ],
@@ -163,12 +170,22 @@ class AlertSection extends ConsumerWidget {
                 context.push('/dashboard/alerts');
               },
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(20),
+                  ),
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFF07281), Color(0xFFFF9AA2)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
                 child: Center(
                   child: Text(
                     'Ver todas (${alerts.length})',
                     style: const TextStyle(
-                      color: Color(0xFFF07281), // Rosa Cerdito Natural - Primario
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -233,8 +250,8 @@ class AlertTile extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -262,7 +279,7 @@ class AlertTile extends ConsumerWidget {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF3E3E3E), // Gris Oscuro - Texto Principal
+                        color: Color(0xFF5D4037),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -270,7 +287,7 @@ class AlertTile extends ConsumerWidget {
                       alert.description,
                       style: const TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF7B7B7B), // Gris Medio - Texto Secundario
+                        color: Color(0xFF6F6F6F),
                       ),
                     ),
                   ],
@@ -287,16 +304,16 @@ class AlertTile extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8BC34A).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFF4CAF50).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFF8BC34A).withOpacity(0.3),
-                      width: 1,
+                      color: const Color(0xFF4CAF50).withOpacity(0.35),
+                      width: 1.2,
                     ),
                   ),
                   child: const Icon(
                     Icons.check_circle_outline,
-                    color: Color(0xFF8BC34A), // Verde Claro - Éxito/Activo
+                    color: Color(0xFF4CAF50),
                     size: 18,
                   ),
                 ),

@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/corrals/data/corrals_repository.dart';
 import 'package:porkapp/features/corrals/domain/corral.dart';
 
 /// Provider para obtener un corral por ID
 final corralByIdProvider =
     FutureProvider.family<Corral?, String>((ref, corralId) async {
+  // Observar el estado de autenticación para reiniciar cuando cambie el usuario
+  ref.watch(authStateProvider);
   final repository = ref.watch(corralsRepositoryProvider);
   try {
     return await repository.getCorral(corralId);
@@ -17,11 +20,20 @@ final corralsRepositoryProvider = Provider((ref) => CorralsRepository());
 
 /// StateNotifier para manejar la lista de corrales con actualizaciones optimistas
 class CorralsNotifier extends StateNotifier<AsyncValue<List<Corral>>> {
-  CorralsNotifier(this._repository) : super(const AsyncValue.loading()) {
+  CorralsNotifier(this._repository, this._ref)
+      : super(const AsyncValue.loading()) {
+    // Observar el estado de autenticación
+    _ref.listen(authStateProvider, (previous, next) {
+      // Recargar corrales cuando cambie el estado de autenticación
+      if (previous != next) {
+        loadCorrals();
+      }
+    });
     loadCorrals();
   }
 
   final CorralsRepository _repository;
+  final Ref _ref;
 
   Future<void> loadCorrals() async {
     state = const AsyncValue.loading();
@@ -63,11 +75,13 @@ class CorralsNotifier extends StateNotifier<AsyncValue<List<Corral>>> {
 /// Provider que obtiene la lista de corrales
 final corralsProvider =
     StateNotifierProvider<CorralsNotifier, AsyncValue<List<Corral>>>((ref) {
-  return CorralsNotifier(ref.read(corralsRepositoryProvider));
+  return CorralsNotifier(ref.read(corralsRepositoryProvider), ref);
 });
 
 /// Provider que obtiene solo los corrales disponibles (sin lotes activos)
 final availableCorralsProvider = FutureProvider<List<Corral>>((ref) async {
+  // Observar el estado de autenticación para reiniciar cuando cambie el usuario
+  ref.watch(authStateProvider);
   final repository = ref.watch(corralsRepositoryProvider);
   return await repository.getAvailableCorrals();
 });

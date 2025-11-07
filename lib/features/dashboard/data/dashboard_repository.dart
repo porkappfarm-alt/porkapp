@@ -340,6 +340,7 @@ class DashboardRepository {
           .from('batches')
           .select('id, name, animal_count')
           .eq('status', 'active');
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
 
       final batchesWithoutRecent = <Map<String, dynamic>>[];
 
@@ -374,11 +375,18 @@ class DashboardRepository {
   /// Obtiene corrales cerca de capacidad
   Future<List<Map<String, dynamic>>> _getCorralsNearCapacity() async {
     try {
+      final userId = _supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        return [];
+      }
+
       // Esta query necesita ser optimizada con una vista o función en la BD
       final corrals = await _supabase
           .from('corrals')
           .select('id, name, capacity, status')
-          .eq('status', 'ocupado');
+          .eq('status', 'ocupado')
+          .eq('created_by', userId); // Filtrar por usuario actual
 
       final corralsNear = <Map<String, dynamic>>[];
 
@@ -393,6 +401,7 @@ class DashboardRepository {
             .select('animal_count')
             .eq('corral_id', corralId)
             .eq('status', 'active');
+        // RLS filtra automáticamente por usuario vía is_corral_owner()
 
         int totalAnimals = 0;
         for (final batch in batches) {
@@ -448,10 +457,11 @@ class DashboardRepository {
       final batchProgressService = BatchProgressService(_supabase);
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -494,10 +504,11 @@ class DashboardRepository {
       final batchProgressService = BatchProgressService(_supabase);
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -541,10 +552,11 @@ class DashboardRepository {
       final batchProgressService = BatchProgressService(_supabase);
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -621,10 +633,11 @@ class DashboardRepository {
           (finalScheduleData.first['average_weight_kg'] as num).toDouble();
 
       // Obtener todos los lotes activos con birth_date
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batchesData = await _supabase
           .from('batches')
           .select(
-              'id, name, birth_date, created_at, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
+              'id, name, birth_date, entry_date, headcount_start, corral_id, initial_avg_weight, status, notes')
           .eq('status', 'active')
           .not('birth_date', 'is', null);
 
@@ -765,6 +778,7 @@ class DashboardRepository {
   /// Obtiene resumen de los últimos 3 lotes activos
   Future<List<BatchSummary>> getBatchSummaries({int limit = 3}) async {
     try {
+      // RLS filtra automáticamente por usuario vía is_corral_owner()
       final batches = await _supabase
           .from('batches')
           .select('''
@@ -787,11 +801,12 @@ class DashboardRepository {
         final entryDate = DateTime.parse(batch['entry_date'] as String);
         final daysInFarm = DateTime.now().difference(entryDate).inDays;
 
-        // Obtener última biometría del lote
+        // Obtener última biometría activa del lote
         final latestBiometry = await _supabase
             .from('batch_biometrics')
-            .select('avg_weight, avg_adg')
+            .select('avg_weight, avg_adg, animals_measured')
             .eq('batch_id', batchId)
+            .eq('status', 'active') // Solo biometrías activas
             .order('measurement_date', ascending: false)
             .limit(1);
 
@@ -806,13 +821,24 @@ class DashboardRepository {
 
         final initialWeight =
             (batch['initial_avg_weight'] as num?)?.toDouble() ?? 0.0;
-        const targetWeight = 120.0;
+
+        // Obtener el peso objetivo del último día del feeding_schedule
+        final targetWeightData = await _supabase
+            .from('feeding_schedule')
+            .select('average_weight_kg')
+            .order('days_old', ascending: false)
+            .limit(1);
+
+        final targetWeight = targetWeightData.isNotEmpty
+            ? (targetWeightData.first['average_weight_kg'] as num?)
+                    ?.toDouble() ??
+                120.0
+            : 120.0;
 
         double progressToTarget = 0.0;
-        if (currentAvgWeight != null && initialWeight > 0) {
-          progressToTarget = ((currentAvgWeight - initialWeight) /
-                  (targetWeight - initialWeight)) *
-              100;
+        if (currentAvgWeight != null && targetWeight > 0) {
+          // Progreso = (Peso actual / Peso objetivo) × 100
+          progressToTarget = (currentAvgWeight / targetWeight) * 100;
           progressToTarget = progressToTarget.clamp(0.0, 100.0);
         }
 

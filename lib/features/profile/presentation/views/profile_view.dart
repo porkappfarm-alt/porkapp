@@ -17,6 +17,9 @@ const _errorRed = Color(0xFFEF5350);
 
 // Provider para obtener el perfil del usuario actual
 final currentUserProfileProvider = FutureProvider<UserProfile?>((ref) async {
+  // Observar el estado de autenticación para reiniciar cuando cambie el usuario
+  ref.watch(authStateProvider);
+
   final user = supabase.auth.currentUser;
   if (user == null) return null;
 
@@ -132,7 +135,30 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     );
 
     if (confirmed == true && mounted) {
-      await ref.read(authStateProvider.notifier).signOut();
+      try {
+        // Mostrar indicador de carga
+        setState(() => _isLoading = true);
+
+        print('ProfileView: Calling signOut...');
+        await ref.read(authStateProvider.notifier).signOut();
+        print('ProfileView: signOut completed');
+
+        // El router listener se encargará de la navegación
+      } catch (e) {
+        print('ProfileView: Error during signOut: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al cerrar sesión: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 

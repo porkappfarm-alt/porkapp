@@ -328,25 +328,14 @@ class _CorralDetailsViewState extends ConsumerState<CorralDetailsView> {
                     ),
                   ],
                 ),
-                child: const Center(
-                  child: Text(
-                    '🐷',
-                    style: TextStyle(fontSize: 26),
+                child: ClipOval(
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Image.asset(
+                      'imagenes/corrales-de-animales.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  nombre,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF6B5E55), // Gris Taupe
-                    fontFamily: 'Poppins',
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               IconButton(

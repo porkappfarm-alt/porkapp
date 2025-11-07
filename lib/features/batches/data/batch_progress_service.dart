@@ -19,11 +19,12 @@ class BatchProgressService {
       final daysOld = batch.daysOld;
       final weeksOld = batch.weeksOld;
 
-      // Obtener la última biometría del lote
+      // Obtener la última biometría activa del lote
       final biometricsData = await _supabase
           .from('batch_biometrics')
           .select('avg_weight, measurement_date')
           .eq('batch_id', batch.id)
+          .eq('status', 'active') // Solo biometrías activas
           .not('avg_weight', 'is', null)
           .order('measurement_date', ascending: false)
           .limit(1);

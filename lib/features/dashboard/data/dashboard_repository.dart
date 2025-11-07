@@ -787,11 +787,12 @@ class DashboardRepository {
         final entryDate = DateTime.parse(batch['entry_date'] as String);
         final daysInFarm = DateTime.now().difference(entryDate).inDays;
 
-        // Obtener última biometría del lote
+        // Obtener última biometría activa del lote
         final latestBiometry = await _supabase
             .from('batch_biometrics')
-            .select('avg_weight, avg_adg')
+            .select('avg_weight, avg_adg, animals_measured')
             .eq('batch_id', batchId)
+            .eq('status', 'active') // Solo biometrías activas
             .order('measurement_date', ascending: false)
             .limit(1);
 
@@ -806,13 +807,24 @@ class DashboardRepository {
 
         final initialWeight =
             (batch['initial_avg_weight'] as num?)?.toDouble() ?? 0.0;
-        const targetWeight = 120.0;
+
+        // Obtener el peso objetivo del último día del feeding_schedule
+        final targetWeightData = await _supabase
+            .from('feeding_schedule')
+            .select('average_weight_kg')
+            .order('days_old', ascending: false)
+            .limit(1);
+
+        final targetWeight = targetWeightData.isNotEmpty
+            ? (targetWeightData.first['average_weight_kg'] as num?)
+                    ?.toDouble() ??
+                120.0
+            : 120.0;
 
         double progressToTarget = 0.0;
-        if (currentAvgWeight != null && initialWeight > 0) {
-          progressToTarget = ((currentAvgWeight - initialWeight) /
-                  (targetWeight - initialWeight)) *
-              100;
+        if (currentAvgWeight != null && targetWeight > 0) {
+          // Progreso = (Peso actual / Peso objetivo) × 100
+          progressToTarget = (currentAvgWeight / targetWeight) * 100;
           progressToTarget = progressToTarget.clamp(0.0, 100.0);
         }
 

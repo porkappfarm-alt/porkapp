@@ -7,8 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:porkapp/shared/design/app_styles.dart' as design;
 import '../../../batches/providers/batch_providers.dart';
+import '../../../batches/providers/batch_progress_provider.dart';
 import '../../../animals/domain/animal.dart';
 import '../../providers/batch_biometrics_provider.dart';
+import '../../../dashboard/providers/dashboard_charts_provider.dart';
+import '../../../dashboard/providers/dashboard_alerts_provider.dart';
 
 class NewBiometricView extends ConsumerStatefulWidget {
   final String initialBatchId;
@@ -356,6 +359,22 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         // Refrescar el listado de biometrías usando el batchId que ya tenemos
         ref.invalidate(batchBiometricsProvider(batchId));
 
+        // Refrescar los datos del lote para actualizar los cálculos
+        ref.invalidate(batchProvider(batchId));
+
+        // Refrescar el progreso del lote
+        // Necesitamos obtener el batch completo para invalidar el provider
+        final batch = ref.read(batchProvider(batchId)).value;
+        if (batch != null) {
+          ref.invalidate(batchProgressProvider(batch));
+        }
+
+        // Refrescar datos del dashboard
+        ref.invalidate(batchSummariesProvider);
+        ref.invalidate(dashboardAlertsProvider);
+        ref.invalidate(weightTrend30DaysProvider);
+        ref.invalidate(adgComparisonDataProvider);
+
         // Mostrar mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -425,404 +444,417 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
       body: _isLoadingData
           ? const Center(child: CircularProgressIndicator())
           : ref.watch(batchProvider(widget.initialBatchId)).when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline,
-                      size: 64, color: design.AppColors.error),
-                  const SizedBox(height: 16),
-                  Text('Error: ${error.toString()}'),
-                ],
-              ),
-            ),
-            data: (batch) {
-              final liveAnimals = batch.animals
-                  .where((animal) => animal.status == 'active')
-                  .toList();
-
-              // Update button state after build
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _updateButtonState(liveAnimals);
-              });
-
-              if (liveAnimals.isEmpty) {
-                return Center(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.warning_amber_rounded,
-                          size: 64, color: design.AppColors.warning),
+                      const Icon(Icons.error_outline,
+                          size: 64, color: design.AppColors.error),
                       const SizedBox(height: 16),
-                      Text(
-                        'No hay animales vivos en este lote',
-                        style: TextStyle(
-                          color: design.AppColors.textSecondary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      Text('Error: ${error.toString()}'),
                     ],
                   ),
-                );
-              }
+                ),
+                data: (batch) {
+                  final liveAnimals = batch.animals
+                      .where((animal) => animal.status == 'active')
+                      .toList();
 
-              return SafeArea(
-                child: Column(
-                  children: [
-                    // Header mejorado
-                    Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: design.AppColors.surfacePrimary,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: design.AppColors.coral.withOpacity(0.25),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: design.AppColors.coral.withOpacity(0.12),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
+                  // Update button state after build
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _updateButtonState(liveAnimals);
+                  });
+
+                  if (liveAnimals.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 4,
-                                      height: 4,
-                                      decoration: const BoxDecoration(
-                                        color: design.AppColors.coral,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      batch.name,
-                                      style: headerTitleStyle,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            design.AppColors.backgroundPrimary,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.calendar_today,
-                                              size: 14,
-                                              color: design
-                                                  .AppColors.textSecondary),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            dateFormat.format(
-                                                _measurementDate ??
-                                                    DateTime.now()),
-                                            style: chipTextStyle,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: design.AppColors.successLight
-                                            .withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.pets,
-                                              size: 14,
-                                              color:
-                                                  design.AppColors.verdeField),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            '${liveAnimals.length} animales',
-                                            style: successChipTextStyle,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          Icon(Icons.warning_amber_rounded,
+                              size: 64, color: design.AppColors.warning),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No hay animales vivos en este lote',
+                            style: TextStyle(
+                              color: design.AppColors.textSecondary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    );
+                  }
 
-                    // Animals List
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: liveAnimals.length,
-                        itemBuilder: (context, index) {
-                          final animal = liveAnimals[index];
-                          final animalId = animal.id;
-
-                          // Initialize controllers and focus nodes if they don't exist
-                          if (!_weightControllers.containsKey(animalId)) {
-                            _weightControllers[animalId] =
-                                TextEditingController();
-                            
-                            // Guardar valor original vacío para animales sin peso previo
-                            if (isEditMode &&
-                                !_originalWeights.containsKey(animalId)) {
-                              _originalWeights[animalId] = '';
-                            }
-                          }
-
-                          // Ensure focus node exists
-                          if (!_focusNodes.containsKey(animalId)) {
-                            _focusNodes[animalId] = FocusNode();
-                          }
-
-                          // Add listener to update button state when text changes
-                          // (remove existing listener first to avoid duplicates)
-                          final controller = _weightControllers[animalId]!;
-                          controller.removeListener(() => _updateButtonState(liveAnimals));
-                          controller.addListener(() {
-                            _updateButtonState(liveAnimals);
-                          });
-
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            decoration: BoxDecoration(
-                              color: design.AppColors.surfacePrimary,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: design.AppColors.borderLight,
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                  return SafeArea(
+                    child: Column(
+                      children: [
+                        // Header mejorado
+                        Container(
+                          margin: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: design.AppColors.surfacePrimary,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: design.AppColors.coral.withOpacity(0.25),
+                              width: 1.5,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                            boxShadow: [
+                              BoxShadow(
+                                color: design.AppColors.coral.withOpacity(0.12),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                       children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: BoxDecoration(
-                                                color: design
-                                                    .AppColors.successLight
-                                                    .withOpacity(0.2),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: const Icon(
-                                                Icons.pets,
-                                                size: 16,
-                                                color:
-                                                    design.AppColors.verdeField,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              '#${animal.identifier}',
-                                              style: identifierStyle,
-                                            ),
-                                          ],
-                                        ),
-                                        if (animal.weight != null)
-                                          Text(
-                                            'Peso anterior: ${animal.weight!.toStringAsFixed(1)} kg',
-                                            style: TextStyle(
-                                              color: design
-                                                  .AppColors.textSecondary,
-                                              fontSize: 14,
-                                            ),
+                                        Container(
+                                          width: 4,
+                                          height: 4,
+                                          decoration: const BoxDecoration(
+                                            color: design.AppColors.coral,
+                                            shape: BoxShape.circle,
                                           ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          batch.name,
+                                          style: headerTitleStyle,
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  SizedBox(
-                                    width: 120,
-                                    child: TextField(
-                                      controller: _weightControllers[animalId],
-                                      focusNode: _focusNodes[animalId],
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      textAlign: TextAlign.center,
-                                      enabled: !_isSaving,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Peso',
-                                        hintStyle: const TextStyle(
-                                          color: design.AppColors.textDisabled,
-                                        ),
-                                        suffixText: 'kg',
-                                        suffixStyle: const TextStyle(
-                                          color: design.AppColors.textSecondary,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        filled: true,
-                                        fillColor:
-                                            design.AppColors.backgroundPrimary,
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                            color: design.AppColors.borderLight,
-                                            width: 2,
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: design
+                                                .AppColors.backgroundPrimary,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.calendar_today,
+                                                  size: 14,
+                                                  color: design
+                                                      .AppColors.textSecondary),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                dateFormat.format(
+                                                    _measurementDate ??
+                                                        DateTime.now()),
+                                                style: chipTextStyle,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                            color: design.AppColors.borderLight,
-                                            width: 2,
+                                        const SizedBox(width: 12),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: design.AppColors.successLight
+                                                .withOpacity(0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.pets,
+                                                  size: 14,
+                                                  color: design
+                                                      .AppColors.verdeField),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                '${liveAnimals.length} animales',
+                                                style: successChipTextStyle,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                            color: design.AppColors.coral,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 14,
-                                        ),
-                                      ),
-                                      onSubmitted: (value) {
-                                        // Solo mover al siguiente campo, NO guardar
-                                        if (index < liveAnimals.length - 1) {
-                                          final nextAnimalId =
-                                              liveAnimals[index + 1].id;
-                                          _focusNodes[nextAnimalId]
-                                              ?.requestFocus();
-                                        }
-                                      },
+                                      ],
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    // Notes and Buttons
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, -2),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Botón único de finalizar/actualizar
-                          ValueListenableBuilder<bool>(
-                            valueListenable: _buttonEnabled,
-                            builder: (context, isEnabled, child) {
-                              return Column(
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton.icon(
-                                      onPressed: (_isSaving || !isEnabled)
-                                          ? null
-                                          : _finalizeBiometric,
-                                      icon: const Icon(Icons.check),
-                                      label: Text(isEditMode
-                                          ? 'Actualizar'
-                                          : 'Finalizar'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: design.AppColors.coral,
-                                        foregroundColor: design.AppColors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 18),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        elevation: 1,
-                                        disabledBackgroundColor:
-                                            design.AppColors.borderLight,
-                                      ),
-                                    ),
+                        ),
+
+                        // Animals List
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: liveAnimals.length,
+                            itemBuilder: (context, index) {
+                              final animal = liveAnimals[index];
+                              final animalId = animal.id;
+
+                              // Initialize controllers and focus nodes if they don't exist
+                              if (!_weightControllers.containsKey(animalId)) {
+                                _weightControllers[animalId] =
+                                    TextEditingController();
+
+                                // Guardar valor original vacío para animales sin peso previo
+                                if (isEditMode &&
+                                    !_originalWeights.containsKey(animalId)) {
+                                  _originalWeights[animalId] = '';
+                                }
+                              }
+
+                              // Ensure focus node exists
+                              if (!_focusNodes.containsKey(animalId)) {
+                                _focusNodes[animalId] = FocusNode();
+                              }
+
+                              // Add listener to update button state when text changes
+                              // (remove existing listener first to avoid duplicates)
+                              final controller = _weightControllers[animalId]!;
+                              controller.removeListener(
+                                  () => _updateButtonState(liveAnimals));
+                              controller.addListener(() {
+                                _updateButtonState(liveAnimals);
+                              });
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: design.AppColors.surfacePrimary,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: design.AppColors.borderLight,
+                                    width: 1.5,
                                   ),
-                                  if (!isEnabled)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8),
-                                      child: Text(
-                                        isEditMode
-                                            ? 'Debes ingresar todos los pesos para actualizar'
-                                            : 'Debes ingresar todos los pesos para finalizar',
-                                        style: TextStyle(
-                                          color: design.AppColors.warning,
-                                          fontSize: 12,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(6),
+                                                  decoration: BoxDecoration(
+                                                    color: design
+                                                        .AppColors.successLight
+                                                        .withOpacity(0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.pets,
+                                                    size: 16,
+                                                    color: design
+                                                        .AppColors.verdeField,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  '#${animal.identifier}',
+                                                  style: identifierStyle,
+                                                ),
+                                              ],
+                                            ),
+                                            if (animal.weight != null)
+                                              Text(
+                                                'Peso anterior: ${animal.weight!.toStringAsFixed(1)} kg',
+                                                style: TextStyle(
+                                                  color: design
+                                                      .AppColors.textSecondary,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                ],
+                                      const SizedBox(width: 16),
+                                      SizedBox(
+                                        width: 120,
+                                        child: TextField(
+                                          controller:
+                                              _weightControllers[animalId],
+                                          focusNode: _focusNodes[animalId],
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
+                                          textAlign: TextAlign.center,
+                                          enabled: !_isSaving,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          decoration: InputDecoration(
+                                            hintText: 'Peso',
+                                            hintStyle: const TextStyle(
+                                              color:
+                                                  design.AppColors.textDisabled,
+                                            ),
+                                            suffixText: 'kg',
+                                            suffixStyle: const TextStyle(
+                                              color: design
+                                                  .AppColors.textSecondary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            filled: true,
+                                            fillColor: design
+                                                .AppColors.backgroundPrimary,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              borderSide: const BorderSide(
+                                                color: design
+                                                    .AppColors.borderLight,
+                                                width: 2,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              borderSide: const BorderSide(
+                                                color: design
+                                                    .AppColors.borderLight,
+                                                width: 2,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              borderSide: const BorderSide(
+                                                color: design.AppColors.coral,
+                                                width: 2,
+                                              ),
+                                            ),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 14,
+                                            ),
+                                          ),
+                                          onSubmitted: (value) {
+                                            // Solo mover al siguiente campo, NO guardar
+                                            if (index <
+                                                liveAnimals.length - 1) {
+                                              final nextAnimalId =
+                                                  liveAnimals[index + 1].id;
+                                              _focusNodes[nextAnimalId]
+                                                  ?.requestFocus();
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             },
                           ),
-                        ],
-                      ),
+                        ),
+
+                        // Notes and Buttons
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, -2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              // Botón único de finalizar/actualizar
+                              ValueListenableBuilder<bool>(
+                                valueListenable: _buttonEnabled,
+                                builder: (context, isEnabled, child) {
+                                  return Column(
+                                    children: [
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton.icon(
+                                          onPressed: (_isSaving || !isEnabled)
+                                              ? null
+                                              : _finalizeBiometric,
+                                          icon: const Icon(Icons.check),
+                                          label: Text(isEditMode
+                                              ? 'Actualizar'
+                                              : 'Finalizar'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                design.AppColors.coral,
+                                            foregroundColor:
+                                                design.AppColors.white,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 18),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            elevation: 1,
+                                            disabledBackgroundColor:
+                                                design.AppColors.borderLight,
+                                          ),
+                                        ),
+                                      ),
+                                      if (!isEnabled)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            isEditMode
+                                                ? 'Debes ingresar todos los pesos para actualizar'
+                                                : 'Debes ingresar todos los pesos para finalizar',
+                                            style: TextStyle(
+                                              color: design.AppColors.warning,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  );
+                },
+              ),
     );
   }
 }

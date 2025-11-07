@@ -259,25 +259,35 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         final previousWeight = prevWeight ?? 0.0;
 
         return {
-          'biometric_id':
-              _biometricId, // Supabase convertirá automáticamente el string a UUID
-          'animal_id': data['animal_id'],
+          'biometric_id': _biometricId, // Ya es un string UUID válido
+          'animal_id': data['animal_id'], // Ya es un string UUID válido
           'weight': data['weight'],
           'previous_weight': previousWeight,
         };
       }).toList();
 
-      print('Inserting ${measurementsToInsert.length} measurements');
+      print(
+          '✅ Preparando inserción de ${measurementsToInsert.length} mediciones');
+      print('📝 ID de biometría: $_biometricId');
       if (measurementsToInsert.isNotEmpty) {
-        print('First measurement sample: ${measurementsToInsert.first}');
+        print('📊 Primera medición: ${measurementsToInsert.first}');
       }
 
       try {
+        print('🔄 Insertando mediciones en batch_biometrics...');
         await Supabase.instance.client
             .from('biometric_measurements')
             .insert(measurementsToInsert);
+        print('✅ Mediciones insertadas exitosamente');
       } catch (e) {
-        print('Error inserting measurements: $e');
+        print('❌ Error al insertar mediciones: $e');
+        print('❌ Tipo de error: ${e.runtimeType}');
+        if (e is PostgrestException) {
+          print('❌ Código: ${e.code}');
+          print('❌ Detalles: ${e.details}');
+          print('❌ Hint: ${e.hint}');
+          print('❌ Mensaje: ${e.message}');
+        }
         rethrow;
       }
 

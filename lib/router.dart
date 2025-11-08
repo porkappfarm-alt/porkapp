@@ -7,6 +7,7 @@ import 'package:porkapp/features/auth/presentation/login_view.dart';
 import 'package:porkapp/features/auth/presentation/views/change_password_view.dart';
 import 'package:porkapp/features/auth/presentation/views/update_password_view.dart';
 import 'package:porkapp/features/auth/presentation/views/reset_password_view.dart';
+import 'package:porkapp/features/auth/presentation/password_recovery_view.dart';
 import 'package:porkapp/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:porkapp/features/dashboard/presentation/views/all_alerts_view.dart';
 import 'package:porkapp/features/corrals/presentation/corrals_view.dart';
@@ -129,6 +130,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final goingToChangePassword = state.uri.path == '/change-password';
       final goingToUpdatePassword = state.uri.path == '/update-password';
       final goingToResetPassword = state.uri.path == '/reset-password';
+      final goingToPasswordRecovery = state.uri.path == '/password-recovery';
       final currentLocation = state.uri.path;
 
       // Handle authentication states
@@ -142,14 +144,16 @@ final routerProvider = Provider<GoRouter>((ref) {
 
         case AuthState.unauthenticated:
           // Si no está autenticado, redirigir a login a menos que ya esté ahí o en reset-password
-          if (goingToResetPassword) {
-            return null; // Permitir acceso a reset-password sin autenticación
+          if (goingToResetPassword || goingToPasswordRecovery) {
+            return null; // Permitir acceso a reset-password y password-recovery sin autenticación
           }
           return goingToLogin ? null : '/login';
 
         case AuthState.authenticated:
           // Permitir acceso directo a rutas de cambio de contraseña sin restricciones adicionales
-          if (goingToUpdatePassword || goingToResetPassword) {
+          if (goingToUpdatePassword ||
+              goingToResetPassword ||
+              goingToPasswordRecovery) {
             return null;
           }
 
@@ -241,6 +245,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/reset-password',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ResetPasswordView(),
+      ),
+
+      // Ruta: /password-recovery
+      // - Pantalla para recuperación de contraseña desde deep link
+      // - Se muestra fuera del shell principal
+      GoRoute(
+        path: '/password-recovery',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const PasswordRecoveryView(),
       ),
 
       // Main shell route with bottom navigation for authenticated screens

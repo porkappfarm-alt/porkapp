@@ -44,6 +44,9 @@ dependencies:
   # Supabase
   supabase_flutter: ^2.0.0
 
+  # Deep linking
+  app_links: ^6.3.2
+
   # UI components
   shared_preferences: ^2.2.2
   shared_preferences_android: ^2.2.1

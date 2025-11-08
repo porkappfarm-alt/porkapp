@@ -519,7 +519,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: () => context.push('/change-password'),
+                      onPressed: () => context.push('/update-password'),
                       icon: const Icon(Icons.lock),
                       label: const Text('Cambiar contraseña'),
                       style: outlinedPrimaryStyle,

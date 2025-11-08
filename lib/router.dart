@@ -5,6 +5,7 @@ import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/auth/data/auth_repository.dart';
 import 'package:porkapp/features/auth/presentation/login_view.dart';
 import 'package:porkapp/features/auth/presentation/views/change_password_view.dart';
+import 'package:porkapp/features/auth/presentation/views/update_password_view.dart';
 import 'package:porkapp/features/auth/presentation/views/reset_password_view.dart';
 import 'package:porkapp/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:porkapp/features/dashboard/presentation/views/all_alerts_view.dart';
@@ -126,6 +127,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final goingToLogin = state.uri.path == '/login';
       final goingToChangePassword = state.uri.path == '/change-password';
+      final goingToUpdatePassword = state.uri.path == '/update-password';
+      final goingToResetPassword = state.uri.path == '/reset-password';
       final currentLocation = state.uri.path;
 
       // Handle authentication states
@@ -138,10 +141,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           return null;
 
         case AuthState.unauthenticated:
-          // Si no está autenticado, redirigir a login a menos que ya esté ahí
+          // Si no está autenticado, redirigir a login a menos que ya esté ahí o en reset-password
+          if (goingToResetPassword) {
+            return null; // Permitir acceso a reset-password sin autenticación
+          }
           return goingToLogin ? null : '/login';
 
         case AuthState.authenticated:
+          // Permitir acceso directo a rutas de cambio de contraseña sin restricciones adicionales
+          if (goingToUpdatePassword || goingToResetPassword) {
+            return null;
+          }
+
           // Si está en login y autenticado, esperar un momento antes de redirigir
           // para evitar parpadeos durante el proceso de autenticación
           if (goingToLogin) {
@@ -211,6 +222,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/change-password',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ChangePasswordView(),
+      ),
+
+      // Ruta: /update-password
+      // - Pantalla para actualizar contraseña voluntariamente
+      // - Requiere contraseña actual para validación
+      // - Se muestra fuera del shell principal
+      GoRoute(
+        path: '/update-password',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const UpdatePasswordView(),
       ),
 
       // Ruta: /reset-password

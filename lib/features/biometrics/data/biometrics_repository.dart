@@ -122,7 +122,7 @@ class BiometricsRepository {
     final response = await _supabase
         .from(_animalMeasurementsTable)
         .select()
-        .eq('batch_measurement_id', batchMeasurementId)
+        .eq('biometric_id', batchMeasurementId)
         .order('created_at', ascending: false);
     return response.map((json) => AnimalMeasurement.fromJson(json)).toList();
   }

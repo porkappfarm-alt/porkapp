@@ -29,7 +29,8 @@ class AnimalMeasurement {
   factory AnimalMeasurement.fromJson(Map<String, dynamic> json) {
     return AnimalMeasurement(
       id: json['id'] as String,
-      batchMeasurementId: json['batch_measurement_id'] as String,
+      // biometric_id en la DB mapea a batchMeasurementId en el modelo
+      batchMeasurementId: json['biometric_id'] as String,
       animalId: json['animal_id'] as String,
       weight: (json['weight'] as num).toDouble(),
       previousWeight: (json['previous_weight'] as num?)?.toDouble(),
@@ -44,7 +45,8 @@ class AnimalMeasurement {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'batch_measurement_id': batchMeasurementId,
+      // batchMeasurementId en el modelo mapea a biometric_id en la DB
+      'biometric_id': batchMeasurementId,
       'animal_id': animalId,
       'weight': weight,
       'previous_weight': previousWeight,

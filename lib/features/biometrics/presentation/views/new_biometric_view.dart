@@ -90,25 +90,38 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
   }
 
   Future<void> _loadBiometricData() async {
-    if (_biometricId == null) return;
+    if (_biometricId == null) {
+      print(
+          '⚠️ _loadBiometricData: biometricId es null, no hay nada que cargar');
+      return;
+    }
+
+    print('📥 Iniciando carga de datos para biometricId: $_biometricId');
 
     try {
       // Cargar datos de la biometría
+      print('🔍 Buscando biometría en batch_biometrics...');
       final biometricData = await Supabase.instance.client
           .from('batch_biometrics')
           .select()
           .eq('id', _biometricId!)
           .single();
 
+      print('✅ Biometría encontrada: ${biometricData['measurement_date']}');
       _measurementDate = DateTime.parse(biometricData['measurement_date']);
 
       // Cargar pesos ya guardados
+      print('🔍 Buscando mediciones guardadas en biometric_measurements...');
       final savedMeasurements = await Supabase.instance.client
           .from('biometric_measurements')
           .select()
           .eq('biometric_id', _biometricId!);
 
-      print('📊 Cargando ${savedMeasurements.length} mediciones guardadas');
+      print('📊 Encontradas ${savedMeasurements.length} mediciones guardadas');
+
+      if (savedMeasurements.isEmpty) {
+        print('⚠️ No hay mediciones guardadas para esta biometría');
+      }
 
       for (final measurement in savedMeasurements) {
         final animalId = measurement['animal_id'];
@@ -118,11 +131,12 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         );
         // Guardar el valor original para detectar cambios
         _originalWeights[animalId] = weightText;
-        print('📊 Peso cargado para animal $animalId: $weightText kg');
+        print('✅ Peso cargado para animal $animalId: $weightText kg');
       }
-      print('✅ Controladores creados: ${_weightControllers.length}');
-    } catch (e) {
+      print('✅ Total de controladores creados: ${_weightControllers.length}');
+    } catch (e, stackTrace) {
       print('❌ Error loading biometric data: $e');
+      print('Stack trace: $stackTrace');
     }
   }
 
@@ -268,7 +282,7 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
       }
 
       try {
-        print('🔄 Insertando mediciones en batch_biometrics...');
+        print('🔄 Insertando mediciones en biometric_measurements...');
         await Supabase.instance.client
             .from('biometric_measurements')
             .insert(measurementsToInsert);
@@ -362,12 +376,9 @@ class _NewBiometricViewState extends ConsumerState<NewBiometricView> {
         // Refrescar los datos del lote para actualizar los cálculos
         ref.invalidate(batchProvider(batchId));
 
-        // Refrescar el progreso del lote
-        // Necesitamos obtener el batch completo para invalidar el provider
-        final batch = ref.read(batchProvider(batchId)).value;
-        if (batch != null) {
-          ref.invalidate(batchProgressProvider(batch));
-        }
+        // Refrescar el progreso del lote (invalidar todos para asegurar que se actualice)
+        // Con autoDispose, se reconstruirán automáticamente cuando se vuelvan a usar
+        ref.invalidate(batchProgressProvider);
 
         // Refrescar datos del dashboard
         ref.invalidate(batchSummariesProvider);

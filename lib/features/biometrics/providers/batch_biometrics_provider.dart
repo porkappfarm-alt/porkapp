@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/biometrics_data_source.dart';
 import '../domain/batch_measurement.dart';
 
-final batchBiometricsProvider =
-    FutureProvider.family<List<BatchMeasurement>, String>((ref, batchId) async {
+final batchBiometricsProvider = FutureProvider.family
+    .autoDispose<List<BatchMeasurement>, String>((ref, batchId) async {
   try {
     print('🔍 BatchBiometricsProvider: Starting for batch: $batchId');
 

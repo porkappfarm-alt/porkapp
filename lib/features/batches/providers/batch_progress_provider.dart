@@ -11,16 +11,15 @@ final batchProgressServiceProvider = Provider<BatchProgressService>((ref) {
 });
 
 /// Provider para calcular el progreso de un lote específico
-final batchProgressProvider =
-    FutureProvider.family<BatchProgress?, Batch>((ref, batch) async {
+final batchProgressProvider = FutureProvider.family
+    .autoDispose<BatchProgress?, Batch>((ref, batch) async {
   final service = ref.watch(batchProgressServiceProvider);
   return await service.calculateProgress(batch);
 });
 
 /// Provider para calcular el progreso de múltiples lotes
-final batchesProgressProvider =
-    FutureProvider.family<Map<String, BatchProgress>, List<Batch>>(
-        (ref, batches) async {
+final batchesProgressProvider = FutureProvider.family
+    .autoDispose<Map<String, BatchProgress>, List<Batch>>((ref, batches) async {
   final service = ref.watch(batchProgressServiceProvider);
   return await service.calculateProgressForBatches(batches);
 });

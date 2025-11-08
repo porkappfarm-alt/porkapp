@@ -119,7 +119,7 @@ class BatchCard extends ConsumerWidget {
                           label: 'Peso Prom. Última Biom.',
                           value: biometricsAsync.when(
                             data: (measurements) => measurements.isNotEmpty
-                                ? '${measurements.last.averageWeight.toStringAsFixed(1)} kg'
+                                ? '${measurements.first.averageWeight.toStringAsFixed(1)} kg'
                                 : '--',
                             loading: () => '...',
                             error: (e, _) => '--',

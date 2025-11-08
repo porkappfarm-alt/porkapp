@@ -5,9 +5,9 @@ class Animal {
   final String identifier;
   final DateTime? birthDate;
   final String? sex;
-  final double? weight;
+  final double?
+      weight; // Peso inicial - calculado automáticamente desde primera biometría
   final String breed;
-  final String type;
   final DateTime? entryDate;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -26,7 +26,6 @@ class Animal {
     this.sex,
     this.weight,
     required this.breed,
-    required this.type,
     this.entryDate,
     this.createdAt,
     this.updatedAt,
@@ -49,7 +48,6 @@ class Animal {
       sex: json['sex'] as String?,
       weight: (json['weight_at_entry'] as num?)?.toDouble(),
       breed: json['breed'] as String,
-      type: json['animal_type'] as String,
       entryDate: json['entry_date'] != null
           ? DateTime.parse(json['entry_date'] as String)
           : null,
@@ -77,7 +75,6 @@ class Animal {
       'sex': sex,
       'weight_at_entry': weight,
       'breed': breed,
-      'animal_type': type,
       'entry_date': entryDate?.toIso8601String(),
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
@@ -98,7 +95,6 @@ class Animal {
     String? sex,
     double? weight,
     String? breed,
-    String? type,
     DateTime? entryDate,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -117,7 +113,6 @@ class Animal {
       sex: sex ?? this.sex,
       weight: weight ?? this.weight,
       breed: breed ?? this.breed,
-      type: type ?? this.type,
       entryDate: entryDate ?? this.entryDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -38,7 +38,6 @@ class AnimalsRepository {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required String type,
     double? weight,
     String status = 'active',
   }) async {
@@ -57,9 +56,9 @@ class AnimalsRepository {
           'identifier': identifier,
           'birth_date': birthDate.toIso8601String(),
           'breed': breed,
-          'weight_at_entry': weight,
+          'weight_at_entry': weight ??
+              0, // Se actualizará automáticamente con la primera biometría
           'status': status,
-          'animal_type': type,
           'created_at': currentTime.toIso8601String(),
         })
         .select()
@@ -73,7 +72,6 @@ class AnimalsRepository {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required String type,
     double? weight,
     required String status,
   }) async {
@@ -83,9 +81,8 @@ class AnimalsRepository {
           'identifier': identifier,
           'birth_date': birthDate.toIso8601String(),
           'breed': breed,
-          'weight_at_entry': weight,
+          // weight_at_entry NO se actualiza manualmente - solo mediante trigger
           'status': status,
-          'animal_type': type,
         })
         .eq('id', id)
         .select()

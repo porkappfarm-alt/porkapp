@@ -21,7 +21,6 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
   late DateTime _birthDate = DateTime.now();
   final _weightController = TextEditingController();
   String _status = 'active';
-  String _type = 'fattening'; // valor por defecto para el tipo
   bool _isLoading = false;
 
   bool get isEditing => widget.animal != null;
@@ -35,7 +34,6 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
       _birthDate = widget.animal!.birthDate ?? DateTime.now();
       _weightController.text = widget.animal!.weight.toString();
       _status = widget.animal!.status;
-      _type = widget.animal!.type;
     }
   }
 
@@ -75,7 +73,6 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
               identifier: _identifierController.text,
               birthDate: _birthDate,
               breed: _breedController.text,
-              type: _type,
               weight: _weightController.text.isEmpty
                   ? null
                   : double.tryParse(_weightController.text),
@@ -87,7 +84,6 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
               identifier: _identifierController.text,
               birthDate: _birthDate,
               breed: _breedController.text,
-              type: _type,
               weight: _weightController.text.isEmpty
                   ? null
                   : double.tryParse(_weightController.text),
@@ -198,53 +194,6 @@ class _CreateAnimalViewState extends ConsumerState<CreateAnimalView> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tipo de Animal',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _type,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: theme.colorScheme.surface,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'fattening',
-                            child: Text(
-                              'Engorde',
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'breeding',
-                            child: Text(
-                              'Reproductora',
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _type = value!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 16),
                   _buildField(
                     controller: _weightController,

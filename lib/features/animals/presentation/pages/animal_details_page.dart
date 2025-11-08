@@ -51,7 +51,6 @@ class AnimalDetailsPage extends ConsumerWidget {
                     const Divider(),
                     const SizedBox(height: 8),
                     _buildInfoRow('Identificador:', animal.identifier),
-                    _buildInfoRow('Tipo:', animal.type),
                     _buildInfoRow('Estado:', animal.status),
                     _buildInfoRow('Género:',
                         animal.gender == 'male' ? 'Macho' : 'Hembra'),

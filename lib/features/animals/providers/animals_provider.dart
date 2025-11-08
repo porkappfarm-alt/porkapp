@@ -56,7 +56,6 @@ class AnimalsNotifier extends StateNotifier<AsyncValue<List<Animal>>> {
         birthDate: birthDate,
         weight: weight,
         breed: breed,
-        type: 'fattening',
         entryDate: DateTime.now(),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),

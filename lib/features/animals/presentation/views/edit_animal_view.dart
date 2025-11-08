@@ -9,12 +9,14 @@ class EditAnimalView extends ConsumerStatefulWidget {
 
   const EditAnimalView({super.key, this.animalId, required this.batchId});
 
-  static Future<void> show(BuildContext context, {String? animalId, required String batchId}) {
+  static Future<void> show(BuildContext context,
+      {String? animalId, required String batchId}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => EditAnimalView(animalId: animalId, batchId: batchId),
+      builder: (context) =>
+          EditAnimalView(animalId: animalId, batchId: batchId),
     );
   }
 
@@ -28,7 +30,6 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
   late TextEditingController _identifierController;
   late TextEditingController _weightController;
   late TextEditingController _breedController;
-  late TextEditingController _typeController;
   late TextEditingController _notesController;
   late DateTime _birthDate;
   late DateTime _entryDate;
@@ -40,7 +41,6 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
     _identifierController = TextEditingController();
     _weightController = TextEditingController();
     _breedController = TextEditingController();
-    _typeController = TextEditingController();
     _notesController = TextEditingController();
     _birthDate = DateTime.now();
     _entryDate = DateTime.now();
@@ -58,7 +58,6 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
     _identifierController.dispose();
     _weightController.dispose();
     _breedController.dispose();
-    _typeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -83,8 +82,7 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
         setState(() {
           _identifierController.text = animal.identifier;
           _weightController.text = animal.weight.toString();
-          _breedController.text = animal.breed ?? '';
-          _typeController.text = animal.type;
+          _breedController.text = animal.breed;
           _notesController.text = animal.notes ?? '';
           _birthDate = animal.birthDate ?? DateTime.now();
           _entryDate = animal.entryDate ?? DateTime.now();
@@ -116,20 +114,18 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
     if (!_formKey.currentState!.validate()) return;
 
     final animal = Animal(
-      id: widget.animalId ?? '',
-      batchId: widget.batchId,
-      identifier: _identifierController.text,
-      weight: double.parse(_weightController.text),
-      breed: _breedController.text,
-      type: _typeController.text,
-      birthDate: _birthDate,
-      entryDate: _entryDate,
-      notes: _notesController.text.isEmpty ? null : _notesController.text,
-      status: 'active',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      gender: _selectedGender
-    );
+        id: widget.animalId ?? '',
+        batchId: widget.batchId,
+        identifier: _identifierController.text,
+        weight: double.tryParse(_weightController.text),
+        breed: _breedController.text,
+        birthDate: _birthDate,
+        entryDate: _entryDate,
+        notes: _notesController.text.isEmpty ? null : _notesController.text,
+        status: 'active',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        gender: _selectedGender);
 
     final repository = ref.read(animalRepositoryProvider);
     final result = widget.animalId != null
@@ -220,7 +216,9 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.animalId != null ? 'Editar Animal' : 'Nuevo Animal',
+                              widget.animalId != null
+                                  ? 'Editar Animal'
+                                  : 'Nuevo Animal',
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -241,100 +239,127 @@ class _EditAnimalViewState extends ConsumerState<EditAnimalView> {
                     ],
                   ),
                   const SizedBox(height: 28),
-                      _buildField(
-                        label: 'Tipo de animal',
-                        controller: _typeController,
-                        placeholder: 'Lechón',
-                        icon: Icons.pets_outlined,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'El tipo de animal es requerido';
-                          }
-                          return null;
-                        },
+                  _buildField(
+                    label: 'Identificador/Arete',
+                    controller: _identifierController,
+                    placeholder: 'L0004-0001',
+                    icon: Icons.tag_outlined,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'El identificador es requerido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Este identificador debe ser único',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF7B7B7B),
+                      fontFamily: 'Nunito Sans',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Campo de peso inicial - solo lectura
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFE0E0E0),
+                        width: 1,
                       ),
-                      const SizedBox(height: 16),
-                      _buildField(
-                        label: 'Identificador/Arete',
-                        controller: _identifierController,
-                        placeholder: 'L0004-0001',
-                        icon: Icons.tag_outlined,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'El identificador es requerido';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Este identificador debe ser único',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF7B7B7B),
-                          fontFamily: 'Nunito Sans',
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.monitor_weight_outlined,
+                              color: Color(0xFF7B7B7B),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Peso inicial',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF3E3E3E),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildField(
-                        label: 'Peso inicial (kg)',
-                        controller: _weightController,
-                        placeholder: '',
-                        icon: Icons.monitor_weight_outlined,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'El peso es requerido';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Ingrese un número válido';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildDateField(
-                        label: 'Fecha de nacimiento',
-                        date: _birthDate,
-                        onTap: () => _selectDate(context, true),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildField(
-                        label: 'Raza/Línea genética',
-                        controller: _breedController,
-                        placeholder: 'No especificada',
-                        icon: Icons.science_outlined,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Género:',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF7B7B7B),
-                          fontFamily: 'Nunito Sans',
+                        const SizedBox(height: 8),
+                        Text(
+                          _weightController.text.isEmpty ||
+                                  _weightController.text == '0' ||
+                                  _weightController.text == '0.0'
+                              ? 'Se calculará automáticamente con la primera biometría'
+                              : '${_weightController.text} kg',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF3E3E3E),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildGenderButton('Macho', true),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Este valor se actualiza automáticamente desde la primera medición',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF7B7B7B),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildGenderButton('Hembra', false),
-                          ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDateField(
+                    label: 'Fecha de nacimiento',
+                    date: _birthDate,
+                    onTap: () => _selectDate(context, true),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildField(
+                    label: 'Raza/Línea genética',
+                    controller: _breedController,
+                    placeholder: 'No especificada',
+                    icon: Icons.science_outlined,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Género:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF7B7B7B),
+                      fontFamily: 'Nunito Sans',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildGenderButton('Macho', true),
                       ),
-                      const SizedBox(height: 16),
-                      _buildField(
-                        label: 'Notas (opcional)',
-                        controller: _notesController,
-                        placeholder: '',
-                        icon: Icons.note_outlined,
-                        maxLines: 3,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildGenderButton('Hembra', false),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildField(
+                    label: 'Notas (opcional)',
+                    controller: _notesController,
+                    placeholder: '',
+                    icon: Icons.note_outlined,
+                    maxLines: 3,
+                  ),
                   const SizedBox(height: 28),
                   Row(
                     children: [

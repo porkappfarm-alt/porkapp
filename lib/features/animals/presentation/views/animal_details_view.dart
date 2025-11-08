@@ -17,7 +17,7 @@ class AnimalDetailsView extends ConsumerWidget {
     super.key,
     required this.animalId,
   });
-  
+
   Future<void> _showAddEventDialog(BuildContext context) async {
     await showDialog(
       context: context,
@@ -29,7 +29,7 @@ class AnimalDetailsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final animalAsync = ref.watch(animalProvider(animalId));
-    
+
     return animalAsync.when(
       data: (animal) => Scaffold(
         appBar: StandardAppBar(
@@ -87,11 +87,6 @@ class AnimalDetailsView extends ConsumerWidget {
                   icon: Icons.tag,
                 ),
                 _InfoRow(
-                  label: 'Tipo',
-                  value: _getAnimalTypeText(animal.type),
-                  icon: Icons.category,
-                ),
-                _InfoRow(
                   label: 'Raza',
                   value: animal.breed,
                   icon: Icons.pets,
@@ -103,7 +98,8 @@ class AnimalDetailsView extends ConsumerWidget {
                 ),
                 _InfoRow(
                   label: 'Fecha de nacimiento',
-                  value: DateFormat('dd/MM/yyyy').format(animal.birthDate ?? DateTime.now()),
+                  value: DateFormat('dd/MM/yyyy')
+                      .format(animal.birthDate ?? DateTime.now()),
                   icon: Icons.calendar_today,
                 ),
                 if (animal.weight != null)
@@ -131,7 +127,8 @@ class AnimalDetailsView extends ConsumerWidget {
     );
   }
 
-  Widget _buildEventsSection(BuildContext context, ThemeData theme, WidgetRef ref, Animal animal) {
+  Widget _buildEventsSection(
+      BuildContext context, ThemeData theme, WidgetRef ref, Animal animal) {
     final eventsAsync = ref.watch(animalEventsProvider(animal.id));
 
     return Padding(
@@ -260,21 +257,6 @@ class AnimalDetailsView extends ConsumerWidget {
 
   void _showEventDetails(BuildContext context, dynamic event) {
     // TODO: Implementar diálogo de detalles del evento
-  }
-
-  String _getAnimalTypeText(String type) {
-    switch (type) {
-      case 'piglet':
-        return 'Lechón';
-      case 'sow':
-        return 'Reproductora';
-      case 'boar':
-        return 'Padrillo';
-      case 'fattening':
-        return 'Engorde';
-      default:
-        return type;
-    }
   }
 
   String _getStatusText(String status) {

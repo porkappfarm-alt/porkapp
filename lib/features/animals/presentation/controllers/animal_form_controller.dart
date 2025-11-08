@@ -20,7 +20,6 @@ class AnimalFormController {
     if (animal != null) {
       _originalValues.addAll({
         'identifier': animal.identifier,
-        'type': animal.type,
         'weight': animal.weight,
         'breed': animal.breed,
         'status': animal.status,

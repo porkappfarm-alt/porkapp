@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/animals/data/animals_repository.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
 import 'package:porkapp/features/animals/domain/animal_status.dart';
-import 'package:porkapp/features/animals/domain/animal_filters.dart' as filters;
 import 'package:porkapp/features/animals/domain/animal_state_machine.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_status_widgets.dart';
 
@@ -30,7 +29,6 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
   late TextEditingController _notesController;
   late DateTime _birthDate;
   AnimalStatus _status = AnimalStatus.active;
-  filters.AnimalType _type = const filters.AnimalType.fattening();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -45,8 +43,6 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
     _notesController = TextEditingController(text: widget.animal?.notes);
     _birthDate = widget.animal?.birthDate ?? DateTime.now();
     _status = (widget.animal?.status as AnimalStatus?) ?? AnimalStatus.active;
-    _type = (widget.animal?.type as filters.AnimalType?) ??
-        const filters.AnimalType.fattening();
   }
 
   @override
@@ -84,7 +80,6 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
         birthDate: _birthDate,
         weight: double.tryParse(_weightController.text),
         breed: _breedController.text,
-        type: _type.toString(),
         status: _status.name,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         entryDate: widget.animal?.entryDate ?? DateTime.now(),
@@ -100,7 +95,6 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
           identifier: animal.identifier,
           birthDate: animal.birthDate ?? DateTime.now(),
           breed: animal.breed,
-          type: animal.type.toString(),
           weight: animal.weight,
           status: _status.name,
         );
@@ -110,7 +104,6 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
           identifier: animal.identifier,
           birthDate: animal.birthDate ?? DateTime.now(),
           breed: animal.breed,
-          type: animal.type.toString(),
           weight: animal.weight,
         );
       }
@@ -225,56 +218,6 @@ class _NewAnimalFormDialogState extends ConsumerState<NewAnimalFormDialog> {
                   },
                 ),
                 const SizedBox(height: 16),
-
-                // Tipo de Animal (solo para nuevos animales)
-                if (widget.animal == null) ...[
-                  DropdownButtonFormField<String>(
-                    value: _type.toString(),
-                    decoration: const InputDecoration(
-                      labelText: 'Tipo de Animal',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'piglet',
-                        child: Text('Lechón'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'sow',
-                        child: Text('Reproductora'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'boar',
-                        child: Text('Padrillo'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'fattening',
-                        child: Text('Engorde'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          switch (value) {
-                            case 'piglet':
-                              _type = const filters.AnimalType.piglet();
-                              break;
-                            case 'sow':
-                              _type = const filters.AnimalType.sow();
-                              break;
-                            case 'boar':
-                              _type = const filters.AnimalType.boar();
-                              break;
-                            case 'fattening':
-                              _type = const filters.AnimalType.fattening();
-                              break;
-                          }
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                ],
 
                 // Notas
                 TextFormField(

@@ -35,7 +35,6 @@ class AnimalDetailNotifier extends FamilyAsyncNotifier<Animal, String> {
     required String identifier,
     required DateTime birthDate,
     required String breed,
-    required String type,
     double? weight,
     required String status,
   }) async {
@@ -51,7 +50,6 @@ class AnimalDetailNotifier extends FamilyAsyncNotifier<Animal, String> {
         identifier: identifier,
         birthDate: birthDate,
         breed: breed,
-        type: type,
         weight: weight,
         status: status,
       );

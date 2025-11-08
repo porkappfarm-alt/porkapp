@@ -505,7 +505,8 @@ class _BatchHeader extends ConsumerWidget {
                             ),
                           );
                         }
-                        final lastMeasurement = measurements.last;
+                        // Como el query está ordenado descendente, .first es la más reciente
+                        final lastMeasurement = measurements.first;
 
                         return _InfoCard(
                           icon: Icons.scale_rounded,

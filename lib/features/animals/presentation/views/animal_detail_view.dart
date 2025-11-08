@@ -314,12 +314,6 @@ class _AnimalDetailContent extends StatelessWidget {
               ),
               _buildInfoRow(
                 context: context,
-                icon: Icons.category,
-                label: 'Tipo',
-                value: animal.type,
-              ),
-              _buildInfoRow(
-                context: context,
                 icon: Icons.pets,
                 label: 'Raza',
                 value: animal.breed,

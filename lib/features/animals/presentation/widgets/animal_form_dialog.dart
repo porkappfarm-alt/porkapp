@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:porkapp/features/animals/domain/animal.dart';
-import 'package:porkapp/features/animals/domain/animal_filters.dart';
 import 'package:porkapp/features/animals/providers/animals_provider.dart';
 import 'package:porkapp/features/animals/data/animals_repository.dart';
-import 'package:porkapp/features/animals/presentation/widgets/animal_type_fields.dart';
 import 'package:porkapp/features/animals/presentation/widgets/animal_status_change.dart';
 import 'package:porkapp/features/animals/presentation/widgets/form_feedback.dart';
 import 'package:porkapp/features/animals/presentation/controllers/animal_form_controller.dart';
@@ -29,7 +27,6 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
   late TextEditingController _notesController;
   late final DateTime _birthDate;
   bool _isMale = true;
-  AnimalType _selectedType = AnimalType.piglet;
 
   @override
   void initState() {
@@ -69,19 +66,6 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
     super.dispose();
   }
 
-  String _getAnimalTypeLabel(AnimalType type) {
-    switch (type) {
-      case AnimalType.piglet:
-        return 'Lechón';
-      case AnimalType.sow:
-        return 'Reproductora';
-      case AnimalType.boar:
-        return 'Padrillo';
-      case AnimalType.fattening:
-        return 'Engorde';
-    }
-  }
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       _formController
@@ -96,7 +80,6 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
       birthDate: _birthDate,
       weight: double.parse(_weightController.text),
       breed: _breedController.text,
-      type: _getAnimalTypeLabel(_selectedType),
       entryDate: DateTime.now(),
       createdAt: widget.animal?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
@@ -117,7 +100,6 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
           breed: animal.breed,
           weight: animal.weight,
           status: animal.status,
-          type: animal.type,
         );
       } else {
         await repository.createAnimal(
@@ -127,7 +109,6 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
           breed: animal.breed,
           weight: animal.weight,
           status: animal.status,
-          type: animal.type,
         );
       }
 
@@ -208,44 +189,6 @@ class _AnimalFormDialogState extends ConsumerState<AnimalFormDialog> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
-
-                    // Tipo de animal
-                    DropdownButtonFormField<AnimalType>(
-                      value: _selectedType,
-                      decoration: const InputDecoration(
-                        labelText: 'Tipo de animal',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: [
-                        AnimalType.piglet,
-                        AnimalType.sow,
-                        AnimalType.boar,
-                        AnimalType.fattening,
-                      ].map((type) {
-                        return DropdownMenuItem<AnimalType>(
-                          value: type,
-                          child: Text(_getAnimalTypeLabel(type)),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _selectedType = value;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Campos específicos por tipo
-                    AnimalTypeFields(
-                      type: _getAnimalTypeLabel(_selectedType),
-                      animal: widget.animal,
-                      onFieldChanged: (field, value) {
-                        // Los valores se manejarán en _submit
-                      },
-                    ),
-                    const SizedBox(height: 16),
 
                     // Identificador
                     Consumer(

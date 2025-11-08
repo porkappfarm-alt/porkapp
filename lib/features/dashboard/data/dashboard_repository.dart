@@ -18,20 +18,14 @@ class DashboardRepository {
   /// Obtiene todos los KPIs principales del dashboard
   Future<DashboardKPIs> getKPIs() async {
     try {
-      // Query 1: Total de animales activos por tipo
+      // Query 1: Total de animales activos
       final animalsData = await _supabase
           .from('animals')
-          .select('id, animal_type, status, entry_date')
+          .select('id, status, entry_date')
           .eq('status', 'active');
 
-      // Calcular totales y distribución por tipo
+      // Total de animales activos (todos son de engorde)
       final totalActiveAnimals = animalsData.length;
-      final animalsByType = <String, int>{};
-
-      for (final animal in animalsData) {
-        final type = animal['animal_type'] as String? ?? 'unknown';
-        animalsByType[type] = (animalsByType[type] ?? 0) + 1;
-      }
 
       // Query 2: Información de corrales
       final corralsData =
@@ -132,7 +126,7 @@ class DashboardRepository {
 
       return DashboardKPIs(
         totalActiveAnimals: totalActiveAnimals,
-        animalsByType: animalsByType,
+        animalsByType: {}, // Ya no se usa tipo de animal - todos son de engorde
         corralOccupancy: corralOccupancy,
         currentAvgWeight: currentAvgWeight,
         avgADG: avgADG,

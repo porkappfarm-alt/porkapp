@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permiso de Internet requerido para Supabase -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
-        android:label="porkapp_new"
+        android:label="PorkApp"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

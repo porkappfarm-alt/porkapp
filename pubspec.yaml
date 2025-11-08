@@ -63,6 +63,8 @@ dependencies:
   connectivity_plus: ^7.0.0
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
   flutter_test:
@@ -88,3 +90,18 @@ flutter:
   assets:
     - assets/images/
     - imagenes/
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/launcher.png"
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/splash.png
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+  ios_content_mode: center

@@ -9,7 +9,7 @@ final supabaseProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
 });
 
-// Constants for initialization
+// Constantes de Supabase - Configuración de producción
 const supabaseUrl = 'https://xyqftjfnnqbudjhzfpvy.supabase.co';
 const supabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cWZ0amZubnFidWRqaHpmcHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MTY2NjgsImV4cCI6MjA3NDM5MjY2OH0.tCvIVuLRhoAyP3cFMw4vamtNRJSB7B6_AKFGma4-Oe0';
@@ -18,10 +18,12 @@ const supabaseAnonKey =
 Future<void> initializeSupabase() async {
   try {
     print('Initializing Supabase...');
+    print('Using Supabase URL: $supabaseUrl');
+
     await Supabase.initialize(
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
-      debug: true, // Enable debug mode
+      debug: true,
       authOptions: FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
         autoRefreshToken: true,

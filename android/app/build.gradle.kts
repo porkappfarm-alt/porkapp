@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.porkapp_new"
-    
+
     // Configuración temporal para isar_flutter_libs
     buildFeatures {
         buildConfig = true
@@ -23,7 +23,7 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
-    
+
     // Configuración para isar_flutter_libs
     androidComponents {
         beforeVariants { variantBuilder ->
@@ -35,7 +35,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.porkapp_new"
+        applicationId = "com.example.porkapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

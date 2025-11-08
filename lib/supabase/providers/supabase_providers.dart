@@ -9,7 +9,10 @@ final supabaseProvider = Provider<SupabaseClient>((ref) {
 
 /// Service role client provider for admin operations
 final supabaseServiceClientProvider = Provider<SupabaseClient>((ref) {
-  final serviceClient = SupabaseClient(supabaseUrl, String.fromEnvironment('SUPABASE_SERVICE_KEY'));
+  final serviceClient = SupabaseClient(
+    supabaseUrl,
+    String.fromEnvironment('SUPABASE_SERVICE_KEY'),
+  );
   // Ensure headers are set consistently for admin operations
   final headers = {
     'apikey': String.fromEnvironment('SUPABASE_SERVICE_KEY'),

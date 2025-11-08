@@ -8,7 +8,6 @@ class AuthRepository {
     required String password,
   }) async {
     print('AuthRepository: Iniciando intento de login...');
-    print('AuthRepository: URL de Supabase: $supabaseUrl');
     print('AuthRepository: Email: $email');
 
     try {

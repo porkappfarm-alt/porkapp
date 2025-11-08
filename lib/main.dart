@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:porkapp/router.dart';
@@ -10,13 +9,6 @@ import 'package:porkapp/features/biometrics/data/biometrics_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load environment variables
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    print('Warning: .env file not found');
-  }
 
   // Initialize Supabase
   await initializeSupabase();

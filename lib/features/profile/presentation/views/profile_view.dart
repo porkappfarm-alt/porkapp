@@ -5,6 +5,7 @@ import 'package:porkapp/core/widgets/standard_app_bar.dart';
 import 'package:porkapp/features/auth/providers/auth_provider.dart';
 import 'package:porkapp/features/users/domain/user_profile.dart';
 import 'package:porkapp/supabase/supabase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show UserAttributes;
 
 const _primaryPink = Color(0xFFFF5A6E);
 const _primaryPinkDark = Color(0xFFE91E63);
@@ -71,17 +72,47 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     setState(() => _isLoading = true);
 
     try {
-      // Actualizar directamente en Supabase
-      await supabase.from('profiles').update({
-        'full_name': _fullNameController.text.trim(),
-        'identification_number': _identificationController.text.trim().isEmpty
-            ? null
-            : _identificationController.text.trim(),
-        'whatsapp_number': _whatsappController.text.trim().isEmpty
-            ? null
-            : _whatsappController.text.trim(),
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', currentUser.id);
+      print('🔄 Actualizando perfil...');
+      print('User ID: ${currentUser.id}');
+      print('Full Name: ${_fullNameController.text.trim()}');
+      print('Identification: ${_identificationController.text.trim()}');
+      print('WhatsApp: ${_whatsappController.text.trim()}');
+
+      // 1. Actualizar el metadata del usuario en auth.users
+      await supabase.auth.updateUser(
+        UserAttributes(
+          data: {
+            'full_name': _fullNameController.text.trim(),
+            'identification_number':
+                _identificationController.text.trim().isEmpty
+                    ? null
+                    : _identificationController.text.trim(),
+            'whatsapp_number': _whatsappController.text.trim().isEmpty
+                ? null
+                : _whatsappController.text.trim(),
+          },
+        ),
+      );
+
+      print('✅ Metadata de auth.users actualizado');
+
+      // 2. Actualizar la tabla profiles (el trigger sincronizará full_name desde auth.users)
+      final response = await supabase
+          .from('profiles')
+          .update({
+            'identification_number':
+                _identificationController.text.trim().isEmpty
+                    ? null
+                    : _identificationController.text.trim(),
+            'whatsapp_number': _whatsappController.text.trim().isEmpty
+                ? null
+                : _whatsappController.text.trim(),
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', currentUser.id)
+          .select();
+
+      print('✅ Respuesta de Supabase profiles: $response');
 
       // Invalidar el provider para recargar los datos
       ref.invalidate(currentUserProfileProvider);
@@ -95,7 +126,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         );
         setState(() => _isEditing = false);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ Error al actualizar perfil: $e');
+      print('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
